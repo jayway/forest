@@ -1,7 +1,7 @@
 package com.jayway.jersey.rest.resource;
 
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.jayway.jersey.rest.service.AbstractRunner;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;

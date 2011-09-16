@@ -1,15 +1,17 @@
 package com.jayway.jersey.rest.resource;
 
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.jayway.jersey.rest.service.AbstractRunner;
 import com.jayway.jersey.rest.service.StateHolder;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import javax.servlet.ServletOutputStream;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -34,7 +36,7 @@ public class CapabilitiesTest extends AbstractRunner {
     }
 
     @Test
-    public void discover() {
+    public void discover() throws IOException {
         HtmlHelper mock = Mockito.mock(HtmlHelper.class);
 
         Mockito.doAnswer( new Answer<Object>() {
@@ -42,7 +44,7 @@ public class CapabilitiesTest extends AbstractRunner {
                 StateHolder.set( invocation.getArguments()[1] );
                 return "invoked";
             }
-        }).when( mock ).addResourceMethods( Mockito.any( StringBuilder.class), Mockito.anyList() );
+        }).when( mock ).addResourceMethods( Mockito.any( ServletOutputStream.class), Mockito.anyList() );
 
         StateHolder.set( mock );
 
@@ -60,9 +62,9 @@ public class CapabilitiesTest extends AbstractRunner {
         hasMethod(result, "other:SUBRESOURCE" );
         hasMethod(result, "addten:QUERY");
         hasMethod(result, "echo:QUERY");
-        hasMethod(result, "wrong2:ILLEGAL");
+        hasMethod(result, "wrong2:NOT_FOUND");
 
-        Assert.assertEquals( "Must have 6 ResourceMethods", 6, list.size() );
+        Assert.assertEquals( "Must have 7 ResourceMethods", 7, list.size() );
     }
 
     private void hasMethod( String result, String name ) {

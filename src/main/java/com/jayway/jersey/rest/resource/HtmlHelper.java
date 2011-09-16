@@ -2,6 +2,8 @@ package com.jayway.jersey.rest.resource;
 
 import com.jayway.jersey.rest.RestfulJerseyService;
 
+import javax.servlet.ServletOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -12,7 +14,7 @@ import java.util.List;
  */
 public class HtmlHelper {
 
-    public void addResourceMethods( StringBuilder sb, List<Resource.ResourceMethod> methods ) {
+    public void addResourceMethods( ServletOutputStream os, List<Resource.ResourceMethod> methods ) throws IOException {
     	StringBuilder queries = new StringBuilder( );
     	StringBuilder commands = new StringBuilder( );
         StringBuilder subResources = new StringBuilder( );
@@ -27,15 +29,17 @@ public class HtmlHelper {
                 subResources.append("<li><a href='").append(path).append( "/'>").append(path).append("</a></li>");
     		}
     	}
-    	appendListIfNotEmpty( sb, queries, "<h2>Queries</h2>" );
-    	appendListIfNotEmpty( sb, commands, "<h2>Commands</h2>" );
-    	appendListIfNotEmpty( sb, subResources, "<h2>Sub Resources</h2>" );
+    	appendListIfNotEmpty( os, queries, "<h2>Queries</h2>" );
+    	appendListIfNotEmpty( os, commands, "<h2>Commands</h2>" );
+    	appendListIfNotEmpty( os, subResources, "<h2>Sub Resources</h2>" );
     }
 
-    private void appendListIfNotEmpty( StringBuilder appendTo, StringBuilder list, String title ) {
-    	appendTo.append( title );
+    private void appendListIfNotEmpty( ServletOutputStream os, StringBuilder list, String title ) throws IOException {
+    	os.print( title );
     	if ( list.length() > 0 ) {
-    		appendTo.append( "<ul>" ).append( list ).append( "</ul>" ); 
+    		os.print( "<ul>" );
+            os.print( list.toString() );
+            os.print( "</ul>" );
     	}
     }
     

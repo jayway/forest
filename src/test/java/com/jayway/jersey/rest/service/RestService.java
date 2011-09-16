@@ -13,8 +13,12 @@ public class RestService extends RestfulJerseyService {
 
     @Override
     protected void setupContext() {
-        if ( StateHolder.get() != null && StateHolder.get() instanceof HtmlHelper ) {
-            getContextMap().put( HtmlHelper.class, (HtmlHelper) StateHolder.get());
+        if ( StateHolder.get() != null ) {
+            if (StateHolder.get() instanceof HtmlHelper ) {
+                getContextMap().put( HtmlHelper.class, (HtmlHelper) StateHolder.get());
+            } else if ( StateHolder.get() instanceof String ) {
+                getContextMap().put( String.class, (String) StateHolder.get());
+            }
         }
     }
 

@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.ws.rs.ext.Providers;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -33,6 +35,7 @@ public abstract class RestfulJerseyService {
     @Context private UriInfo uriInfo;
     @Context private HttpServletResponse response;
     @Context private HttpServletRequest request;
+    @Context private Providers providers;
 
 
     public static Set<Class> basicTypes;
@@ -53,6 +56,7 @@ public abstract class RestfulJerseyService {
         contextMap.put( HttpServletRequest.class, request );
         contextMap.put( UriInfo.class, uriInfo );
         contextMap.put( HtmlHelper.class, new HtmlHelper() );
+        contextMap.put( Providers.class, providers );
         setContextMap(contextMap);
 
         // call application specific context setup
@@ -62,27 +66,38 @@ public abstract class RestfulJerseyService {
     @GET
     @Produces( "text/html;charset=utf-8" )
     @Consumes( "text/html;charset=utf-8" )
-    public Object capabilities() {
+    public Response capabilities() {
         setup();
-        if ( uriInfo.getPath().endsWith( "/") )
-            return root().capabilities();
+        if ( uriInfo.getPath().endsWith( "/") ) {
+            root().capabilitiesHtml();
+            return Response.status(200).build();
+        }
         else throw new WebApplicationException( Response.Status.NOT_FOUND );
     }
 
     @GET
     @Path("{get:.*}")
-    @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, "text/html;charset=utf-8" })
+    @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Object get(  ) {
         setup();
-        return evaluateGet(uriInfo.getPath());
+        return evaluateGet( new PathAndMethod( uriInfo.getPath() ));
     }
-    
+
+    @GET
+    @Path("{get:.*}")
+    @Produces( "text/html;charset=utf-8" )
+    public Response getHtml(  ) throws IOException {
+        setup();
+        evaluateGetHtml( new PathAndMethod( uriInfo.getPath() ) );
+        return Response.status(200).build();
+    }
+
     @POST
     @Path("{post:.*}")
     @Consumes( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response postJSON( InputStream json ) {
         setup();
-        return evaluatePostPut(uriInfo.getPath(), json, null);
+        return evaluatePostPut( new PathAndMethod( uriInfo.getPath() ), json, null);
     }
     
     @PUT
@@ -90,7 +105,7 @@ public abstract class RestfulJerseyService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response putJSON( InputStream json ) {
         setup();
-        return evaluatePostPut( uriInfo.getPath(), json, null );
+        return evaluatePostPut( new PathAndMethod( uriInfo.getPath()), json, null );
     }
 
 
@@ -99,7 +114,7 @@ public abstract class RestfulJerseyService {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response postForm( MultivaluedMap<String, String> formParams ) {
         setup();
-        return evaluatePostPut( uriInfo.getPath(), null, formParams );
+        return evaluatePostPut( new PathAndMethod( uriInfo.getPath() ), null, formParams );
     }
 
     @PUT
@@ -107,7 +122,7 @@ public abstract class RestfulJerseyService {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response putForm( MultivaluedMap<String, String> formParams ) {
         setup();
-        return evaluatePostPut( uriInfo.getPath(), null, formParams );
+        return evaluatePostPut( new PathAndMethod( uriInfo.getPath() ), null, formParams );
     }
 
 
@@ -115,29 +130,35 @@ public abstract class RestfulJerseyService {
     @Path("{delete:.*}")
     public Response delete() {
         setup();
-        evaluateDelete(uriInfo.getPath());
+        evaluateDelete( new PathAndMethod( uriInfo.getPath() ));
         return Response.ok( "Operation Completed Successfully" ).status(200).build();
     }
 
-
-    protected Object evaluateGet( String path ) {
-        PathAndMethod pathAndMethod = new PathAndMethod( path );
+    protected Object evaluateGet( PathAndMethod pathAndMethod ) {
         if ( pathAndMethod.method() == null ) {
-            return evaluatePath( pathAndMethod.pathSegments() ).capabilities();
+            // TODO add support for discovery using XML and JSON
+            evaluatePath( pathAndMethod.pathSegments() ).capabilitiesHtml();
+            return null;
         }
         return evaluatePath( pathAndMethod.pathSegments() ).get(pathAndMethod.method());
     }
 
-    protected Response evaluatePostPut( String path, InputStream stream, MultivaluedMap<String, String> formParams ) {
-        PathAndMethod pathAndMethod = new PathAndMethod( path );
+    protected void evaluateGetHtml( PathAndMethod pathAndMethod ) throws IOException {
+        if ( pathAndMethod.method() == null ) {
+            evaluatePath( pathAndMethod.pathSegments() ).capabilitiesHtml();
+        } else {
+            evaluatePath( pathAndMethod.pathSegments() ).getHtml(pathAndMethod.method());
+        }
+    }
+
+    protected Response evaluatePostPut( PathAndMethod pathAndMethod, InputStream stream, MultivaluedMap<String, String> formParams ) {
         if ( pathAndMethod.method() == null ) {
             throw new WebApplicationException( HttpServletResponse.SC_METHOD_NOT_ALLOWED );
         }
         return evaluatePath( pathAndMethod.pathSegments() ).post(pathAndMethod.method(), formParams, stream);
     }
 
-    protected void evaluateDelete( String path ) {
-        PathAndMethod pathAndMethod = new PathAndMethod(path);
+    protected void evaluateDelete( PathAndMethod pathAndMethod ) {
         if ( pathAndMethod.method() != null ) {
             throw new WebApplicationException( HttpServletResponse.SC_METHOD_NOT_ALLOWED );
         }

@@ -1,7 +1,5 @@
 package com.jayway.jersey.rest.resource;
 
-import com.jayway.jersey.rest.dto.StringDTO;
-
 /**
  * Base class for resources that has named sub resources.
  * E.g. suppose there is a PersonsResource which has a
@@ -13,6 +11,6 @@ import com.jayway.jersey.rest.dto.StringDTO;
  */
 public interface IdResource {
 
-    Resource id( StringDTO id);
+    Resource id( String id);
 
 }

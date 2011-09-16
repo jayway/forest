@@ -30,6 +30,12 @@ public class PathsTest extends AbstractRunner {
     }
 
     @Test
+    public void invokeIdResourceAsQuery2() {
+        mustThrow(webResource.path("test/other/idid").type(MediaType.TEXT_HTML), "GET", String.class, 404);
+    }
+
+
+    @Test
     public void invokeResourceAsQuery() {
         mustThrow( webResource.path("test/other").type(MediaType.TEXT_HTML), "GET", String.class, 404);
     }
