@@ -1,0 +1,21 @@
+Deploying a snapshot:
+
+ % mvn clean
+ % mvn deploy -Prelease
+
+Preparing a release (dry run):
+
+ % mvn clean
+ % mvn release:prepare -DdryRun=true -Prelease
+ <enter your gpg passphrase>
+
+Preparing a release:
+
+ % mvn clean
+ % mvn release:prepare -Prelease
+ <enter your gpg passphrase>
+
+Performing a release:
+
+ % mvn release:perform -Prelease
+ <enter your gpg passphrase>
