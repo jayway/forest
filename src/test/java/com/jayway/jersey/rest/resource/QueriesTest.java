@@ -19,19 +19,19 @@ public class QueriesTest extends AbstractRunner {
 
      @Test
      public void testEchoMethod() {
-         StringDTO response = webResource.path("test/echo").queryParam("StringDTO.string", "echo")
-                 .type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get(StringDTO.class);
+         String response = webResource.path("test/echo").queryParam("argument1", "echo")
+                 .type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get(String.class);
 
-         Assert.assertEquals( "echo", response.string() );
+         Assert.assertEquals( "echo", response );
      }
 
 
     @Test
     public void testEchoMethodXml() {
-        StringDTO response = webResource.path("test/echo").queryParam("StringDTO.string", "echo")
-                .type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML).get(StringDTO.class);
+        String response = webResource.path("test/echo").queryParam("argument1", "echo")
+                .type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML).get(String.class);
 
-        Assert.assertEquals( "echo", response.string() );
+        Assert.assertEquals( "echo", response );
     }
 
     @Test
@@ -46,16 +46,25 @@ public class QueriesTest extends AbstractRunner {
 
     @Test
     public void testQueryWithInteger() {
-        IntegerDTO dto = webResource.path("test/addten").queryParam("IntegerDTO.integer", "60")
+        IntegerDTO integer = webResource.path("test/addten").queryParam("argument1", "60")
                 .type(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON).get(IntegerDTO.class);
-        Assert.assertEquals( 70, dto.getInteger().intValue() );
+        Assert.assertEquals( 70, integer.getInteger().intValue() );
     }
 
     @Test
     public void testQueryWithIntegerWrongInput() {
-        mustThrow(webResource.path("test/addten").queryParam("IntegerDTO.integer", "x6f?0")
+        mustThrow(webResource.path("test/addten").queryParam("argument1", "x6f?0")
                 .accept(MediaType.APPLICATION_JSON), "GET", IntegerDTO.class, 400);
+    }
+
+
+    @Test
+    public void testQueryWithIntegerAndInteger() {
+        IntegerDTO integer = webResource.path("test/add").queryParam("argument1", "60").queryParam( "argument2.IntegerDTO.integer", "13" )
+                .type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON).get(IntegerDTO.class);
+        Assert.assertEquals( 73, integer.getInteger().intValue() );
     }
 
 }

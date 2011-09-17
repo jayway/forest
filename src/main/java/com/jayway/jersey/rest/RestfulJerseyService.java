@@ -43,6 +43,7 @@ public abstract class RestfulJerseyService {
     static {
         basicTypes = new HashSet<Class>();
         basicTypes.add( String.class);
+        basicTypes.add( Long.class );
         basicTypes.add( Integer.class);
         basicTypes.add( Double.class );
         basicTypes.add( Boolean.class );

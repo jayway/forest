@@ -9,6 +9,11 @@ public class IntegerDTO {
 
     private Integer integer;
 
+    public IntegerDTO() {}
+    public IntegerDTO( Integer integer ) {
+        this.integer = integer;
+    }
+
     public Integer getInteger() {
         return integer;
     }

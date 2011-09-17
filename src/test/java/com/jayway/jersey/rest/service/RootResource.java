@@ -13,25 +13,28 @@ public class RootResource extends Resource {
         return new RootResource();
     }
 
-    public void command( StringDTO input ) {
+    public void command( String input ) {
         StateHolder.set(input);
     }
 
-    public IntegerDTO addten( IntegerDTO number ) {
-        number.setInteger( number.getInteger() + 10 );
-        return number;
+    public IntegerDTO addten( Integer number ) {
+        return new IntegerDTO( number + 10);
     }
 
-    public StringDTO echo( StringDTO input ) {
+    public IntegerDTO add( Integer first, IntegerDTO second ) {
+        return new IntegerDTO( first + second.getInteger() );
+    }
+
+    public void addcommand( Integer first, IntegerDTO second ) {
+        StateHolder.set( first + second.getInteger() );
+    }
+
+    public String echo( String input ) {
         return input;
     }
     
     public OtherResource other() {
         return new OtherResource();
-    }
-
-    public void wrong2( StringDTO one, StringDTO two ) {
-        
     }
 
     @RequiresRoles( String.class )

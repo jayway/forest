@@ -8,6 +8,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Map;
+
+import static com.jayway.jersey.rest.RestfulJerseyService.*;
 
 /**
  * Contains helper methods for producing html
@@ -35,9 +38,9 @@ public class HtmlHelper {
     }
 
     private void appendListIfNotEmpty( ServletOutputStream os, StringBuilder list, String title ) throws IOException {
-    	os.print( title );
+    	os.print(title);
     	if ( list.length() > 0 ) {
-    		os.print( "<ul>" );
+    		os.print("<ul>");
             os.print( list.toString() );
             os.print( "</ul>" );
     	}
@@ -58,10 +61,31 @@ public class HtmlHelper {
         sb.append( "<form name='generatedform' action='").append(method.getName()).
                 append("' method='").append(httpMethod).append("' >" );
 
-        for ( Class<?> type : types ) {
-            createForm( type.getSimpleName(), type, sb, type.getSimpleName() );
+        for ( int i=0; i<types.length; i++ ) {
+            Class<?> type = types[i];
+            create( "argument"+(i+1), type, sb, type.getSimpleName() );
         }
+        /*for ( Class<?> type : types ) {
+            createForm( type.getSimpleName(), type, sb, type.getSimpleName() );
+        }*/
         return sb.append( "<input type='submit' /></form>" ).toString();
+    }
+
+    private static void create( String legend, Class<?> dto, StringBuilder sb, String typeName ) {
+        sb.append("<fieldset><legend>").append(legend).append("</legend>");
+        if ( basicTypes.contains( dto ) ) {
+            sb.append(typeName).append(": <input type='text' ").
+                    append("name='").append( legend ).append("'/></br>");
+        } else if ( List.class.isAssignableFrom( dto ) ) {
+            // TODO
+        } else if ( Map.class.isAssignableFrom( dto ) ) {
+            // TODO
+        } else {
+            // dto type
+            createForm( dto.getSimpleName(), dto, sb, typeName + "." + dto.getSimpleName() );
+        }
+
+        sb.append("</fieldset>");
     }
 
     private static void createForm( String legend, Class<?> dto, StringBuilder sb, String fieldPath ) {
@@ -71,7 +95,7 @@ public class HtmlHelper {
             String name = f.getName();
             Class<?> type = f.getType();
             // this must be one of the getters
-            if (RestfulJerseyService.basicTypes.contains(  type ) ) {
+            if (basicTypes.contains(  type ) ) {
                 sb.append(name).append(": <input type='").
                         append( name.equals("password")? "password": "text" ).
                         append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
@@ -83,6 +107,7 @@ public class HtmlHelper {
                 sb.append("</select></br>");
             } else {
                 // for now assume DTO subtype
+                // TODO List & Map, (any other???)
                 createForm( name, type, sb, fieldPath + "." + name );
             }
         }

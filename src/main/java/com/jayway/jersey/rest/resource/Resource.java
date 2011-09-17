@@ -5,6 +5,9 @@ import com.jayway.jersey.rest.constraint.Constraint;
 import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONUnmarshaller;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,8 @@ import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -89,25 +94,49 @@ abstract public class Resource {
 
 
     private Object[] arguments( Method m, InputStream stream ) {
-        try {
-            String contentType = role( HttpServletRequest.class ).getContentType();
-            if ( m.getParameterTypes().length == 1 ) {
-                Class<?> dto = m.getParameterTypes()[0];
-                // TODO scrap JSON and handle simple types
-                if ( contentType.equals( MediaType.APPLICATION_JSON )) {
-                    Class<?> dtoClass = dto.newInstance().getClass();
-                    JAXBContext context = JSONJAXBContext.newInstance( dtoClass );
-                    JSONUnmarshaller jsonUnmarshaller = JSONJAXBContext.getJSONUnmarshaller( context.createUnmarshaller() );
-                    return new Object[]{ jsonUnmarshaller.unmarshalFromJSON( stream, dtoClass ) };
-                } else {
-                    // default to xml
-                    JAXBContext context = JAXBContext.newInstance(dto.newInstance().getClass());
-                    return new Object[] { context.createUnmarshaller().unmarshal( stream ) };
-                }
+        String contentType = role( HttpServletRequest.class ).getContentType();
+        if ( contentType.equals( MediaType.APPLICATION_JSON )) {
+            if ( m.getParameterTypes().length == 0 ) return new Object[0];
+
+            Object parse = JSONValue.parse(new InputStreamReader(stream));
+            if ( parse == null ) throw badRequest();
+            if ( RestfulJerseyService.basicTypes.contains( parse.getClass() ) ) {
+                return new Object[] { basicType( parse, m.getParameterTypes()[0]) };
             }
-            return new Object[0];
-        } catch (Exception e) {
-            throw badRequest( e );
+            if ( !(parse instanceof JSONArray) ) throw badRequest();
+            JSONArray parsed = (JSONArray) parse;
+            Object[] args = new Object[ m.getParameterTypes().length ];
+            for ( int i=0; i<args.length; i++) {
+                Class<?> type = m.getParameterTypes()[i];
+                Object argument = parsed.get(i);
+                if ( RestfulJerseyService.basicTypes.contains( type ) ) {
+                    args[i] = basicType(argument, type);
+                } else {
+                    try {
+                        Class<?> dtoClass = type.newInstance().getClass();
+                        JAXBContext context = JSONJAXBContext.newInstance( dtoClass );
+                        JSONUnmarshaller jsonUnmarshaller = JSONJAXBContext.getJSONUnmarshaller( context.createUnmarshaller() );
+                        StringReader reader = new StringReader(((JSONObject) argument).toJSONString());
+                        args[i] = jsonUnmarshaller.unmarshalFromJSON( reader, dtoClass );
+                    } catch ( Exception e ) {
+                        throw badRequest( e );
+                    }
+                }
+
+                // TODO list and maps
+
+            }
+            return args;
+        }
+        // TODO support other types
+        throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    private Object basicType( Object value, Class<?> type ) {
+        if ( value instanceof Long && type == Integer.class ) {
+            return ((Long) value).intValue();
+        } else {
+            return value;
         }
     }
 
@@ -115,8 +144,15 @@ abstract public class Resource {
         if ( m.getParameterTypes().length == 0 ) {
             return new Object[0];
         }
-        Class<?> dto = m.getParameterTypes()[0];
-        return new Object[]{ populateDTO( dto, formParams, dto.getSimpleName() ) };
+        Object[] args = new Object[m.getParameterTypes().length];
+
+        for ( int i=0; i<args.length; i++ ) {
+            Class<?> type = m.getParameterTypes()[i];
+            args[i] = mapArguments( type, formParams, "argument"+(i+1) );
+        }
+        return args;
+        //Class<?> dto = m.getParameterTypes()[0];
+        //return new Object[]{ populateDTO( dto, formParams, dto.getSimpleName() ) };
     }
 
     private boolean checkConstraint(Method method) {
@@ -144,7 +180,7 @@ abstract public class Resource {
     }
 
     public Resource invokePathMethod( String path ) {
-        ResourceMethod method = findMethod( path );
+        ResourceMethod method = findMethod(path);
         if ( method.isSubResource() ) {
             try {
                 return (Resource) method.method.invoke(this);
@@ -250,9 +286,14 @@ abstract public class Resource {
                 if ( m.method.getParameterTypes().length == 0 ) {
                     return m.method.invoke( this );
                 }
-                // TODO handle simple types
-                Class<?> dto = m.method.getParameterTypes()[0];
-                return m.method.invoke(this, populateDTO( dto, queryParams, dto.getSimpleName() ) );
+                Object[] args = new Object[m.method.getParameterTypes().length];
+                for ( int i=0; i<args.length; i++) {
+                    Class<?> type = m.method.getParameterTypes()[i];
+                    args[i] = mapArguments( type, queryParams, "argument"+(i+1));
+                }
+                return m.method.invoke( this, args );
+                //Class<?> dto = m.method.getParameterTypes()[0];
+                //return m.method.invoke(this, populateDTO( dto, queryParams, dto.getSimpleName() ) );
             } catch ( IllegalAccessException e) {
                 throw internalServerError( e );
             } catch ( InvocationTargetException e) {
@@ -261,33 +302,51 @@ abstract public class Resource {
         }
     }
 
-
-    protected Object populateDTO(Class<?> dto, MultivaluedMap<String, String> formParams, String prefix ) {
+    private Object mapArguments( Class<?> dto, MultivaluedMap<String, String> formParams, String prefix ) {
         try {
-            Object o = dto.newInstance();
-            for ( Field f : o.getClass().getDeclaredFields() ) {
-                if ( Modifier.isFinal( f.getModifiers() ) ) continue;
-                f.setAccessible(true);
-                String value = formParams.getFirst(prefix + "." + f.getName());
-
-                if ( f.getType() == String.class ) {
-                    f.set( o, value );
-                } else if ( f.getType() == Integer.class ) {
-                    f.set( o, Integer.valueOf( value ) );
-                } else if ( f.getType() == Double.class ) {
-                    f.set( o, Double.valueOf( value ) );
-                } else if ( f.getType() == Boolean.class ) {
-                    f.set( o, Boolean.valueOf( value ) );
-                } else if ( f.getType().isEnum() ) {
-                    f.set( o, Enum.valueOf((Class<Enum>) f.getType(), value));f.set( o, Enum.valueOf((Class<Enum>) f.getType(), value));
-                } else {
-                    Object innerDto = populateDTO( f.getType(), formParams, prefix + "." +f.getName() );
-                    f.set( o, innerDto );
-                }
+            if ( RestfulJerseyService.basicTypes.contains( dto ) ) {
+                return mapBasic( dto, formParams.getFirst( prefix ) );
             }
-            return o;
+            // TODO handle list & map
+
+            return populateDTO(dto, formParams, prefix + "." + dto.getSimpleName());
         } catch (Exception e) {
-            throw badRequest(e);
+            throw badRequest( e );
+        }
+    }
+
+    private Object populateDTO(Class<?> dto, MultivaluedMap<String, String> formParams, String prefix ) throws Exception {
+        Object o = dto.newInstance();
+        for ( Field f : o.getClass().getDeclaredFields() ) {
+            if ( Modifier.isFinal( f.getModifiers() ) ) continue;
+            f.setAccessible(true);
+            String value = formParams.getFirst(prefix + "." + f.getName());
+
+            if ( value == null ) {
+                Object innerDto = populateDTO( f.getType(), formParams, prefix + "." +f.getName() );
+                f.set( o, innerDto );
+            } else {
+                f.set( o, mapBasic( f.getType(), value ));
+            }
+        }
+        return o;
+    }
+
+    private Object mapBasic( Class<?> clazz, String value ) {
+        if( clazz == String.class ) {
+            return value;
+        } else if ( clazz == Integer.class ) {
+            return Integer.valueOf( value );
+        } else if ( clazz == Long.class ) {
+            return Long.valueOf( value );
+        } else if ( clazz == Double.class ) {
+            return Double.valueOf( value );
+        } else if ( clazz == Boolean.class ) {
+            return Boolean.valueOf( value );
+        } else if ( clazz.isEnum() ) {
+            return Enum.valueOf((Class<Enum>) clazz, value);
+        } else {
+            return null;
         }
     }
 
@@ -307,6 +366,10 @@ abstract public class Resource {
         return new WebApplicationException( e, Response.Status.BAD_REQUEST );
     }
 
+    private WebApplicationException badRequest() {
+        return new WebApplicationException( Response.Status.BAD_REQUEST );
+    }
+
     class ResourceMethod {
         private MethodType type = MethodType.NOT_FOUND;
         private Method method;
@@ -324,9 +387,9 @@ abstract public class Resource {
                 return;
             }
 
-            if ( argumentCheck( method.getParameterTypes() ) ) {
-                handleReturnType( method.getReturnType() );
-            }
+            //if ( argumentCheck( method.getParameterTypes() ) ) {
+            handleReturnType( method.getReturnType() );
+            //}
         }
 
         private boolean argumentCheck( Class<?>[] parameterTypes ) {
