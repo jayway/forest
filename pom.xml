@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.jayway.restfuljersey</groupId>
-    <artifactId>restfuljersey</artifactId>
-    <packaging>jar</packaging>
-    <version>0.2.0-SNAPSHOT</version>
+	<groupId>com.jayway.restfuljersey</groupId>
+	<artifactId>restfuljersey-root</artifactId>
+	<packaging>pom</packaging>
+	<version>0.2.0-SNAPSHOT</version>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
-    <properties>
-        <com.sun.jersey.version>1.8</com.sun.jersey.version>
-    </properties>
-    <url>http://github.com/jayway/Restful-Jersey</url>
+	<url>http://github.com/jayway/Restful-Jersey</url>
+	<properties>
+		<com.sun.jersey.version>1.8</com.sun.jersey.version>
+	</properties>
+	<modules>
+	  <module>core</module>
+	  <module>samples</module>
+	</modules>
 
-    <scm>
-	<connection>scm:git:git://github.com/jayway/Restful-Jersey.git</connection>
-	<developerConnection>scm:git:ssh://git@github.com/jayway/Restful-Jersey.git</developerConnection>
-	<url>https://github.com/jayway/Restful-Jersey/tree/master</url>
-    </scm>
+	<scm>
+		<connection>scm:git:git://github.com/jayway/Restful-Jersey.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jayway/Restful-Jersey.git</developerConnection>
+		<url>https://github.com/jayway/Restful-Jersey/tree/master</url>
+	</scm>
 
 	<developers>
 		<developer>
@@ -41,103 +44,34 @@
 			<email>ulrik.sandberg at jayway.com</email>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>jankronquist</id>
+			<name>Jan Kronquist</name>
+			<organization>Jayway</organization>
+			<organizationUrl>http://www.jayway.com</organizationUrl>
+			<email>jan.kronquist at jayway.com</email>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1-alpha1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-        </dependency>
-
-
-
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <!-- Logging dependencies            -->
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.2</version>
-        </dependency>
-
-        
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <!-- Test dependencies            -->
-        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.8.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.test.framework</groupId>
-            <artifactId>jersey-test-framework</artifactId>
-            <version>1.0.3</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <showWarnings>true</showWarnings>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<profiles>
 		<profile>
-			<!--
-				This profile should be used whenever releasing,
-				whether it's a snapshot deploy or a proper release.
-				It makes sure sources and javadocs are built, for
-				example, which are artifacts required by Sonatype.
-			-->
+			<!-- This profile should be used whenever releasing, whether it's a snapshot 
+				deploy or a proper release. It makes sure sources and javadocs are built, 
+				for example, which are artifacts required by Sonatype. -->
 			<id>release</id>
 			<build>
 				<plugins>
