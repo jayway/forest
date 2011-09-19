@@ -19,12 +19,12 @@ public class AccountRepository {
         return account;
     }
 
-    public Account findWithRole(String id, Class<?> role) {
+    public <T> T findWithRole(String id, Class<T> role) {
         Account account = findById(id);
         if ( !role.isAssignableFrom( account.getClass() )) {
             throw new NotFoundException();
         }
-        return account;
+        return (T) account;
     }
 
     public Collection<Account> withRole( Class<?> role ) {
@@ -44,11 +44,11 @@ public class AccountRepository {
     public static Map<String, Account> accounts;
 
     static {
-        accounts = new HashMap<String, Account>();
-        accounts.put("12345", new SavingsAccount( "12345" ) );
-        accounts.put("11111", new SavingsAccount("11111"));
-        accounts.put("12321", new CheckingAccount("12321"));
-        accounts.put("47291", new CheckingAccount("47291"));
+        accounts = new LinkedHashMap<String, Account>();
+        accounts.put("11111", new SavingsAccount( "11111" ) );
+        accounts.put("22222", new SavingsAccount("22222"));
+        accounts.put("33333", new CheckingAccount("33333"));
+        accounts.put("44444", new CheckingAccount("44444"));
     }
 
 }

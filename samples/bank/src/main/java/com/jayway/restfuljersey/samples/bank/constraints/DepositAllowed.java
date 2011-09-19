@@ -23,7 +23,7 @@ public @interface DepositAllowed {
             Account account = map.get(Account.class);
             if ( account == null ) return false;
 
-            if ( account.getBalance() > Account.MAX_ENSURED_BALANCE ) {
+            if ( account.getBalance() >= Account.MAX_ENSURED_BALANCE ) {
                 return account.isAllowExceedBalanceLimit();
             } else {
                 return true;

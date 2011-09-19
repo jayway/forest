@@ -1,14 +1,16 @@
-package com.jayway.restfuljersey.samples.bank.resources;
+package com.jayway.restfuljersey.samples.bank.resources.accounts;
 
 import com.jayway.jersey.rest.resource.IndexResource;
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.restfuljersey.samples.bank.constraints.DepositAllowed;
 import com.jayway.restfuljersey.samples.bank.constraints.HasCredit;
+import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.model.AccountManager;
 import com.jayway.restfuljersey.samples.bank.model.Depositable;
 import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
 import com.jayway.restfuljersey.samples.bank.constraints.HasRole;
+import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
 /**
  */
@@ -30,8 +32,18 @@ public class AccountResource extends Resource implements IndexResource {
     }
 
     @HasCredit
-    @HasRole( role = Account.class, specificRole = Withdrawable.class )
+    @HasRole( object = Account.class, hasRole = Withdrawable.class )
     public void withdraw( Integer amount ) {
         role(AccountManager.class).withdraw((Withdrawable) role(Account.class), amount);
     }
+
+    @HasCredit
+    @HasRole( object = Account.class, hasRole = Withdrawable.class)
+    public void transfer( TransferToDTO transfer ) {
+        Depositable depositable = role(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
+        Withdrawable withdrawable = (Withdrawable) role(Account.class);
+
+        role( AccountManager.class ).transfer(withdrawable, depositable, transfer.getAmount() );
+    }
+
 }

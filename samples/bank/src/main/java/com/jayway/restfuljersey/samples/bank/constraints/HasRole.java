@@ -16,14 +16,14 @@ import java.lang.annotation.Target;
 @Constraint(HasRole.Evaluator.class)
 public @interface HasRole {
 
-    Class<?> role();
-    Class<?> specificRole();
+    Class<?> object();
+    Class<?> hasRole();
 
     class Evaluator implements ConstraintEvaluator<HasRole, ContextMap> {
 
         public boolean isValid( HasRole role, ContextMap map ) {
-            Class<?> instance = role.role();
-            Class<?> theRole = role.specificRole();
+            Class<?> instance = role.object();
+            Class<?> theRole = role.hasRole();
 
             Object theInstance = map.get( instance );
             return theRole.isAssignableFrom( theInstance.getClass() );

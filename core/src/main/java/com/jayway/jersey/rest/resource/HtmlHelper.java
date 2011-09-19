@@ -82,7 +82,7 @@ public class HtmlHelper {
             // TODO
         } else {
             // dto type
-            createForm( dto.getSimpleName(), dto, sb, typeName + "." + dto.getSimpleName() );
+            createForm( dto.getSimpleName(), dto, sb, legend + "." + dto.getSimpleName() );
         }
 
         sb.append("</fieldset>");

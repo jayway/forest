@@ -17,10 +17,6 @@ public class CheckingAccount extends Account implements Depositable, Withdrawabl
 
     @Override
     public void withdraw(int amount) {
-        if ( balance >= amount ) {
-            balance -= amount;
-        } else {
-            throw new OverdrawException();
-        }
+        balance -= amount;
     }
 }

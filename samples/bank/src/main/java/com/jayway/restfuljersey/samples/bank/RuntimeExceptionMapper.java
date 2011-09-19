@@ -1,5 +1,6 @@
 package com.jayway.restfuljersey.samples.bank;
 
+import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
 import com.jayway.restfuljersey.samples.bank.exceptions.NotFoundException;
 import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
 
@@ -21,6 +22,8 @@ public class RuntimeExceptionMapper implements
         } else if ( ex instanceof NotFoundException ) {
             return Response.status( Response.Status.NOT_FOUND ).build();
         } else if ( ex instanceof OverdrawException ) {
+            return Response.status( Response.Status.CONFLICT ).build();
+        } else if ( ex instanceof CannotDepositException ) {
             return Response.status( Response.Status.CONFLICT ).build();
         }
 
