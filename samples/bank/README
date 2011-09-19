@@ -1,0 +1,9 @@
+
+Bank sample:
+
+run it with command: mvn jetty:run
+
+The root of the rest api can then be found on 
+http://localhost:8080/jpmorgan/rest/
+
+
