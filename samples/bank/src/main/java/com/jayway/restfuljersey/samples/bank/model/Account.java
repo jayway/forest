@@ -4,6 +4,7 @@ package com.jayway.restfuljersey.samples.bank.model;
  */
 public class Account {
 
+    public static final String HTML_DESCRIPTION = "<html><h1>Account: %s</h1> Balance = %d <br>Account is allowed to exceed deposit ensured limit: %s</html>";
     public static final int MAX_ENSURED_BALANCE = 1000;
     protected int balance;
     private String number;

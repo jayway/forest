@@ -3,6 +3,8 @@ package com.jayway.restfuljersey.samples.bank.constraints;
 import com.jayway.jersey.rest.constraint.Constraint;
 import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
 import com.jayway.jersey.rest.resource.ContextMap;
+import com.jayway.restfuljersey.samples.bank.model.Account;
+import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,20 +15,13 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(HasRole.Evaluator.class)
-public @interface HasRole {
+@Constraint(IsWithdrawable.Evaluator.class)
+public @interface IsWithdrawable {
 
-    Class<?> object();
-    Class<?> hasRole();
+    class Evaluator implements ConstraintEvaluator<IsWithdrawable, ContextMap> {
 
-    class Evaluator implements ConstraintEvaluator<HasRole, ContextMap> {
-
-        public boolean isValid( HasRole role, ContextMap map ) {
-            Class<?> instance = role.object();
-            Class<?> theRole = role.hasRole();
-
-            Object theInstance = map.get( instance );
-            return theRole.isAssignableFrom( theInstance.getClass() );
+        public boolean isValid( IsWithdrawable role, ContextMap map ) {
+            return map.get(Account.class) instanceof Withdrawable;
         }
 
     }

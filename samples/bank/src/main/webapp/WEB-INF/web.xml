@@ -4,23 +4,14 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-  <servlet>
-  	<servlet-name>rest-servlet</servlet-name>
-  	<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-  	<init-param>
-  		<param-name>com.sun.jersey.config.property.packages</param-name>
-  		<param-value>com.jayway.restfuljersey.samples.bank</param-value>
-  	</init-param>
-  	<init-param>
-  		<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-  		<param-value>true</param-value>
-  	</init-param>
-  	<load-on-startup>1</load-on-startup>
-  </servlet>
+    <servlet>
+        <servlet-name>servletonly</servlet-name>
+        <servlet-class>com.jayway.restfuljersey.samples.bank.RestService</servlet-class>
+    </servlet>
 
-  <servlet-mapping>
-  	<servlet-name>rest-servlet</servlet-name>
-  	<url-pattern>/jpmorgan/*</url-pattern>
-  </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>servletonly</servlet-name>
+        <url-pattern>/bank/*</url-pattern>
+    </servlet-mapping>
 
 </web-app>

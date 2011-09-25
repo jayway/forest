@@ -4,61 +4,44 @@ import com.jayway.jersey.rest.service.AbstractRunner;
 import com.jayway.jersey.rest.service.StateHolder;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import javax.servlet.ServletOutputStream;
-import javax.ws.rs.core.MediaType;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
  */
 public class ConstraintsTest extends AbstractRunner {
 
-    public ConstraintsTest() throws Exception {
-        super( );
-    }
 
     @Test
-    public void testConstraint() {
+    public void testConstraint() throws IOException {
         StateHolder.set("Hello World");
-
-        String result = webResource.path("test/constraint").type(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).get( String.class );
-
+        String result = get("/bank/constraint", String.class);
         Assert.assertEquals( "Hello World", result );
     }
 
     @Test
     public void testIlllegalConstraint() {
-        mustThrow(webResource.path("test/constraint").accept(MediaType.APPLICATION_JSON), "GET", String.class, 404);
+        try {
+            get( "/bank/constraint", String.class);
+            Assert.fail();
+        } catch (IOException e) {
+            Assert.assertTrue(  e instanceof FileNotFoundException );
+        }
 
     }
 
-
+/*
     @Test
     public void testIllegalDelete() {
-        mustThrow(webResource.path("test/other/constraint/").accept(MediaType.APPLICATION_JSON), "DELETE", null, 404);
+        //mustThrow(webResource.path("test/other/constraint/").accept(MediaType.APPLICATION_JSON), "DELETE", null, 404);
+        try {
+            delete( "/bank/other/constraint/", String.class);
+            Assert.fail();
+        } catch (IOException e) {
+            Assert.assertTrue(  e instanceof FileNotFoundException );
+        }
+
     }
+*/
 
-    /**
-     * This tests that the discovery of  
-     */
-    @Test
-    public void testDiscocerNoIndex() throws IOException {
-        HtmlHelper mock = Mockito.mock(HtmlHelper.class);
-
-        Mockito.doAnswer( new Answer<Object>() {
-            public Object answer(InvocationOnMock
-                                         invocation) {
-                StateHolder.set(invocation.getArguments()[1]);
-                return "invoked";
-            }
-        }).when( mock ).addResourceMethods( Mockito.any( ServletOutputStream.class), Mockito.anyList() );
-
-        StateHolder.set(mock);
-
-        webResource.path("test/other/constraint/").type(MediaType.TEXT_HTML).get( String.class );
-    }
 }

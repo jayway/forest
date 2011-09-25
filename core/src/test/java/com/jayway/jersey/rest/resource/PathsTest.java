@@ -1,45 +1,56 @@
 package com.jayway.jersey.rest.resource;
 
 import com.jayway.jersey.rest.service.AbstractRunner;
-import com.jayway.jersey.rest.service.StateHolder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  */
 public class PathsTest extends AbstractRunner {
 
 
-    public PathsTest() throws Exception {
-        super();
-    }
-
     @Test
-    public void testDiscoverId() {
-        String nameId = webResource.path("test/other/id/").type(MediaType.TEXT_HTML).get(String.class);
-        String nameName = webResource.path("test/other/name/").type(MediaType.TEXT_HTML).get(String.class);
+    public void testDiscoverId() throws IOException {
+        String nameId = get("/bank/other/id/", String.class, "text/html");
+        String nameName = get("/bank/other/name/", String.class, "text/html");
 
         Assert.assertEquals( nameId, nameName );
     }
 
-    @Test
+   @Test
     public void invokeIdResourceAsQuery() {
-        mustThrow(webResource.path("test/other/id").type(MediaType.TEXT_HTML), "GET", String.class, 404);
+       try {
+           get( "/bank/other/id", String.class );
+           Assert.fail();
+       } catch (IOException e) {
+           Assert.assertTrue( e instanceof FileNotFoundException );
+       }
     }
 
     @Test
     public void invokeIdResourceAsQuery2() {
-        mustThrow(webResource.path("test/other/idid").type(MediaType.TEXT_HTML), "GET", String.class, 404);
+        try {
+            get( "/bank/other/idid", String.class );
+            Assert.fail();
+        } catch (IOException e) {
+            Assert.assertTrue(e instanceof FileNotFoundException);
+        }
     }
 
 
     @Test
     public void invokeResourceAsQuery() {
-        mustThrow( webResource.path("test/other").type(MediaType.TEXT_HTML), "GET", String.class, 404);
+        try {
+            get( "/bank/other", String.class );
+            Assert.fail();
+        } catch (IOException e) {
+            Assert.assertTrue(e instanceof FileNotFoundException);
+        }
     }
-
+/*
     @Test
     public void invokeIdResourceAsCommand() {
         mustThrow( webResource.path("test/other/id").type(MediaType.APPLICATION_JSON), "POST", null, 404);
@@ -77,5 +88,5 @@ public class PathsTest extends AbstractRunner {
         webResource.path("test/other/delete").type(MediaType.APPLICATION_JSON).post();
         Assert.assertEquals( "Delete invoked", StateHolder.get() );
     }
-
+*/
 }

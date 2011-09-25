@@ -1,4 +1,6 @@
-package com.jayway.jersey.rest.resource;
+package com.jayway.jersey.rest.roles;
+
+import com.jayway.jersey.rest.resource.Resource;
 
 /**
  * Base class for resources that has named sub resources.

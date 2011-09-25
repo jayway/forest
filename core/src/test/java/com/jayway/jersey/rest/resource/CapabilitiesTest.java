@@ -1,34 +1,20 @@
 package com.jayway.jersey.rest.resource;
 
 import com.jayway.jersey.rest.service.AbstractRunner;
-import com.jayway.jersey.rest.service.StateHolder;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-import javax.servlet.ServletOutputStream;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  */
 public class CapabilitiesTest extends AbstractRunner {
     
-    public CapabilitiesTest() throws Exception {
-        super();
+    @Test
+    public void testRoot() throws IOException {
+        System.out.println( get( "/bank/", Object.class, "text/html" ) );
     }
 
-    @Test
-    public void testRoot() {
-        String response = webResource.path("test/").accept(MediaType.TEXT_HTML).get(String.class);
-        System.out.println( response );
-    }
-
-    @Test
+/*    @Test
     public void testPathEvaluation() {
         String root = webResource.path("test/").type(MediaType.TEXT_HTML).get(String.class);
         String subsub = webResource.path("test/sub/sub/").type(MediaType.TEXT_HTML).get(String.class);
@@ -44,7 +30,7 @@ public class CapabilitiesTest extends AbstractRunner {
                 StateHolder.set( invocation.getArguments()[1] );
                 return "invoked";
             }
-        }).when( mock ).addResourceMethods( Mockito.any( ServletOutputStream.class), Mockito.anyList() );
+        }).when( mock ).addResourceMethods( Mockito.any( StringBuilder.class), Mockito.anyList() );
 
         StateHolder.set( mock );
 
@@ -99,6 +85,6 @@ public class CapabilitiesTest extends AbstractRunner {
         webResource.path("test/sub/").type( MediaType.APPLICATION_JSON ).get( String.class );
         webResource.path("test/sub/").type( MediaType.TEXT_HTML ).get( String.class );
     }
-
+*/
 
 }

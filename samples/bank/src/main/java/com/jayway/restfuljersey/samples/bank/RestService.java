@@ -1,17 +1,23 @@
 package com.jayway.restfuljersey.samples.bank;
 
-import com.jayway.jersey.rest.RestfulJerseyService;
+import com.jayway.jersey.rest.RestfulServlet;
+import com.jayway.jersey.rest.resource.ExceptionMapper;
 import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.jersey.rest.resource.Response;
+import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
+import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
 import com.jayway.restfuljersey.samples.bank.model.AccountManager;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 import com.jayway.restfuljersey.samples.bank.resources.RootResource;
 
-import javax.ws.rs.Path;
+import javax.servlet.http.HttpServletResponse;
 
-/**
- */
-@Path("rest")
-public class RestService extends RestfulJerseyService {
+public class RestService extends RestfulServlet {
+
+    @Override
+    protected String servletMapping() {
+        return "/bank";
+    }
 
     @Override
     protected Resource root() {
@@ -24,4 +30,17 @@ public class RestService extends RestfulJerseyService {
         getContextMap().put(AccountManager.class, new AccountManager());
     }
 
+    @Override
+    protected ExceptionMapper exceptionMapper() {
+        return new ExceptionMapper() {
+            public Response map(Exception e) {
+                if ( e instanceof CannotDepositException) {
+                    return new Response(HttpServletResponse.SC_CONFLICT, "Deposit not allowed" );
+                } else if ( e instanceof OverdrawException) {
+                    return new Response(HttpServletResponse.SC_CONFLICT, "Account cannot be overdrawn");
+                }
+                return null;
+            }
+        };
+    }
 }

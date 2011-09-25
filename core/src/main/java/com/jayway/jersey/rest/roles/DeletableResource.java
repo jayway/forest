@@ -1,4 +1,4 @@
-package com.jayway.jersey.rest.resource;
+package com.jayway.jersey.rest.roles;
 
 /**
  * Implement this on a resource to let it

@@ -7,64 +7,45 @@ import com.jayway.jersey.rest.service.StateHolder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
-/**
- */
-public class QueriesTest extends AbstractRunner {
-
-    public QueriesTest() throws Exception {
-        super( );
-    }
-
-     @Test
-     public void testEchoMethod() {
-         String response = webResource.path("test/echo").queryParam("argument1", "echo")
-                 .type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).get(String.class);
-
-         Assert.assertEquals( "echo", response );
-     }
-
+public class QueriesTest  extends AbstractRunner {
 
     @Test
-    public void testEchoMethodXml() {
-        String response = webResource.path("test/echo").queryParam("argument1", "echo")
-                .type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML).get(String.class);
+    public void testInvokeIndex() throws IOException {
+        StateHolder.set("Expected String");
 
-        Assert.assertEquals( "echo", response );
+        StringDTO returned = get("/bank/other/description", StringDTO.class);
+        Assert.assertEquals( "Expected String", returned.string() );
     }
 
     @Test
-    public void testInvokeIndex() {
-        String expected = "Expected String";
-        StateHolder.set( expected );
-        webResource.path("test/other/index").accept( MediaType.APPLICATION_JSON ).get( StringDTO.class );
-        StringDTO result = (StringDTO) StateHolder.get();
-        Assert.assertEquals( expected, result.string() );
+    public void testQueryWithInteger() throws IOException {
+        queryParam("argument1", "60");
+        IntegerDTO integer = get( "/bank/addten", IntegerDTO.class );
+
+        Assert.assertEquals(70, integer.getInteger().intValue());
+    }
+
+    @Test
+    public void testQueryWithIntegerWrongInput() throws IOException {
+
+        queryParam( "argument1", "x6f?0");
+        try {
+            get( "/bank/addten", IntegerDTO.class );
+            Assert.fail();
+        } catch (IOException e ) {
+            Assert.assertTrue( e.getMessage().contains( "code: 400"));
+        }
     }
 
 
     @Test
-    public void testQueryWithInteger() {
-        IntegerDTO integer = webResource.path("test/addten").queryParam("argument1", "60")
-                .type(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).get(IntegerDTO.class);
-        Assert.assertEquals( 70, integer.getInteger().intValue() );
-    }
-
-    @Test
-    public void testQueryWithIntegerWrongInput() {
-        mustThrow(webResource.path("test/addten").queryParam("argument1", "x6f?0")
-                .accept(MediaType.APPLICATION_JSON), "GET", IntegerDTO.class, 400);
-    }
-
-
-    @Test
-    public void testQueryWithIntegerAndInteger() {
-        IntegerDTO integer = webResource.path("test/add").queryParam("argument1", "60").queryParam( "argument2.IntegerDTO.integer", "13" )
-                .type(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).get(IntegerDTO.class);
-        Assert.assertEquals( 73, integer.getInteger().intValue() );
+    public void testQueryWithIntegerAndInteger() throws IOException {
+        queryParam( "argument1", "60");
+        queryParam( "argument2.IntegerDTO.integer", "13");
+        Integer aLong = get("/bank/add", Integer.class);
+        Assert.assertEquals(73, aLong.intValue());
     }
 
 }
