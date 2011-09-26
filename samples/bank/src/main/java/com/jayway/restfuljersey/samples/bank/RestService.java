@@ -15,11 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 public class RestService extends RestfulServlet {
 
     @Override
-    protected String servletMapping() {
-        return "/bank";
-    }
-
-    @Override
     protected Resource root() {
         return new RootResource();
     }

@@ -20,7 +20,6 @@ public abstract class RestfulServlet extends HttpServlet {
 
     protected abstract Resource root();
     protected abstract void setupContext();
-    protected abstract String servletMapping();
 
     /**
      * Override this to add custom exception mapping
@@ -53,8 +52,8 @@ public abstract class RestfulServlet extends HttpServlet {
 
 
     private String setup(HttpServletRequest req, HttpServletResponse resp) {
-        String path = req.getRequestURI().substring( servletMapping().length() );
-        if ( !path.startsWith( "/") ) {
+        String path = req.getPathInfo();
+        if ( path == null ) {
             throw new NotFoundException();
         }
         ContextMap contextMap = new ContextMap();

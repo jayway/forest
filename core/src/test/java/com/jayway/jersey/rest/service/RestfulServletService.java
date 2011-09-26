@@ -1,16 +1,10 @@
 package com.jayway.jersey.rest.service;
 
-import com.jayway.jersey.rest.RestfulServlet;
 import com.jayway.jersey.rest.resource.Resource;
 
 /**
  */
 public class RestfulServletService extends com.jayway.jersey.rest.RestfulServlet {
-
-    @Override
-    protected String servletMapping() {
-        return "/bank";
-    }
 
     @Override
     protected Resource root() {
