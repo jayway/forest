@@ -1,10 +1,12 @@
 package com.jayway.restfuljersey.samples.bank.resources.accounts;
 
-import com.jayway.jersey.rest.roles.DescribedResource;
+import static com.jayway.forest.grove.RoleManager.context;
+
 import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.restfuljersey.samples.bank.constraints.IsWithdrawable;
+import com.jayway.jersey.rest.roles.DescribedResource;
 import com.jayway.restfuljersey.samples.bank.constraints.DepositAllowed;
 import com.jayway.restfuljersey.samples.bank.constraints.HasCredit;
+import com.jayway.restfuljersey.samples.bank.constraints.IsWithdrawable;
 import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.model.AccountManager;
@@ -12,10 +14,10 @@ import com.jayway.restfuljersey.samples.bank.model.Depositable;
 import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
-public class AccountResource extends Resource implements DescribedResource {
+public class AccountResource implements Resource, DescribedResource {
 
     public void allowexceeddepositlimit( Boolean allow ) {
-        context(Account.class).setAllowExceedBalanceLimit(allow);
+    	context(Account.class).setAllowExceedBalanceLimit(allow);
     }
 
     @DepositAllowed

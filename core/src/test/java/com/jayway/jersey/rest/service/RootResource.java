@@ -1,6 +1,9 @@
 package com.jayway.jersey.rest.service;
 
-import com.jayway.jersey.rest.constraint.RequiresRoles;
+import static com.jayway.forest.grove.RoleManager.context;
+
+import com.jayway.forest.grove.RoleManager;
+import com.jayway.jersey.rest.constraint.grove.RequiresRoles;
 import com.jayway.jersey.rest.dto.IntegerDTO;
 import com.jayway.jersey.rest.roles.CreatableResource;
 import com.jayway.jersey.rest.resource.Resource;
@@ -10,7 +13,7 @@ import java.util.List;
 
 /**
  */
-public class RootResource extends Resource implements CreatableResource {
+public class RootResource implements Resource, CreatableResource {
 
     public RootResource sub() {
         return new RootResource();

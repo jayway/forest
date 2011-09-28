@@ -1,11 +1,13 @@
 package com.jayway.jersey.rest.resource;
 
-import com.jayway.jersey.rest.service.AbstractRunner;
-import com.jayway.jersey.rest.service.StateHolder;
-import org.junit.Assert;
-import org.junit.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.jayway.jersey.rest.service.AbstractRunner;
+import com.jayway.jersey.rest.service.RestfulServletService;
 
 /**
  */
@@ -14,7 +16,7 @@ public class ConstraintsTest extends AbstractRunner {
 
     @Test
     public void testConstraint() throws IOException {
-        StateHolder.set("Hello World");
+    	RestfulServletService.addRole("Hello World", String.class);
         String result = get("/bank/constraint", String.class);
         Assert.assertEquals( "Hello World", result );
     }

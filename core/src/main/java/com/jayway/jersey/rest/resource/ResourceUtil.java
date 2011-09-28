@@ -1,16 +1,5 @@
 package com.jayway.jersey.rest.resource;
 
-import com.jayway.jersey.rest.RestfulServlet;
-import com.jayway.jersey.rest.constraint.Constraint;
-import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
-import com.jayway.jersey.rest.constraint.Doc;
-import com.jayway.jersey.rest.exceptions.*;
-import com.jayway.jersey.rest.roles.DeletableResource;
-import com.jayway.jersey.rest.roles.IdResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -18,6 +7,25 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jayway.jersey.rest.RestfulServlet;
+import com.jayway.jersey.rest.constraint.Constraint;
+import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
+import com.jayway.jersey.rest.constraint.Doc;
+import com.jayway.jersey.rest.exceptions.BadRequestException;
+import com.jayway.jersey.rest.exceptions.InternalServerErrorException;
+import com.jayway.jersey.rest.exceptions.MethodNotAllowedException;
+import com.jayway.jersey.rest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.jersey.rest.exceptions.NotFoundException;
+import com.jayway.jersey.rest.exceptions.UnsupportedMediaTypeException;
+import com.jayway.jersey.rest.resource.grove.GroveContextMap;
+import com.jayway.jersey.rest.roles.DeletableResource;
+import com.jayway.jersey.rest.roles.IdResource;
 
 /**
  */
@@ -48,7 +56,7 @@ public class ResourceUtil {
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
             ConstraintEvaluator<Annotation, ContextMap> constraintEvaluator = constraint.value().newInstance();
-            return constraintEvaluator.isValid( annotation, contextMap());
+            return constraintEvaluator.isValid( annotation, new GroveContextMap());
 
         } catch (InstantiationException e) {
             log.error("Could not instantiate constraint", e);
@@ -56,10 +64,6 @@ public class ResourceUtil {
             log.error( "Constraint need public empty argument constructor", e);
         }
         return true;
-    }
-
-    static ContextMap contextMap() {
-        return RestfulServlet.getContextMap();
     }
 
     public static void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
@@ -151,7 +155,7 @@ public class ResourceUtil {
         }
     }
 
-    public static Object get( Resource resource, String get ) {
+    public static Object get( HttpServletRequest request, Resource resource, String get ) {
         ResourceMethod m = findMethod(resource, get);
         if ( m.isSubResource() || m.isNotFound() || m.isConstraintFalse() || m.isIdSubResource() ) throw notFound();
 
@@ -159,7 +163,7 @@ public class ResourceUtil {
             throw new MethodNotAllowedRenderTemplateException( m );
         }
 
-        Map<String, String[]> queryParams = resource.context(HttpServletRequest.class).getParameterMap();
+        Map<String, String[]> queryParams = request.getParameterMap();
         if ( queryParams.size() == 0 && m.method().getParameterTypes().length > 0) {
             throw new MethodNotAllowedRenderTemplateException( m );
         } else {

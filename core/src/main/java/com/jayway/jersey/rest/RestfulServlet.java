@@ -1,20 +1,31 @@
 package com.jayway.jersey.rest;
 
-import com.jayway.jersey.rest.exceptions.*;
-import com.jayway.jersey.rest.reflection.Capabilities;
-import com.jayway.jersey.rest.resource.*;
-import com.jayway.jersey.rest.roles.DescribedResource;
-import com.jayway.jersey.rest.roles.IdDiscoverableResource;
-import com.jayway.jersey.rest.roles.Linkable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.*;
+
+import com.jayway.jersey.rest.exceptions.MethodNotAllowedException;
+import com.jayway.jersey.rest.exceptions.NotFoundException;
+import com.jayway.jersey.rest.reflection.Capabilities;
+import com.jayway.jersey.rest.resource.ContextMap;
+import com.jayway.jersey.rest.resource.ExceptionMapper;
+import com.jayway.jersey.rest.resource.MediaTypeHandler;
+import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.jersey.rest.resource.ResourceMethod;
+import com.jayway.jersey.rest.resource.ResourceUtil;
+import com.jayway.jersey.rest.resource.ResponseHandler;
+import com.jayway.jersey.rest.roles.DescribedResource;
+import com.jayway.jersey.rest.roles.IdDiscoverableResource;
 
 public abstract class RestfulServlet extends HttpServlet {
 
@@ -27,16 +38,6 @@ public abstract class RestfulServlet extends HttpServlet {
      */
     protected ExceptionMapper exceptionMapper() {
         return null;
-    }
-
-    private static ThreadLocal<ContextMap> map = new ThreadLocal<ContextMap>();
-
-    protected static void setContextMap( ContextMap map) {
-        RestfulServlet.map.set(map);
-    }
-
-    public static ContextMap getContextMap() {
-        return map.get();
     }
 
     public static Set<Class> basicTypes;
@@ -56,10 +57,6 @@ public abstract class RestfulServlet extends HttpServlet {
         if ( path == null ) {
             throw new NotFoundException();
         }
-        ContextMap contextMap = new ContextMap();
-        contextMap.put( HttpServletRequest.class, req );
-        contextMap.put( HttpServletResponse.class, resp );
-        setContextMap(contextMap);
 
         // call application specific context setup
         setupContext();
@@ -72,7 +69,7 @@ public abstract class RestfulServlet extends HttpServlet {
         new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
             public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws IOException {
                 String path = setup(req, resp);
-                return evaluateGet(new PathAndMethod(path));
+                return evaluateGet(req, new PathAndMethod(path));
             }
         });
     }
@@ -112,11 +109,11 @@ public abstract class RestfulServlet extends HttpServlet {
         Object run( HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaTypeHandler ) throws Exception;
     }
 
-    private Object evaluateGet( PathAndMethod pathAndMethod ) {
+    private Object evaluateGet( HttpServletRequest request, PathAndMethod pathAndMethod ) {
         if ( pathAndMethod.method() == null ) {
             return capabilities(evaluatePath(pathAndMethod.pathSegments()));
         }
-        return ResourceUtil.get(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
+        return ResourceUtil.get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
     }
 
     private void evaluatePostPut( PathAndMethod pathAndMethod, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {

@@ -1,5 +1,6 @@
 package com.jayway.jersey.rest.service;
 
+import com.jayway.forest.grove.RoleManager;
 import com.jayway.jersey.rest.resource.JSONHelper;
 import org.json.simple.JSONValue;
 import org.junit.AfterClass;
@@ -30,6 +31,7 @@ public class AbstractRunner {
     @Before
     public void setup() {
         StateHolder.set(null);
+        RestfulServletService.reset();
         queryParams = new LinkedHashMap<String, String>();
     }
 

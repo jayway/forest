@@ -1,5 +1,7 @@
-package com.jayway.jersey.rest.constraint;
+package com.jayway.jersey.rest.constraint.grove;
 
+import com.jayway.jersey.rest.constraint.Constraint;
+import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
 import com.jayway.jersey.rest.resource.ContextMap;
 
 import java.lang.annotation.ElementType;
@@ -20,7 +22,7 @@ public @interface RequiresRolesNotSet {
 
         public boolean isValid( RequiresRolesNotSet role, ContextMap map ) {
             for ( Class<?> clazz : role.value() ) {
-                if ( map.get( clazz ) != null ) return false;
+                if ( map.role( clazz ) != null ) return false;
             }
             return true;
         }

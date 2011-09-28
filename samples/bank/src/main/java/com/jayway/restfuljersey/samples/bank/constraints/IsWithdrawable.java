@@ -21,7 +21,7 @@ public @interface IsWithdrawable {
     class Evaluator implements ConstraintEvaluator<IsWithdrawable, ContextMap> {
 
         public boolean isValid( IsWithdrawable role, ContextMap map ) {
-            return map.get(Account.class) instanceof Withdrawable;
+            return map.role(Account.class) instanceof Withdrawable;
         }
 
     }

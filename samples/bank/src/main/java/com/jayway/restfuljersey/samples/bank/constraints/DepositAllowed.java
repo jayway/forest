@@ -20,7 +20,7 @@ public @interface DepositAllowed {
     class Evaluator implements ConstraintEvaluator<DepositAllowed, ContextMap> {
 
         public boolean isValid( DepositAllowed role, ContextMap map ) {
-            Account account = map.get(Account.class);
+            Account account = map.role(Account.class);
             if ( account == null ) return false;
 
             if ( account.getBalance() >= Account.MAX_ENSURED_BALANCE ) {

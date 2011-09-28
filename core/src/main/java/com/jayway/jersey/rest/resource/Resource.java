@@ -7,8 +7,8 @@ package com.jayway.jersey.rest.resource;
  * representation that lists the resources' reflection
  *
  */
-public class Resource {
-
+public interface Resource {
+/*
     protected <T> T context(Class<T> clazz) {
         ContextMap map = ResourceUtil.contextMap();
         return map.get(clazz);
@@ -18,5 +18,5 @@ public class Resource {
         ContextMap map = ResourceUtil.contextMap();
         map.put(clazz, instance);
     }
-
+*/
 }

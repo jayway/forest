@@ -20,7 +20,7 @@ public @interface HasCredit {
     class Evaluator implements ConstraintEvaluator<HasCredit, ContextMap> {
 
         public boolean isValid( HasCredit role, ContextMap map ) {
-            Account account = map.get(Account.class);
+            Account account = map.role(Account.class);
             return account != null && account.getBalance() > 0;
         }
 
