@@ -16,18 +16,18 @@ public class ResourceMethod {
 		name = link.id();
         type = MethodType.SUBRESOURCE;
     }
-
+    
     public ResourceMethod() {
-    }
+	}
 
     // TODO: this should be replaced with a factory method
-    public ResourceMethod(ResourceUtil resourceUtil, Method method) {
+    public ResourceMethod(ResourceUtil resourceUtil, Resource resource, Method method) {
 		this.method = method;
         this.name = method.getName();
 
         if (Modifier.isAbstract(method.getModifiers())) return;
         if (!Modifier.isPublic(method.getModifiers())) return;
-        if (!resourceUtil.checkConstraint(method)) {
+        if (!resourceUtil.checkConstraint(resource, method)) {
             type = MethodType.CONSTRAINT_FALSE;
             return;
         }

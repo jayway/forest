@@ -1,9 +1,10 @@
-package com.jayway.jersey.rest.constraint.grove;
+package com.jayway.restfuljersey.samples.bank.grove.constraints;
 
 import com.jayway.jersey.rest.constraint.Constraint;
 import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
 import com.jayway.jersey.rest.resource.ContextMap;
 import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.restfuljersey.samples.bank.model.Account;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,18 +15,14 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(RequiresRoles.Evaluator.class)
-public @interface RequiresRoles {
+@Constraint(HasCredit.Evaluator.class)
+public @interface HasCredit {
 
-    Class<?>[] value();
+    class Evaluator implements ConstraintEvaluator<HasCredit, Resource> {
 
-    class Evaluator implements ConstraintEvaluator<RequiresRoles, Resource>{
-
-        public boolean isValid( RequiresRoles role, Resource resource, ContextMap map ) {
-            for ( Class<?> clazz : role.value() ) {
-                if ( map.role( clazz ) == null ) return false;
-            }
-            return true;
+        public boolean isValid( HasCredit role, Resource resource, ContextMap map ) {
+            Account account = map.role(Account.class);
+            return account != null && account.getBalance() > 0;
         }
 
     }

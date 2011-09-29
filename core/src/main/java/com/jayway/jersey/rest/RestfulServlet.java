@@ -181,7 +181,7 @@ public abstract class RestfulServlet extends HttpServlet {
         Capabilities capabilities = new Capabilities(clazz.getName());
         for ( Method m : clazz.getDeclaredMethods() ) {
             if ( m.isSynthetic() ) continue;
-            ResourceMethod method = new ResourceMethod( resourceUtil(), m );
+            ResourceMethod method = new ResourceMethod( resourceUtil(), resource, m );
             switch (method.type()) {
                 case COMMAND:
                     capabilities.addCommand(method);

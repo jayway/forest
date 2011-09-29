@@ -37,10 +37,10 @@ public class ResourceUtil {
 		this.contextMap = contextMap;
 	}
 
-    boolean checkConstraint(Method method) {
+    boolean checkConstraint(Resource resource, Method method) {
         for ( Annotation a : method.getAnnotations() ) {
             if ( a.annotationType().getAnnotation(Constraint.class) != null ) {
-                if ( !constraintEvaluator( a ) ) return false;
+                if ( !constraintEvaluator( resource, a ) ) return false;
             }
         }
         return true;
@@ -55,12 +55,12 @@ public class ResourceUtil {
         return null;
     }
 
-    private boolean constraintEvaluator( Annotation annotation ) {
+    private boolean constraintEvaluator( Resource resource, Annotation annotation ) {
         if ( annotation == null ) return true;
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
-            ConstraintEvaluator<Annotation, ContextMap> constraintEvaluator = constraint.value().newInstance();
-            return constraintEvaluator.isValid( annotation, contextMap);
+            ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
+            return constraintEvaluator.isValid( annotation, resource, contextMap);
 
         } catch (InstantiationException e) {
             log.error("Could not instantiate constraint", e);
@@ -128,7 +128,7 @@ public class ResourceUtil {
         for ( Method method : clazz.getDeclaredMethods() ) {
             if ( method.isSynthetic() ) continue;
             if ( method.getName().equals( name ) ) {
-                return new ResourceMethod( this, method );
+                return new ResourceMethod( this, resource, method );
             }
         }
         return new ResourceMethod();
