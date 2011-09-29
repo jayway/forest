@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.jayway.jersey.rest.exceptions.MethodNotAllowedException;
 import com.jayway.jersey.rest.exceptions.NotFoundException;
 import com.jayway.jersey.rest.reflection.Capabilities;
-import com.jayway.jersey.rest.resource.ContextMap;
 import com.jayway.jersey.rest.resource.ExceptionMapper;
 import com.jayway.jersey.rest.resource.MediaTypeHandler;
 import com.jayway.jersey.rest.resource.Resource;
@@ -31,6 +30,7 @@ public abstract class RestfulServlet extends HttpServlet {
 
     protected abstract Resource root();
     protected abstract void setupContext();
+    protected abstract ResourceUtil resourceUtil();
 
     /**
      * Override this to add custom exception mapping
@@ -40,10 +40,10 @@ public abstract class RestfulServlet extends HttpServlet {
         return null;
     }
 
-    public static Set<Class> basicTypes;
+    public static Set<Class<?>> basicTypes;
 
     static {
-        basicTypes = new HashSet<Class>();
+        basicTypes = new HashSet<Class<?>>();
         basicTypes.add( String.class);
         basicTypes.add( Long.class );
         basicTypes.add( Integer.class);
@@ -113,7 +113,7 @@ public abstract class RestfulServlet extends HttpServlet {
         if ( pathAndMethod.method() == null ) {
             return capabilities(evaluatePath(pathAndMethod.pathSegments()));
         }
-        return ResourceUtil.get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
+        return resourceUtil().get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
     }
 
     private void evaluatePostPut( PathAndMethod pathAndMethod, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
@@ -121,20 +121,20 @@ public abstract class RestfulServlet extends HttpServlet {
             // TODO allow post if CreatableResource
             throw new MethodNotAllowedException();
         }
-        ResourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
+        resourceUtil().post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
     }
 
     private void evaluateDelete( PathAndMethod pathAndMethod ) {
         if ( pathAndMethod.method() != null ) {
             throw new MethodNotAllowedException();
         }
-        ResourceUtil.invokeDelete(evaluatePath(pathAndMethod.pathSegments()));
+        resourceUtil().invokeDelete(evaluatePath(pathAndMethod.pathSegments()));
     }
 
     private Resource evaluatePath( List<String> segments ) {
         Resource current = root();
         for ( String pathSegment: segments ) {
-            current = ResourceUtil.invokePathMethod( current, pathSegment );
+            current = resourceUtil().invokePathMethod( current, pathSegment );
         }
         return current;
     }
@@ -181,7 +181,7 @@ public abstract class RestfulServlet extends HttpServlet {
         Capabilities capabilities = new Capabilities(clazz.getName());
         for ( Method m : clazz.getDeclaredMethods() ) {
             if ( m.isSynthetic() ) continue;
-            ResourceMethod method = new ResourceMethod( m );
+            ResourceMethod method = new ResourceMethod( resourceUtil(), m );
             switch (method.type()) {
                 case COMMAND:
                     capabilities.addCommand(method);

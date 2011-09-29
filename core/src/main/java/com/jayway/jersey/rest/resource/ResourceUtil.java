@@ -23,7 +23,6 @@ import com.jayway.jersey.rest.exceptions.MethodNotAllowedException;
 import com.jayway.jersey.rest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.jersey.rest.exceptions.NotFoundException;
 import com.jayway.jersey.rest.exceptions.UnsupportedMediaTypeException;
-import com.jayway.jersey.rest.resource.grove.GroveContextMap;
 import com.jayway.jersey.rest.roles.DeletableResource;
 import com.jayway.jersey.rest.roles.IdResource;
 
@@ -32,8 +31,13 @@ import com.jayway.jersey.rest.roles.IdResource;
 public class ResourceUtil {
 
     static Logger log = LoggerFactory.getLogger(ResourceUtil.class);
+	private final ContextMap contextMap;
+    
+    public ResourceUtil(ContextMap contextMap) {
+		this.contextMap = contextMap;
+	}
 
-    static boolean checkConstraint(Method method) {
+    boolean checkConstraint(Method method) {
         for ( Annotation a : method.getAnnotations() ) {
             if ( a.annotationType().getAnnotation(Constraint.class) != null ) {
                 if ( !constraintEvaluator( a ) ) return false;
@@ -42,7 +46,7 @@ public class ResourceUtil {
         return true;
     }
 
-    static String getDocumentation( Method method ) {
+    String getDocumentation( Method method ) {
         for ( Annotation a : method.getAnnotations() ) {
             if ( a instanceof Doc) {
                 return ((Doc) a).value();
@@ -51,12 +55,12 @@ public class ResourceUtil {
         return null;
     }
 
-    private static boolean constraintEvaluator( Annotation annotation ) {
+    private boolean constraintEvaluator( Annotation annotation ) {
         if ( annotation == null ) return true;
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
             ConstraintEvaluator<Annotation, ContextMap> constraintEvaluator = constraint.value().newInstance();
-            return constraintEvaluator.isValid( annotation, new GroveContextMap());
+            return constraintEvaluator.isValid( annotation, contextMap);
 
         } catch (InstantiationException e) {
             log.error("Could not instantiate constraint", e);
@@ -66,7 +70,7 @@ public class ResourceUtil {
         return true;
     }
 
-    public static void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
         ResourceMethod m = findMethod( resource, method );
         if ( !m.isCommand() || m.isNotFound() || m.isConstraintFalse() || m.isIdSubResource() ) throw notFound();
 
@@ -75,7 +79,7 @@ public class ResourceUtil {
     }
 
 
-    private static Object[] arguments( Method m, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
+    private Object[] arguments( Method m, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
         if ( mediaTypeHandler.contentTypeJSON() ) {
             return new JSONHelper().handleArguments( m, stream );
         }
@@ -83,7 +87,7 @@ public class ResourceUtil {
         throw new UnsupportedMediaTypeException();
     }
 
-    private static Object[] arguments( Method m, Map<String, String[]> formParams ) {
+    private Object[] arguments( Method m, Map<String, String[]> formParams ) {
         if ( m.getParameterTypes().length == 0 ) {
             return new Object[0];
         }
@@ -96,7 +100,7 @@ public class ResourceUtil {
         return args;
     }
 
-    public static Resource invokePathMethod( Resource resource, String path ) {
+    public Resource invokePathMethod( Resource resource, String path ) {
         ResourceMethod method = findMethod( resource, path);
         if ( method.isSubResource() ) {
             try {
@@ -119,18 +123,18 @@ public class ResourceUtil {
         throw notFound();
     }
 
-    static ResourceMethod findMethod( Resource resource, String name ) {
+    ResourceMethod findMethod( Resource resource, String name ) {
         Class<? extends Resource> clazz = resource.getClass();
         for ( Method method : clazz.getDeclaredMethods() ) {
             if ( method.isSynthetic() ) continue;
             if ( method.getName().equals( name ) ) {
-                return new ResourceMethod( method );
+                return new ResourceMethod( this, method );
             }
         }
         return new ResourceMethod();
     }
 
-    public static void invokeDelete( Resource resource ) {
+    public void invokeDelete( Resource resource ) {
         if ( resource instanceof DeletableResource) {
             ResourceMethod delete = findMethod( resource, "delete");
             if ( delete.isConstraintFalse() ) throw notFound();
@@ -140,7 +144,7 @@ public class ResourceUtil {
         }
     }
 
-    public static <T extends Resource> void invokeCommand(Method method, T instance, Object... arguments) {
+    public <T extends Resource> void invokeCommand(Method method, T instance, Object... arguments) {
         try {
             method.invoke( instance, arguments );
         } catch (InvocationTargetException e) {
@@ -155,7 +159,7 @@ public class ResourceUtil {
         }
     }
 
-    public static Object get( HttpServletRequest request, Resource resource, String get ) {
+    public Object get( HttpServletRequest request, Resource resource, String get ) {
         ResourceMethod m = findMethod(resource, get);
         if ( m.isSubResource() || m.isNotFound() || m.isConstraintFalse() || m.isIdSubResource() ) throw notFound();
 
@@ -185,7 +189,7 @@ public class ResourceUtil {
         }
     }
 
-    private static Object mapArguments( Class<?> dto, Map<String,String[]> formParams, String prefix ) {
+    private Object mapArguments( Class<?> dto, Map<String,String[]> formParams, String prefix ) {
         try {
             if ( RestfulServlet.basicTypes.contains( dto ) ) {
                 return mapBasic( dto, getFirst(formParams, prefix) );
@@ -198,13 +202,13 @@ public class ResourceUtil {
         }
     }
 
-    private static String getFirst( Map<String, String[]> map, String key ) {
+    private String getFirst( Map<String, String[]> map, String key ) {
         String[] strings = map.get(key);
         if ( strings == null ) return null;
         return strings[0];
     }
 
-    private static Object populateDTO(Class<?> dto, Map<String, String[]> formParams, String prefix ) throws Exception {
+    private Object populateDTO(Class<?> dto, Map<String, String[]> formParams, String prefix ) throws Exception {
         Object o = dto.newInstance();
         for ( Field f : o.getClass().getDeclaredFields() ) {
             if ( Modifier.isFinal(f.getModifiers()) ) continue;
@@ -221,7 +225,7 @@ public class ResourceUtil {
         return o;
     }
 
-    private static Object mapBasic( Class<?> clazz, String value ) {
+    private Object mapBasic( Class<?> clazz, String value ) {
         if( clazz == String.class ) {
             return value;
         } else if ( clazz == Integer.class ) {
@@ -239,16 +243,16 @@ public class ResourceUtil {
         }
     }
 
-    private static NotFoundException notFound() {
+    private NotFoundException notFound() {
         return new NotFoundException();
     }
 
-    private static InternalServerErrorException internalServerError( Exception e ) {
+    private InternalServerErrorException internalServerError( Exception e ) {
         log.error( "Internal error", e );
         return new InternalServerErrorException();
     }
 
-    private static BadRequestException badRequest( Exception e ) {
+    private BadRequestException badRequest( Exception e ) {
         return new BadRequestException();
     }
 

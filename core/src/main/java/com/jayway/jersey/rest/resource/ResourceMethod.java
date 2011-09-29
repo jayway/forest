@@ -12,25 +12,26 @@ public class ResourceMethod {
     private String name;
     private String documentation;
 
-    public ResourceMethod( Linkable link) {
-        name = link.id();
+    public ResourceMethod(Linkable link) {
+		name = link.id();
         type = MethodType.SUBRESOURCE;
     }
 
     public ResourceMethod() {
     }
 
-    public ResourceMethod(Method method) {
-        this.method = method;
+    // TODO: this should be replaced with a factory method
+    public ResourceMethod(ResourceUtil resourceUtil, Method method) {
+		this.method = method;
         this.name = method.getName();
 
         if (Modifier.isAbstract(method.getModifiers())) return;
         if (!Modifier.isPublic(method.getModifiers())) return;
-        if (!ResourceUtil.checkConstraint(method)) {
+        if (!resourceUtil.checkConstraint(method)) {
             type = MethodType.CONSTRAINT_FALSE;
             return;
         }
-        documentation = ResourceUtil.getDocumentation(method);
+        documentation = resourceUtil.getDocumentation(method);
         handleReturnType(method.getReturnType());
     }
 
