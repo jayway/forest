@@ -1,11 +1,6 @@
 package com.jayway.forest.core;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,25 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.exceptions.MethodNotAllowedException;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.ResourceMethod;
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.IdDiscoverableResource;
-import com.jayway.forest.roles.Resource;
 
-public abstract class RestfulServlet extends HttpServlet {
+public class RestfulServlet extends HttpServlet {
 
-    private final DependencyInjectionSPI dependencyInjectionSPI;
-    private final ResourceUtil resourceUtil;
+	private final ForestCore forest;
 
-	protected abstract Resource root();
-    protected abstract void setupContext();
-    
-    public RestfulServlet(DependencyInjectionSPI dependencyInjectionSPI) {
-		this.dependencyInjectionSPI = dependencyInjectionSPI;
-		resourceUtil = new ResourceUtil(dependencyInjectionSPI);
+    public RestfulServlet(Application application, DependencyInjectionSPI dependencyInjectionSPI) {
+		this.forest = new ForestCore(application, dependencyInjectionSPI);
 	}
     
     /**
@@ -42,24 +25,11 @@ public abstract class RestfulServlet extends HttpServlet {
         return null;
     }
 
-    private String setup(HttpServletRequest req, HttpServletResponse resp) {
-        String path = req.getPathInfo();
-        if ( path == null ) {
-            throw new NotFoundException();
-        }
-
-        // call application specific context setup
-        setupContext();
-        return path;
-    }
-
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
             public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws IOException {
-                String path = setup(req, resp);
-                return evaluateGet(req, new PathAndMethod(path));
+                return forest.evaluateGet(req);
             }
         });
     }
@@ -68,11 +38,10 @@ public abstract class RestfulServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
             public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
-                String path = setup(req, resp);
                 if ( mediaType.contentTypeFormUrlEncoded() ) {
-                    evaluatePostPut(new PathAndMethod(path), null, req.getParameterMap(), mediaType );
+                    forest.evaluatePostPut(req, null, req.getParameterMap(), mediaType );
                 } else {
-                    evaluatePostPut(new PathAndMethod(path), req.getInputStream(), null, mediaType );
+                    forest.evaluatePostPut(req, req.getInputStream(), null, mediaType );
                 }
                 return ResponseHandler.SUCCESS_RESPONSE;
             }
@@ -88,8 +57,7 @@ public abstract class RestfulServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
             public String run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
-                String path = setup(req, resp);
-                evaluateDelete(new PathAndMethod(path));
+                forest.evaluateDelete(req);
                 return ResponseHandler.SUCCESS_RESPONSE;
             }
         });
@@ -97,108 +65,5 @@ public abstract class RestfulServlet extends HttpServlet {
 
     public interface Runner {
         Object run( HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaTypeHandler ) throws Exception;
-    }
-
-    private Object evaluateGet( HttpServletRequest request, PathAndMethod pathAndMethod ) {
-        if ( pathAndMethod.method() == null ) {
-            return capabilities(evaluatePath(pathAndMethod.pathSegments()));
-        }
-        return resourceUtil.get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
-    }
-
-    private void evaluatePostPut( PathAndMethod pathAndMethod, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
-        if ( pathAndMethod.method() == null ) {
-            // TODO allow post if CreatableResource
-            throw new MethodNotAllowedException();
-        }
-        resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
-    }
-
-    private void evaluateDelete( PathAndMethod pathAndMethod ) {
-        if ( pathAndMethod.method() != null ) {
-            throw new MethodNotAllowedException();
-        }
-        resourceUtil.invokeDelete(evaluatePath(pathAndMethod.pathSegments()));
-    }
-
-    private Resource evaluatePath( List<String> segments ) {
-        Resource current = root();
-        for ( String pathSegment: segments ) {
-            current = resourceUtil.invokePathMethod( current, pathSegment );
-            current = dependencyInjectionSPI.postCreate(current);
-        }
-        return current;
-    }
-
-    class PathAndMethod {
-        private List<String> pathSegments;
-        private String method;
-
-        public PathAndMethod( String rawPath, String method ) {
-            this(rawPath);
-            if ( this.method == null ) this.method = method;
-        }
-
-        public PathAndMethod( String rawPath ) {
-            int index = rawPath.indexOf( '/' );
-            if ( index > 0 ) {
-                rawPath = rawPath.substring( index+1 );
-            }
-            boolean onlyPathSegments = rawPath.endsWith("/");
-            pathSegments =  new ArrayList<String>();
-            String[] split = rawPath.split("/");
-            for ( int i=0; i<split.length; i++) {
-                if ((onlyPathSegments || i != split.length - 1) && split[i].length() > 0) {
-                    pathSegments.add(split[i]);
-                }
-            }
-            method = null;
-            if (!onlyPathSegments) {
-                method = split[ split.length -1 ];
-            }
-        }
-
-        public List<String> pathSegments() {
-            return pathSegments;
-        }
-
-        public String method() {
-            return method;
-        }
-    }
-
-    private Capabilities capabilities(Resource resource) {
-        Class<?> clazz = resource.getClass();
-        Capabilities capabilities = new Capabilities(clazz.getName());
-        for ( Method m : clazz.getDeclaredMethods() ) {
-            if ( m.isSynthetic() ) continue;
-            ResourceMethod method = resourceUtil.makeResourceMethod(resource, m);
-            switch (method.type()) {
-                case COMMAND:
-                    capabilities.addCommand(method);
-                    break;
-                case QUERY:
-                    capabilities.addQuery(method);
-                    break;
-                case SUBRESOURCE:
-                    capabilities.addResource(method);
-                    break;
-            }
-        }
-        if ( resource instanceof IdDiscoverableResource) {
-            try {
-                capabilities.setDiscovered(  ((IdDiscoverableResource) resource).discover() );
-            } catch( Exception e) {
-                // nothing discovered ignore
-            }
-        }
-        if (resource instanceof DescribedResource) {
-            try {
-                capabilities.setDescriptionResult(((DescribedResource) resource).description());
-            } catch ( Exception e) {
-                capabilities.setDescriptionResult("Exception occurred when evaluating 'description'");
-            }
-        }
-        return capabilities;
     }
 }

@@ -2,6 +2,7 @@ package com.jayway.restfuljersey.samples.bank.grove;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.jayway.forest.core.Application;
 import com.jayway.forest.core.ExceptionMapper;
 import com.jayway.forest.core.Response;
 import com.jayway.forest.core.RestfulServlet;
@@ -17,19 +18,20 @@ import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 public class RestService extends RestfulServlet {
 	
 	public RestService() {
-		super(new GroveDependencyInjectionImpl());
-	}
-	
-    @Override
-    protected Resource root() {
-        return new RootResource();
-    }
+		super(new Application() {
+			@Override
+			public Resource root() {
+				return new RootResource();
+			}
 
-    @Override
-    protected void setupContext() {
-        RoleManager.addRole(AccountRepository.class, new AccountRepository());
-        RoleManager.addRole(AccountManager.class, new AccountManager());
-    }
+			@Override
+			public void setupRequestContext() {
+		        RoleManager.addRole(AccountRepository.class, new AccountRepository());
+		        RoleManager.addRole(AccountManager.class, new AccountManager());
+			}
+			
+		}, new GroveDependencyInjectionImpl());
+	}
 
     @Override
     protected ExceptionMapper exceptionMapper() {
