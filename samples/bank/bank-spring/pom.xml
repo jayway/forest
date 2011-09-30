@@ -5,20 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>restfuljersey-samples-bank</artifactId>
-        <groupId>com.jayway.restfuljersey</groupId>
+        <artifactId>forest-samples-bank</artifactId>
+        <groupId>com.jayway.forest</groupId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
-    <groupId>com.jayway.restfuljersey</groupId>
-    <artifactId>restfuljersey-samples-bank-spring</artifactId>
-    <name>restfuljersey-samples-bank-spring</name>
+    <groupId>com.jayway.forest</groupId>
+    <artifactId>forest-samples-bank-spring</artifactId>
+    <name>forest-samples-bank-spring</name>
     <packaging>war</packaging>
 
 
     <dependencies>
         <dependency>
-            <groupId>com.jayway.restfuljersey</groupId>
-            <artifactId>restfuljersey-samples-bank-domain</artifactId>
+            <groupId>com.jayway.forest</groupId>
+            <artifactId>forest-samples-bank-domain</artifactId>
             <version>${project.version}</version>
         </dependency>
 		<dependency>
