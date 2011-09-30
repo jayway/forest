@@ -8,7 +8,6 @@ import com.jayway.jersey.rest.resource.ExceptionMapper;
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.resource.ResourceUtil;
 import com.jayway.jersey.rest.resource.Response;
-import com.jayway.jersey.rest.resource.grove.GroveContextMap;
 import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
 import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
 import com.jayway.restfuljersey.samples.bank.model.AccountManager;
@@ -17,7 +16,7 @@ import com.jayway.restfuljersey.samples.bank.spring.resources.RootResource;
 
 public class RestService extends RestfulServlet {
 	
-	private final ResourceUtil resourceUtil = new ResourceUtil(new GroveContextMap());
+	private final ResourceUtil resourceUtil = new ResourceUtil();
 
     @Override
     protected Resource root() {

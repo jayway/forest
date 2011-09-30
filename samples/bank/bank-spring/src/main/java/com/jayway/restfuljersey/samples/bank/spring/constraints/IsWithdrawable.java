@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 import com.jayway.jersey.rest.constraint.Constraint;
 import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
-import com.jayway.jersey.rest.resource.ContextMap;
 import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
 import com.jayway.restfuljersey.samples.bank.spring.ResourceWithAccount;
 
@@ -20,7 +19,7 @@ public @interface IsWithdrawable {
 
     class Evaluator implements ConstraintEvaluator<IsWithdrawable, ResourceWithAccount> {
 
-        public boolean isValid( IsWithdrawable role, ResourceWithAccount resource, ContextMap map ) {
+        public boolean isValid( IsWithdrawable role, ResourceWithAccount resource ) {
             return resource.getAccount() instanceof Withdrawable;
         }
 

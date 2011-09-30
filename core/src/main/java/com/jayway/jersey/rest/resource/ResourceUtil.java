@@ -31,11 +31,6 @@ import com.jayway.jersey.rest.roles.IdResource;
 public class ResourceUtil {
 
     static Logger log = LoggerFactory.getLogger(ResourceUtil.class);
-	private final ContextMap contextMap;
-    
-    public ResourceUtil(ContextMap contextMap) {
-		this.contextMap = contextMap;
-	}
 
     boolean checkConstraint(Resource resource, Method method) {
         for ( Annotation a : method.getAnnotations() ) {
@@ -60,7 +55,7 @@ public class ResourceUtil {
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
             ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
-            return constraintEvaluator.isValid( annotation, resource, contextMap);
+            return constraintEvaluator.isValid( annotation, resource);
 
         } catch (InstantiationException e) {
             log.error("Could not instantiate constraint", e);
