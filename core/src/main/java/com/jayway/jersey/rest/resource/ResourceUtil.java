@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jayway.forest.DependencyInjectionSPI;
 import com.jayway.jersey.rest.RestfulServlet;
 import com.jayway.jersey.rest.constraint.Constraint;
 import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
@@ -31,8 +32,13 @@ import com.jayway.jersey.rest.roles.IdResource;
 public class ResourceUtil {
 
     static Logger log = LoggerFactory.getLogger(ResourceUtil.class);
+	private final DependencyInjectionSPI dependencyInjectionSPI;
 
-    boolean checkConstraint(Resource resource, Method method) {
+    public ResourceUtil(DependencyInjectionSPI dependencyInjectionSPI) {
+		this.dependencyInjectionSPI = dependencyInjectionSPI;
+	}
+
+	boolean checkConstraint(Resource resource, Method method) {
         for ( Annotation a : method.getAnnotations() ) {
             if ( a.annotationType().getAnnotation(Constraint.class) != null ) {
                 if ( !constraintEvaluator( resource, a ) ) return false;
@@ -55,6 +61,7 @@ public class ResourceUtil {
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
             ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
+            constraintEvaluator = dependencyInjectionSPI.postCreate(constraintEvaluator);
             return constraintEvaluator.isValid( annotation, resource);
 
         } catch (InstantiationException e) {

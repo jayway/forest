@@ -2,6 +2,8 @@ package com.jayway.restfuljersey.samples.bank.spring.resources;
 
 import static com.jayway.forest.grove.RoleManager.role;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.roles.DescribedResource;
 import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
@@ -18,6 +20,9 @@ import com.jayway.restfuljersey.samples.bank.spring.constraints.IsWithdrawable;
 public class AccountResource implements Resource, DescribedResource, ResourceWithAccount {
 
     private final Account account;
+    
+    @Autowired
+    private AccountManager accountManager;
 
 	public AccountResource(Account account) {
 		this.account = account;
@@ -29,13 +34,13 @@ public class AccountResource implements Resource, DescribedResource, ResourceWit
 
     @DepositAllowed
     public void deposit( Integer amount ) {
-        role(AccountManager.class).deposit((Depositable) account, amount);
+        accountManager.deposit((Depositable) account, amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void withdraw( Integer amount ) {
-        role(AccountManager.class).withdraw((Withdrawable) account, amount);
+        accountManager.withdraw((Withdrawable) account, amount);
     }
 
     @HasCredit
@@ -44,7 +49,7 @@ public class AccountResource implements Resource, DescribedResource, ResourceWit
         Depositable depositable = role(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
         Withdrawable withdrawable = (Withdrawable) account;
 
-        role(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
+        accountManager.transfer(withdrawable, depositable, transfer.getAmount() );
     }
 
 

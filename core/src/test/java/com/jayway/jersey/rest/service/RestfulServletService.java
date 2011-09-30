@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
 import com.jayway.forest.grove.RoleManager;
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.resource.ResourceUtil;
@@ -12,7 +13,10 @@ import com.jayway.jersey.rest.resource.ResourceUtil;
 /**
  */
 public class RestfulServletService extends com.jayway.jersey.rest.RestfulServlet {
-	private final ResourceUtil resourceUtil = new ResourceUtil();
+	
+	public RestfulServletService() {
+		super(new GroveDependencyInjectionImpl());
+	}
 
 	@Override
 	protected Resource root() {
@@ -36,10 +40,5 @@ public class RestfulServletService extends com.jayway.jersey.rest.RestfulServlet
 
 	public static void reset() {
 		map.clear();
-	}
-
-	@Override
-	protected ResourceUtil resourceUtil() {
-		return resourceUtil;
 	}
 }

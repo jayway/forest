@@ -2,6 +2,13 @@ package com.jayway.restfuljersey.samples.bank.spring;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.jayway.forest.DependencyInjectionSPI;
+import com.jayway.forest.di.spring.SpringDependencyInjectionImpl;
 import com.jayway.forest.grove.RoleManager;
 import com.jayway.jersey.rest.RestfulServlet;
 import com.jayway.jersey.rest.resource.ExceptionMapper;
@@ -16,17 +23,23 @@ import com.jayway.restfuljersey.samples.bank.spring.resources.RootResource;
 
 public class RestService extends RestfulServlet {
 	
-	private final ResourceUtil resourceUtil = new ResourceUtil();
+	public RestService() {
+		super(getDI());
+	}
+	
+	private static ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+	
+    private static DependencyInjectionSPI getDI() {
+		return applicationContext.getBean(DependencyInjectionSPI.class);
+	}
 
-    @Override
+	@Override
     protected Resource root() {
         return new RootResource();
     }
 
     @Override
     protected void setupContext() {
-        RoleManager.addRole(AccountRepository.class, new AccountRepository());
-        RoleManager.addRole(AccountManager.class, new AccountManager());
     }
 
     @Override
@@ -42,9 +55,4 @@ public class RestService extends RestfulServlet {
             }
         };
     }
-
-	@Override
-	protected ResourceUtil resourceUtil() {
-		return resourceUtil;
-	}
 }

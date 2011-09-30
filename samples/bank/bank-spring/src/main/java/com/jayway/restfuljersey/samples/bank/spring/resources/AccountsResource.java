@@ -1,8 +1,8 @@
 package com.jayway.restfuljersey.samples.bank.spring.resources;
 
-import static com.jayway.forest.grove.RoleManager.role;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.resource.ResponseHandler;
@@ -12,15 +12,18 @@ import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
 public class AccountsResource implements Resource, IdDiscoverableResource {
+	
+	@Autowired
+	private AccountRepository accountRepository;
 
     @Override
     public Resource id(String id) {
-        Account account = role(AccountRepository.class).findById(id);
+        Account account = accountRepository.findById(id);
         return new AccountResource(account);
     }
 
     @Override
     public List<Linkable> discover() {
-        return ResponseHandler.mapList(Account.class, role(AccountRepository.class).all(), "number", "number" );
+        return ResponseHandler.mapList(Account.class, accountRepository.all(), "number", "number" );
     }
 }

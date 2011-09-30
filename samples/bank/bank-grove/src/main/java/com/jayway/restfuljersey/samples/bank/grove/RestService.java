@@ -2,11 +2,11 @@ package com.jayway.restfuljersey.samples.bank.grove;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
 import com.jayway.forest.grove.RoleManager;
 import com.jayway.jersey.rest.RestfulServlet;
 import com.jayway.jersey.rest.resource.ExceptionMapper;
 import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.jersey.rest.resource.ResourceUtil;
 import com.jayway.jersey.rest.resource.Response;
 import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
 import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
@@ -16,8 +16,10 @@ import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
 public class RestService extends RestfulServlet {
 	
-	private final ResourceUtil resourceUtil = new ResourceUtil();
-
+	public RestService() {
+		super(new GroveDependencyInjectionImpl());
+	}
+	
     @Override
     protected Resource root() {
         return new RootResource();
@@ -42,9 +44,4 @@ public class RestService extends RestfulServlet {
             }
         };
     }
-
-	@Override
-	protected ResourceUtil resourceUtil() {
-		return resourceUtil;
-	}
 }
