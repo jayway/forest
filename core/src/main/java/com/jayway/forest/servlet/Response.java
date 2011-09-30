@@ -1,4 +1,4 @@
-package com.jayway.forest.core;
+package com.jayway.forest.servlet;
 
 /**
  */

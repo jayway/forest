@@ -1,4 +1,4 @@
-package com.jayway.forest.core;
+package com.jayway.forest.servlet;
 
 import java.io.IOException;
 
@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jayway.forest.core.Application;
+import com.jayway.forest.core.ForestCore;
+import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
 
 public class RestfulServlet extends HttpServlet {

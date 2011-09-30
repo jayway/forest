@@ -12,7 +12,7 @@ import com.jayway.forest.roles.Resource;
 
 /**
  */
-public class RestfulServletService extends com.jayway.forest.core.RestfulServlet {
+public class RestfulServletService extends com.jayway.forest.servlet.RestfulServlet {
 	
 	public RestfulServletService() {
 		super(new Application() {

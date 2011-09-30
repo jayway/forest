@@ -1,5 +1,7 @@
-package com.jayway.forest.core;
+package com.jayway.forest.servlet;
 
+import com.jayway.forest.core.JSONHelper;
+import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.*;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.HtmlRestReflection;

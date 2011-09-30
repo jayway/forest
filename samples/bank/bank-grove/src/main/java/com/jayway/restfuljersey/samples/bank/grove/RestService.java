@@ -3,12 +3,12 @@ package com.jayway.restfuljersey.samples.bank.grove;
 import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.core.Application;
-import com.jayway.forest.core.ExceptionMapper;
-import com.jayway.forest.core.Response;
-import com.jayway.forest.core.RestfulServlet;
 import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
 import com.jayway.forest.grove.RoleManager;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.ExceptionMapper;
+import com.jayway.forest.servlet.Response;
+import com.jayway.forest.servlet.RestfulServlet;
 import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
 import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
 import com.jayway.restfuljersey.samples.bank.grove.resources.RootResource;

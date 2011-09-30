@@ -5,10 +5,10 @@ import static com.jayway.forest.grove.RoleManager.role;
 
 import java.util.List;
 
-import com.jayway.forest.core.ResponseHandler;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.ResponseHandler;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
