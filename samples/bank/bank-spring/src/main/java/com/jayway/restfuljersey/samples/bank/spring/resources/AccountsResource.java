@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.jersey.rest.resource.ResponseHandler;
-import com.jayway.jersey.rest.roles.IdDiscoverableResource;
-import com.jayway.jersey.rest.roles.Linkable;
+import com.jayway.forest.core.ResponseHandler;
+import com.jayway.forest.roles.IdDiscoverableResource;
+import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.Resource;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 

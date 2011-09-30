@@ -1,6 +1,6 @@
 package com.jayway.forest.di.grove;
 
-import com.jayway.forest.DependencyInjectionSPI;
+import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.grove.RoleManager;
 
 public class GroveDependencyInjectionImpl implements DependencyInjectionSPI {

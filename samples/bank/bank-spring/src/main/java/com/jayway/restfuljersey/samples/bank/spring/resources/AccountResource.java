@@ -4,8 +4,8 @@ import static com.jayway.forest.grove.RoleManager.role;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.jersey.rest.roles.DescribedResource;
+import com.jayway.forest.roles.DescribedResource;
+import com.jayway.forest.roles.Resource;
 import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.model.AccountManager;

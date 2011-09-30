@@ -1,7 +1,7 @@
 package com.jayway.restfuljersey.samples.bank.spring.resources;
 
-import com.jayway.jersey.rest.constraint.Doc;
-import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.forest.constraint.Doc;
+import com.jayway.forest.roles.Resource;
 
 public class RootResource implements Resource {
 

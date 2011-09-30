@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import com.jayway.forest.DependencyInjectionSPI;
+import com.jayway.forest.di.DependencyInjectionSPI;
 
 public class SpringDependencyInjectionImpl implements DependencyInjectionSPI, ApplicationContextAware {
 

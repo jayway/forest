@@ -2,8 +2,8 @@ package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
 import static com.jayway.forest.grove.RoleManager.role;
 
-import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.jersey.rest.roles.DescribedResource;
+import com.jayway.forest.roles.DescribedResource;
+import com.jayway.forest.roles.Resource;
 import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
 import com.jayway.restfuljersey.samples.bank.grove.constraints.DepositAllowed;
 import com.jayway.restfuljersey.samples.bank.grove.constraints.HasCredit;

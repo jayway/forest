@@ -1,9 +1,9 @@
 package com.jayway.restfuljersey.samples.bank.grove.constraints;
 
+import com.jayway.forest.constraint.Constraint;
+import com.jayway.forest.constraint.ConstraintEvaluator;
 import com.jayway.forest.grove.RoleManager;
-import com.jayway.jersey.rest.constraint.Constraint;
-import com.jayway.jersey.rest.constraint.ConstraintEvaluator;
-import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.forest.roles.Resource;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 
 import java.lang.annotation.ElementType;

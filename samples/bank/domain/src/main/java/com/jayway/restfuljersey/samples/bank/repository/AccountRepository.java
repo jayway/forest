@@ -1,6 +1,6 @@
 package com.jayway.restfuljersey.samples.bank.repository;
 
-import com.jayway.jersey.rest.exceptions.NotFoundException;
+import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.model.CheckingAccount;
 import com.jayway.restfuljersey.samples.bank.model.SavingsAccount;
