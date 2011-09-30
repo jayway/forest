@@ -26,8 +26,8 @@ public class RestService extends RestfulServlet {
 
     @Override
     protected void setupContext() {
-        RoleManager.addToContext(AccountRepository.class, new AccountRepository());
-        RoleManager.addToContext(AccountManager.class, new AccountManager());
+        RoleManager.addRole(AccountRepository.class, new AccountRepository());
+        RoleManager.addRole(AccountManager.class, new AccountManager());
     }
 
     @Override

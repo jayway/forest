@@ -21,7 +21,7 @@ public class ConstraintResource implements Resource, IdResource, DescribedResour
     @Override
     @RequiresRoles( String.class )
     public String description() {
-        return RoleManager.context(String.class);
+        return RoleManager.role(String.class);
     }
 
     @Override

@@ -5,6 +5,6 @@ import com.jayway.jersey.rest.resource.ContextMap;
 
 public class GroveContextMap implements ContextMap {
     public <T> T role(Class<T> clazz ) {
-    	return RoleManager.context(clazz);
+    	return RoleManager.role(clazz);
     }
 }

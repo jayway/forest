@@ -1,7 +1,7 @@
 package com.jayway.restfuljersey.samples.bank.spring.resources;
 
 import static com.jayway.forest.grove.RoleManager.addToContext;
-import static com.jayway.forest.grove.RoleManager.context;
+import static com.jayway.forest.grove.RoleManager.role;
 
 import java.util.List;
 
@@ -16,12 +16,12 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
 
     @Override
     public Resource id(String id) {
-        Account account = context(AccountRepository.class).findById(id);
+        Account account = role(AccountRepository.class).findById(id);
         return new AccountResource(account);
     }
 
     @Override
     public List<Linkable> discover() {
-        return ResponseHandler.mapList(Account.class, context(AccountRepository.class).all(), "number", "number" );
+        return ResponseHandler.mapList(Account.class, role(AccountRepository.class).all(), "number", "number" );
     }
 }

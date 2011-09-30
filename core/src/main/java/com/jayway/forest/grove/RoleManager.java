@@ -12,11 +12,11 @@ public class RoleManager {
     };
 	
     @SuppressWarnings("unchecked")
-	public static <T> T context(Class<T> clazz) {
+	public static <T> T role(Class<T> clazz) {
     	return (T) roleMap.get().get(clazz);
     }
 
-    public static <T> void addToContext(Class<T> clazz, Object instance) {
+    public static <T> void addRole(Class<T> clazz, Object instance) {
     	// TODO: check that role does not exists
     	roleMap.get().put(clazz, instance);
     }

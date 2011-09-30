@@ -1,6 +1,6 @@
 package com.jayway.restfuljersey.samples.bank.spring.resources;
 
-import static com.jayway.forest.grove.RoleManager.context;
+import static com.jayway.forest.grove.RoleManager.role;
 
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.roles.DescribedResource;
@@ -29,22 +29,22 @@ public class AccountResource implements Resource, DescribedResource, ResourceWit
 
     @DepositAllowed
     public void deposit( Integer amount ) {
-        context(AccountManager.class).deposit((Depositable) account, amount);
+        role(AccountManager.class).deposit((Depositable) account, amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void withdraw( Integer amount ) {
-        context(AccountManager.class).withdraw((Withdrawable) account, amount);
+        role(AccountManager.class).withdraw((Withdrawable) account, amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void transfer( TransferToDTO transfer ) {
-        Depositable depositable = context(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
+        Depositable depositable = role(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
         Withdrawable withdrawable = (Withdrawable) account;
 
-        context(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
+        role(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
     }
 
 

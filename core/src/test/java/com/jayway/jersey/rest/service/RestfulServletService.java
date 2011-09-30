@@ -25,7 +25,7 @@ public class RestfulServletService extends com.jayway.jersey.rest.RestfulServlet
 		RoleManager.clear();
 		Set<Entry<Class<?>,Object>> entrySet = map.entrySet();
 		for (Entry<Class<?>, Object> entry : entrySet) {
-			RoleManager.addToContext(entry.getKey(), entry.getValue());
+			RoleManager.addRole(entry.getKey(), entry.getValue());
 		}
 	}
 	

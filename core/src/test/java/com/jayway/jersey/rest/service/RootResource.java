@@ -1,6 +1,6 @@
 package com.jayway.jersey.rest.service;
 
-import static com.jayway.forest.grove.RoleManager.context;
+import static com.jayway.forest.grove.RoleManager.role;
 
 import com.jayway.forest.grove.RoleManager;
 import com.jayway.jersey.rest.constraint.grove.RequiresRoles;
@@ -54,7 +54,7 @@ public class RootResource implements Resource, CreatableResource {
 
     @RequiresRoles( String.class )
     public String constraint() {
-        return context(String.class);
+        return role(String.class);
     }
 
     public void complex( List<List<List<String>>> list ) {

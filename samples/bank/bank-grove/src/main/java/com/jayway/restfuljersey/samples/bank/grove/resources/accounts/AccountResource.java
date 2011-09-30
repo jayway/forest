@@ -1,6 +1,6 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
-import static com.jayway.forest.grove.RoleManager.context;
+import static com.jayway.forest.grove.RoleManager.role;
 
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.roles.DescribedResource;
@@ -17,33 +17,33 @@ import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 public class AccountResource implements Resource, DescribedResource {
 
     public void allowexceeddepositlimit( Boolean allow ) {
-    	context(Account.class).setAllowExceedBalanceLimit(allow);
+    	role(Account.class).setAllowExceedBalanceLimit(allow);
     }
 
     @DepositAllowed
     public void deposit( Integer amount ) {
-        context(AccountManager.class).deposit((Depositable) context(Account.class), amount);
+        role(AccountManager.class).deposit((Depositable) role(Account.class), amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void withdraw( Integer amount ) {
-        context(AccountManager.class).withdraw((Withdrawable) context(Account.class), amount);
+        role(AccountManager.class).withdraw((Withdrawable) role(Account.class), amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void transfer( TransferToDTO transfer ) {
-        Depositable depositable = context(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
-        Withdrawable withdrawable = (Withdrawable) context(Account.class);
+        Depositable depositable = role(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
+        Withdrawable withdrawable = (Withdrawable) role(Account.class);
 
-        context(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
+        role(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
     }
 
 
     @Override
     public Object description() {
-        Account account = context(Account.class);
+        Account account = role(Account.class);
         return String.format( Account.HTML_DESCRIPTION, account.getAccountNumber(), account.getBalance(), account.isAllowExceedBalanceLimit() );
     }
 }
