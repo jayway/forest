@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
 
-    <groupId>com.jayway.restfuljersey</groupId>
-    <artifactId>restfuljersey</artifactId>
+    <groupId>com.jayway.forest</groupId>
+    <artifactId>forest</artifactId>
     <packaging>jar</packaging>
     <parent>
-        <groupId>com.jayway.restfuljersey</groupId>
-        <artifactId>restfuljersey-root</artifactId>
+        <groupId>com.jayway.forest</groupId>
+        <artifactId>forest-root</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
 
