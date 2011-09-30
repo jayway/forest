@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.jayway.restfuljersey</groupId>
-	<artifactId>restfuljersey-root</artifactId>
+	<groupId>com.jayway.forest</groupId>
+	<artifactId>forest-root</artifactId>
 	<packaging>pom</packaging>
 	<version>0.2.0-SNAPSHOT</version>
 	<parent>
@@ -12,7 +12,7 @@
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
-	<url>http://github.com/jayway/Restful-Jersey</url>
+	<url>http://github.com/jayway/forest</url>
 	<properties>
 		<com.sun.jersey.version>1.8</com.sun.jersey.version>
 	</properties>
@@ -22,9 +22,9 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:git://github.com/jayway/Restful-Jersey.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/jayway/Restful-Jersey.git</developerConnection>
-		<url>https://github.com/jayway/Restful-Jersey/tree/master</url>
+		<connection>scm:git:git://github.com/jayway/forest.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jayway/forest.git</developerConnection>
+		<url>https://github.com/jayway/forest/tree/master</url>
 	</scm>
 
 	<developers>
