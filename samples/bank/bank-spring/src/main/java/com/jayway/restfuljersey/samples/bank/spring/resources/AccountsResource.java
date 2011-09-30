@@ -1,6 +1,5 @@
 package com.jayway.restfuljersey.samples.bank.spring.resources;
 
-import static com.jayway.forest.grove.RoleManager.addToContext;
 import static com.jayway.forest.grove.RoleManager.role;
 
 import java.util.List;
