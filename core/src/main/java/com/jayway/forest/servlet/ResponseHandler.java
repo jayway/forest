@@ -6,7 +6,7 @@ import com.jayway.forest.exceptions.*;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.HtmlRestReflection;
 import com.jayway.forest.reflection.JsonRestReflection;
-import com.jayway.forest.reflection.ResourceMethod;
+import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Linkable;
 
@@ -108,13 +108,8 @@ public class ResponseHandler {
         } else if ( e instanceof MethodNotAllowedException) {
             return new Response(SC_METHOD_NOT_ALLOWED, "Method Not Allowed" );
         } else if ( e instanceof MethodNotAllowedRenderTemplateException) {
-            ResourceMethod method = ((MethodNotAllowedRenderTemplateException) e).method();
-            Object form;
-            if ( method.isCommand() ) {
-                form = restReflection().renderCommandForm( method.method() );
-            } else {
-                form = restReflection().renderQueryForm( method.method() );
-            }
+            Capability method = ((MethodNotAllowedRenderTemplateException) e).method();
+            Object form = method.renderForm(restReflection());
             return new Response(SC_METHOD_NOT_ALLOWED, form.toString() );
         } else if ( e instanceof NotFoundException) {
             return new Response(SC_NOT_FOUND, "Not Found" );

@@ -8,9 +8,9 @@ import java.util.List;
 
 public class Capabilities {
 	private final String name;
-	private final List<ResourceMethod> queries = new LinkedList<ResourceMethod>();
-	private final List<ResourceMethod> commands = new LinkedList<ResourceMethod>();
-	private final List<ResourceMethod> resources = new LinkedList<ResourceMethod>();
+	private final List<Capability> queries = new LinkedList<Capability>();
+	private final List<Capability> commands = new LinkedList<Capability>();
+	private final List<Capability> resources = new LinkedList<Capability>();
 	private Object description;
     private List<Linkable> discovered;
 
@@ -20,25 +20,25 @@ public class Capabilities {
 	public Capabilities(String name) {
 		this.name = name;
 	}
-	public void addQuery(ResourceMethod method) {
+	public void addQuery(Capability method) {
 		queries.add(method);
 	}
-	public void addCommand(ResourceMethod method) {
+	public void addCommand(Capability method) {
 		commands.add(method);
 	}
-	public void addResource(ResourceMethod method) {
+	public void addResource(Capability method) {
 		resources.add(method);
 	}
 	public String getName() {
 		return name;
 	}
-	public List<ResourceMethod> getQueries() {
+	public List<Capability> getQueries() {
 		return queries;
 	}
-	public List<ResourceMethod> getCommands() {
+	public List<Capability> getCommands() {
 		return commands;
 	}
-	public List<ResourceMethod> getResources() {
+	public List<Capability> getResources() {
 		return resources;
 	}
 	public Object getDescriptionResult() {

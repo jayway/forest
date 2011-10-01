@@ -22,7 +22,7 @@ public final class HtmlRestReflection implements RestReflection {
         if (!capabilities.getQueries().isEmpty()) {
             results.append("<h2>Queries</h2>");
             results.append("<ul>");
-	    	for (ResourceMethod method: capabilities.getQueries()) {
+	    	for (Capability method: capabilities.getQueries()) {
 	    		appendMethod( results, method );
 	    	}
             results.append("</ul>");
@@ -30,7 +30,7 @@ public final class HtmlRestReflection implements RestReflection {
         if (!capabilities.getCommands().isEmpty()) {
             results.append("<h2>Commands</h2>");
             results.append("<ul>");
-	    	for (ResourceMethod method: capabilities.getCommands()) {
+	    	for (Capability method: capabilities.getCommands()) {
 	    		appendMethod( results, method );
 	    	}
             results.append("</ul>");
@@ -39,7 +39,7 @@ public final class HtmlRestReflection implements RestReflection {
             results.append("<h2>Sub Resources</h2>");
             results.append("<ul>");
 
-            for (ResourceMethod method: capabilities.getResources()) {
+            for (Capability method: capabilities.getResources()) {
 	            appendMethod(results, method );
 	    	}
             for (Linkable resource: capabilities.getDiscovered()) {
@@ -54,9 +54,9 @@ public final class HtmlRestReflection implements RestReflection {
 		return results.toString();
 	}
 
-    private void appendMethod( StringBuilder sb, ResourceMethod method ) {
+    private void appendMethod( StringBuilder sb, Capability method ) {
         sb.append("<li><a href='").append( method.name() );
-        if ( method.isSubResource() ) {
+        if ( method instanceof SubResource ) {
             sb.append("/");
         }
         sb.append("'>").append( method.name() ).append("</a>");

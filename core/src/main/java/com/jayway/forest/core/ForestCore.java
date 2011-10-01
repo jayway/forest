@@ -11,7 +11,10 @@ import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.MethodNotAllowedException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.ResourceMethod;
+import com.jayway.forest.reflection.CommandCapability;
+import com.jayway.forest.reflection.QueryCapability;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.SubResource;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Resource;
@@ -78,17 +81,13 @@ public class ForestCore {
         Capabilities capabilities = new Capabilities(clazz.getName());
         for ( Method m : clazz.getDeclaredMethods() ) {
             if ( m.isSynthetic() ) continue;
-            ResourceMethod method = resourceUtil.makeResourceMethod(resource, m);
-            switch (method.type()) {
-                case COMMAND:
-                    capabilities.addCommand(method);
-                    break;
-                case QUERY:
-                    capabilities.addQuery(method);
-                    break;
-                case SUBRESOURCE:
-                    capabilities.addResource(method);
-                    break;
+            Capability method = resourceUtil.makeResourceMethod(resource, m);
+            if (method instanceof CommandCapability) {
+                capabilities.addCommand(method);
+            } else if (method instanceof QueryCapability) {
+                capabilities.addQuery(method);
+            } else if (method instanceof SubResource) {
+                capabilities.addResource(method);
             }
         }
         if ( resource instanceof IdDiscoverableResource) {

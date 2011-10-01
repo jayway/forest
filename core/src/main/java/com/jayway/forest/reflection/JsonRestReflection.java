@@ -17,12 +17,12 @@ public final class JsonRestReflection implements RestReflection {
 	public Object renderCapabilities(Capabilities capabilities) {
         StringBuilder results = new StringBuilder( );
         results.append("{");
-        List<ResourceMethod> all = new LinkedList<ResourceMethod>();
+        List<CapabilityReference> all = new LinkedList<CapabilityReference>();
         all.addAll( capabilities.getQueries() );
         all.addAll( capabilities.getCommands() );
         all.addAll( capabilities.getResources() );
         for (Linkable link : capabilities.getDiscovered()) {
-            all.add(new ResourceMethod(link));
+            all.add(new LinkCapabilityReference(link));
         }
         if ( !all.isEmpty() ) {
             toMapEntries(all, results);
@@ -31,25 +31,19 @@ public final class JsonRestReflection implements RestReflection {
 		return results.toString();
 	}
 
-    private void appendMethod( StringBuilder sb, ResourceMethod method ) {
+    private void appendMethod( StringBuilder sb, CapabilityReference method ) {
         sb.append( "\"" ).append( method.name() );
-        if ( method.isSubResource() ) {
+        if ( method instanceof SubResource ) {
             sb.append( "/");
         }
-        sb.append("\" : { \"method\" : ");
-        if ( method.isCommand() ) {
-            sb.append( "\"PUT\" }" );
-        } else if ( method.isQuery() ) {
-            sb.append( "\"GET\" }" );
-        } else {
-            // sub resource
-            sb.append( "\"GET\" }" );
-        }
+        sb.append("\" : { \"method\" : \"");
+        sb.append(method.httpMethod());
+        sb.append("\" }");
     }
 
-    private void toMapEntries(List<ResourceMethod> list, StringBuilder results) {
+    private void toMapEntries(List<CapabilityReference> list, StringBuilder results) {
         boolean first = true;
-        for (ResourceMethod method : list) {
+        for (CapabilityReference method : list) {
             if ( !first ) results.append( ",");
             appendMethod( results, method );
             first = false;

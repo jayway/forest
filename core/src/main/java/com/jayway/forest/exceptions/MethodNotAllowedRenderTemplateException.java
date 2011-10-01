@@ -1,18 +1,18 @@
 package com.jayway.forest.exceptions;
 
-import com.jayway.forest.reflection.ResourceMethod;
+import com.jayway.forest.reflection.Capability;
 
 /**
  */
 public class MethodNotAllowedRenderTemplateException extends RuntimeException {
 
-    private ResourceMethod method;
+    private Capability method;
 
-    public MethodNotAllowedRenderTemplateException(ResourceMethod method) {
+    public MethodNotAllowedRenderTemplateException(Capability method) {
         this.method = method;
     }
 
-    public ResourceMethod method() {
+    public Capability method() {
         return method;
     }
 
