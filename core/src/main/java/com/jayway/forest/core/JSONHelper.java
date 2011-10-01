@@ -45,9 +45,9 @@ public class JSONHelper {
         if ( dto instanceof Map ) {
             JSONObject mapResult = new JSONObject();
             Map<?,?> map = (Map<?,?>) dto;
-            for (Object key : map.keySet()) {
-                mapResult.put( key, toJSON(map.get(key)) );
-            }
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+            	mapResult.put( entry.getKey(), toJSON(entry.getValue()) );
+			}
             return mapResult;
         }
 
