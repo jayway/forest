@@ -4,7 +4,6 @@ import static com.jayway.forest.grove.RoleManager.role;
 
 import com.jayway.forest.constraint.grove.RequiresRoles;
 import com.jayway.forest.dto.IntegerDTO;
-import com.jayway.forest.grove.RoleManager;
 import com.jayway.forest.roles.CreatableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;

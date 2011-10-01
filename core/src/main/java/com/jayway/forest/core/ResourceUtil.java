@@ -15,7 +15,6 @@ import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintEvaluator;
 import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.CommandCapability;
 import com.jayway.forest.reflection.CapabilityNotAllowed;
 import com.jayway.forest.reflection.IdCapability;
@@ -59,7 +58,8 @@ public class ResourceUtil {
         if ( annotation == null ) return true;
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
-            ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
+            @SuppressWarnings("unchecked")
+			ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
             constraintEvaluator = dependencyInjectionSPI.postCreate(constraintEvaluator);
             return constraintEvaluator.isValid( annotation, resource);
 
@@ -120,9 +120,5 @@ public class ResourceUtil {
 
     public Object get( HttpServletRequest request, Resource resource, String get ) {
         return findMethod(resource, get).get(request);
-    }
-
-    private NotFoundException notFound() {
-        return new NotFoundException();
     }
 }
