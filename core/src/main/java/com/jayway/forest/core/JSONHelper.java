@@ -78,9 +78,9 @@ public class JSONHelper {
         }
 
         // several arguments must passed in a JSON array
-        if ( !(parse instanceof JSONArray) ) new BadRequestException();
+        if ( !(parse instanceof JSONArray) ) throw new BadRequestException();
         JSONArray argumentArray = (JSONArray) parse;
-        if ( argumentArray.size() != argumentCount ) new BadRequestException();
+        if ( argumentArray.size() != argumentCount ) throw new BadRequestException();
 
         // more than one argument
         Object[] arguments = new Object[ argumentCount ];
