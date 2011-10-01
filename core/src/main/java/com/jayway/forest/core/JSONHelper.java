@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  */
@@ -151,9 +152,10 @@ public class JSONHelper {
                     keyType = valueType = keyClass = valueClass = Object.class;
                 }
                 JSONObject obj = (JSONObject) jsonValue;
-                for (Object key : obj.keySet()) {
-                    Object value = obj.get( key );
-                    map.put( handleArgument( keyClass, keyType, key), handleArgument( valueClass, valueType, value));
+                for (Object e : obj.entrySet()) {
+                	Map.Entry<?, ?> entry = (Entry<?, ?>) e;
+                    map.put( handleArgument( keyClass, keyType, entry.getKey()), 
+                    		 handleArgument( valueClass, valueType, entry.getValue()));
                 }
             } else {
                 throw new BadRequestException();
