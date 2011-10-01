@@ -20,7 +20,8 @@ import java.util.Map;
  */
 public class JSONHelper {
 
-    public Object toJSON(final Object dto ) {
+    @SuppressWarnings({ "unchecked" })
+	public Object toJSON(final Object dto ) {
         if ( dto == null ) return null;
         // basic types or ENUM
         if ( dto instanceof Enum ) {
@@ -34,7 +35,7 @@ public class JSONHelper {
         // JSONArray
         if ( dto instanceof List ) {
             JSONArray arrayResult = new JSONArray();
-            for ( Object o : (List)dto ) {
+            for ( Object o : (List<?>)dto ) {
                 arrayResult.add( toJSON(o) );
             }
             return arrayResult;
@@ -43,7 +44,7 @@ public class JSONHelper {
         // JSONObject
         if ( dto instanceof Map ) {
             JSONObject mapResult = new JSONObject();
-            Map map = (Map) dto;
+            Map<?,?> map = (Map<?,?>) dto;
             for (Object key : map.keySet()) {
                 mapResult.put( key, toJSON(map.get(key)) );
             }
@@ -90,7 +91,8 @@ public class JSONHelper {
 
     }
 
-    public <T> T fromJSON( Class<T> clazz, Object jsonValue ) {
+    @SuppressWarnings("unchecked")
+	public <T> T fromJSON( Class<T> clazz, Object jsonValue ) {
         return (T) handleArgument(clazz, clazz, jsonValue);
     }
 
@@ -107,7 +109,7 @@ public class JSONHelper {
 
         // List
         if ( List.class.isAssignableFrom( argumentClass ) ) {
-            ArrayList list = new ArrayList();
+            ArrayList<Object> list = new ArrayList<Object>();
             if ( jsonValue instanceof JSONArray ) {
                 Type typeArgument;
                 Class<?> typeClass;
@@ -133,7 +135,7 @@ public class JSONHelper {
 
         // Map
         if ( Map.class.isAssignableFrom( argumentClass ) ) {
-            HashMap map = new HashMap();
+            HashMap<Object,Object> map = new HashMap<Object,Object>();
             if ( jsonValue instanceof JSONObject) {
                 Type keyType;
                 Type valueType;

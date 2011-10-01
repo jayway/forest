@@ -1,7 +1,6 @@
 package com.jayway.forest.service;
 
 import com.jayway.forest.core.JSONHelper;
-import com.jayway.forest.grove.RoleManager;
 
 import org.json.simple.JSONValue;
 import org.junit.AfterClass;
@@ -71,7 +70,8 @@ public class AbstractRunner {
         return get( url, clazz, "application/json" );
     }
 
-    protected <T> T get( String url, Class<T> clazz, String accept ) throws IOException {
+    @SuppressWarnings("unchecked")
+	protected <T> T get( String url, Class<T> clazz, String accept ) throws IOException {
         if ( queryParams.size() > 0 ) {
             StringBuilder sb = new StringBuilder( url ).append( "?");
             boolean first = true;

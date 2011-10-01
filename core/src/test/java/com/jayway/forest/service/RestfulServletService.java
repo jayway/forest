@@ -13,6 +13,7 @@ import com.jayway.forest.roles.Resource;
 /**
  */
 public class RestfulServletService extends com.jayway.forest.servlet.RestfulServlet {
+	private static final long serialVersionUID = 1;
 	
 	public RestfulServletService() {
 		super(new Application() {
