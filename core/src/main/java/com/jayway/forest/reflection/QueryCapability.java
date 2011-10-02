@@ -13,8 +13,8 @@ import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.Resource;
 
 public class QueryCapability extends BaseReflectionCapability {
-    private final Resource resource;
-	private final Method method;
+    protected final Resource resource;
+	protected final Method method;
 
 	public QueryCapability(Resource resource, Method method, String name, String documentation) {
 		super(name, documentation);

@@ -10,13 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.MethodNotAllowedException;
 import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.CommandCapability;
-import com.jayway.forest.reflection.QueryCapability;
-import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.SubResource;
+import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
+import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 
 public class ForestCore {
@@ -28,7 +25,7 @@ public class ForestCore {
 	public ForestCore(Application application, DependencyInjectionSPI dependencyInjectionSPI) {
 		this.application = application;
 		this.dependencyInjectionSPI = dependencyInjectionSPI;
-		resourceUtil = new ResourceUtil(dependencyInjectionSPI);
+		resourceUtil = new ResourceUtil(dependencyInjectionSPI, application.transformers());
 	}
 
     private PathAndMethod setup(HttpServletRequest request) {
@@ -45,7 +42,7 @@ public class ForestCore {
     public Object evaluateGet( HttpServletRequest request) {
     	PathAndMethod pathAndMethod = setup(request);
         if ( pathAndMethod.method() == null ) {
-            return capabilities(evaluatePath(pathAndMethod.pathSegments()));
+            return capabilities(evaluatePath(pathAndMethod.pathSegments()), request);
         }
         return resourceUtil.get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
     }
@@ -76,14 +73,20 @@ public class ForestCore {
         return current;
     }
 
-    private Capabilities capabilities(Resource resource) {
+    private Capabilities capabilities(Resource resource, HttpServletRequest request) {
         Class<?> clazz = resource.getClass();
         Capabilities capabilities = new Capabilities(clazz.getName());
+        QueryForListCapability discoverMethod = null;
         for ( Method m : clazz.getDeclaredMethods() ) {
             if ( m.isSynthetic() ) continue;
             Capability method = resourceUtil.makeResourceMethod(resource, m);
             if (method instanceof CommandCapability) {
                 capabilities.addCommand(method);
+            } else if (method instanceof QueryForListCapability) {
+                capabilities.addQuery(method);
+                if ( method.name().equals( "discover") ) {
+                    discoverMethod = (QueryForListCapability) method;
+                }
             } else if (method instanceof QueryCapability) {
                 capabilities.addQuery(method);
             } else if (method instanceof SubResource) {
@@ -91,10 +94,12 @@ public class ForestCore {
             }
         }
         if ( resource instanceof IdDiscoverableResource) {
-            try {
-                capabilities.setDiscovered(  ((IdDiscoverableResource) resource).discover() );
-            } catch( Exception e) {
-                // nothing discovered ignore
+            if ( discoverMethod != null ) {
+                try {
+                    capabilities.setDiscovered( discoverMethod.get(request) );
+                } catch( Exception e) {
+                    // nothing discovered ignore
+                }
             }
         }
         if (resource instanceof DescribedResource) {

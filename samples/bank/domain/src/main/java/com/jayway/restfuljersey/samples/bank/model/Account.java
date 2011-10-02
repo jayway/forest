@@ -8,12 +8,14 @@ public class Account {
     public static final int MAX_ENSURED_BALANCE = 1000;
     protected int balance;
     private String number;
+    private String name;
     private boolean allowExceedBalanceLimit;
 
-    public Account( String number ) {
+    public Account( String number, String name ) {
         balance = 100;
         this.number = number;
         this.allowExceedBalanceLimit = false;
+        this.name = name;
     }
 
     public int getBalance() {
@@ -22,6 +24,10 @@ public class Account {
 
     public String getAccountNumber() {
         return number;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

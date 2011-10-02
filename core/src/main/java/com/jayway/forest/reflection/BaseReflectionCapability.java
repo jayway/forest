@@ -24,7 +24,7 @@ public abstract class BaseReflectionCapability extends Capability {
         }
     }
 
-    private String getFirst( Map<String, String[]> map, String key ) {
+    protected String getFirst( Map<String, String[]> map, String key ) {
         String[] strings = map.get(key);
         if ( strings == null ) return null;
         return strings[0];

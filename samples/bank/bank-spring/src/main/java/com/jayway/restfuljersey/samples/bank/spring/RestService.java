@@ -2,6 +2,7 @@ package com.jayway.restfuljersey.samples.bank.spring;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.jayway.forest.reflection.Transformer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -15,6 +16,8 @@ import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
 import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
 import com.jayway.restfuljersey.samples.bank.spring.resources.RootResource;
 
+import java.util.Map;
+
 public class RestService extends RestfulServlet {
 	
 	public RestService() {
@@ -27,7 +30,12 @@ public class RestService extends RestfulServlet {
 			public Resource root() {
 		        return new RootResource();
 			}
-		}, getDI());
+
+            @Override
+            public Map<Class, Transformer> transformers() {
+                return null;
+            }
+        }, getDI());
 	}
 	
 	private static ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ApplicationConfig.class);

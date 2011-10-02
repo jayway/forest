@@ -12,7 +12,7 @@ public class Capabilities {
 	private final List<Capability> commands = new LinkedList<Capability>();
 	private final List<Capability> resources = new LinkedList<Capability>();
 	private Object description;
-    private List<Linkable> discovered;
+    private PagedSortedListResponse discovered;
 
     public void setDescriptionResult(Object description) {
 		this.description = description;
@@ -44,11 +44,14 @@ public class Capabilities {
 	public Object getDescriptionResult() {
 		return description;
 	}
-    public void setDiscovered(List<Linkable> discovered ) {
+    public void setDiscovered( PagedSortedListResponse discovered ) {
         this.discovered = discovered;
     }
-    public List<Linkable> getDiscovered() {
+    public List<Linkable> getDiscoveredLinks() {
         if ( discovered == null ) return Collections.emptyList();
+        return (List<Linkable>) discovered.getList();
+    }
+    public PagedSortedListResponse getPagedSortedListResponse() {
         return discovered;
     }
 }

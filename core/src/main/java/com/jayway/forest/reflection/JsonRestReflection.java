@@ -21,7 +21,8 @@ public final class JsonRestReflection implements RestReflection {
         all.addAll( capabilities.getQueries() );
         all.addAll( capabilities.getCommands() );
         all.addAll( capabilities.getResources() );
-        for (Linkable link : capabilities.getDiscovered()) {
+        // todo append the whole paging result
+        for (Linkable link : capabilities.getDiscoveredLinks()) {
             all.add(new LinkCapabilityReference(link));
         }
         if ( !all.isEmpty() ) {
@@ -59,6 +60,12 @@ public final class JsonRestReflection implements RestReflection {
 	public Object renderQueryForm(Method method) {
 		return createForm(method, "GET");
 	}
+
+    @Override
+    public Object renderListResponse(PagedSortedListResponse responseObject) {
+        // TODO
+        return null;
+    }
 
     protected String createForm( Method method, String httpMethod ) {
     	return "N/A";

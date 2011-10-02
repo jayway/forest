@@ -3,11 +3,7 @@ package com.jayway.forest.servlet;
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.*;
-import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.HtmlRestReflection;
-import com.jayway.forest.reflection.JsonRestReflection;
-import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.Linkable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +53,9 @@ public class ResponseHandler {
         if (responseObject != null) {
             if ( responseObject instanceof Capabilities ) {
                 responseObject = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
+                response.getOutputStream().print( responseObject.toString() );
+            } else if ( responseObject instanceof PagedSortedListResponse ) {
+                responseObject = restReflection().renderListResponse( (PagedSortedListResponse) responseObject );
                 response.getOutputStream().print( responseObject.toString() );
             } else {
                 if (mediaTypeHandler.acceptJSSON()) {

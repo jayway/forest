@@ -1,13 +1,16 @@
 package com.jayway.restfuljersey.samples.bank.model;
 
-import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
-
 /**
  */
 public class CheckingAccount extends Account implements Depositable, Withdrawable {
 
-    public CheckingAccount(String number) {
-        super(number);
+    public CheckingAccount( String number, String name ) {
+        super(number, name);
+    }
+
+    public CheckingAccount(String number, int balance, String name ) {
+        super(number, name);
+        this.balance = balance;
     }
 
     @Override
