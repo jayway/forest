@@ -13,7 +13,8 @@ import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
 
 public class RestfulServlet extends HttpServlet {
-
+	private static final long serialVersionUID = 1;
+	
 	private final ForestCore forest;
 
     public RestfulServlet(Application application, DependencyInjectionSPI dependencyInjectionSPI) {
@@ -40,7 +41,8 @@ public class RestfulServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
-            public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
+            @SuppressWarnings("unchecked")
+			public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
                 if ( mediaType.contentTypeFormUrlEncoded() ) {
                     forest.evaluatePostPut(req, null, req.getParameterMap(), mediaType );
                 } else {

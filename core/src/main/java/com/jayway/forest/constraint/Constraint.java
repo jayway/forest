@@ -8,5 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Constraint {
-    Class<? extends ConstraintEvaluator> value();
+    @SuppressWarnings("rawtypes")
+	Class<? extends ConstraintEvaluator> value();
 }

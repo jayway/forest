@@ -47,7 +47,8 @@ public abstract class BaseReflectionCapability extends Capability {
         return o;
     }
 
-    private Object mapBasic( Class<?> clazz, String value ) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object mapBasic( Class<?> clazz, String value ) {
         if( clazz == String.class ) {
             return value;
         } else if ( clazz == Integer.class ) {

@@ -53,19 +53,20 @@ public class CommandsTest extends AbstractRunner {
         }
     }
 
-    @Test
+    @Test @SuppressWarnings("unchecked")
     public void testCommandAddToList() throws IOException {
         post( "/bank/addtolist", "[[\"Hello\"], \"World\"]" );
 
-        List<String> list = (List<String>) StateHolder.get();
+        
+		List<String> list = (List<String>) StateHolder.get();
         Assert.assertEquals("HelloWorld", list.get(0) + list.get(1));
     }
 
-    @Test
+    @Test @SuppressWarnings("unchecked")
     public void testComplex() throws IOException {
         post( "/bank/complex", "[[[\"Hello\", \"World\"]]]" );
-
-        List<List<List<String>>> list = (List<List<List<String>>>) StateHolder.get();
+        
+		List<List<List<String>>> list = (List<List<List<String>>>) StateHolder.get();
         String result = "";
         for ( String elm : list.get(0).get(0) ) {
             result += elm;
