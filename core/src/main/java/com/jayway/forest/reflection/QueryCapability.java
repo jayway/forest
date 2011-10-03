@@ -24,7 +24,8 @@ public class QueryCapability extends BaseReflectionCapability {
 
 	@Override
 	public Object get(HttpServletRequest request) {
-        Map<String, String[]> queryParams = request.getParameterMap();
+        @SuppressWarnings("unchecked")
+		Map<String, String[]> queryParams = request.getParameterMap();
         if ( queryParams.size() == 0 && method.getParameterTypes().length > 0) {
             throw new MethodNotAllowedRenderTemplateException( this );
         } else {

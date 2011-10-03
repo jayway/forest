@@ -15,12 +15,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  */
 public class JSONHelper {
 
-    public Object toJSON(final Object dto ) {
+    @SuppressWarnings({ "unchecked" })
+	public Object toJSON(final Object dto ) {
         if ( dto == null ) return null;
         // basic types or ENUM
         if ( dto instanceof Enum ) {
@@ -34,7 +36,7 @@ public class JSONHelper {
         // JSONArray
         if ( dto instanceof List ) {
             JSONArray arrayResult = new JSONArray();
-            for ( Object o : (List)dto ) {
+            for ( Object o : (List<?>)dto ) {
                 arrayResult.add( toJSON(o) );
             }
             return arrayResult;
@@ -43,10 +45,10 @@ public class JSONHelper {
         // JSONObject
         if ( dto instanceof Map ) {
             JSONObject mapResult = new JSONObject();
-            Map map = (Map) dto;
-            for (Object key : map.keySet()) {
-                mapResult.put( key, toJSON(map.get(key)) );
-            }
+            Map<?,?> map = (Map<?,?>) dto;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+            	mapResult.put( entry.getKey(), toJSON(entry.getValue()) );
+			}
             return mapResult;
         }
 
@@ -77,9 +79,9 @@ public class JSONHelper {
         }
 
         // several arguments must passed in a JSON array
-        if ( !(parse instanceof JSONArray) ) new BadRequestException();
+        if ( !(parse instanceof JSONArray) ) throw new BadRequestException();
         JSONArray argumentArray = (JSONArray) parse;
-        if ( argumentArray.size() != argumentCount ) new BadRequestException();
+        if ( argumentArray.size() != argumentCount ) throw new BadRequestException();
 
         // more than one argument
         Object[] arguments = new Object[ argumentCount ];
@@ -90,7 +92,8 @@ public class JSONHelper {
 
     }
 
-    public <T> T fromJSON( Class<T> clazz, Object jsonValue ) {
+    @SuppressWarnings("unchecked")
+	public <T> T fromJSON( Class<T> clazz, Object jsonValue ) {
         return (T) handleArgument(clazz, clazz, jsonValue);
     }
 
@@ -107,7 +110,7 @@ public class JSONHelper {
 
         // List
         if ( List.class.isAssignableFrom( argumentClass ) ) {
-            ArrayList list = new ArrayList();
+            ArrayList<Object> list = new ArrayList<Object>();
             if ( jsonValue instanceof JSONArray ) {
                 Type typeArgument;
                 Class<?> typeClass;
@@ -133,7 +136,7 @@ public class JSONHelper {
 
         // Map
         if ( Map.class.isAssignableFrom( argumentClass ) ) {
-            HashMap map = new HashMap();
+            HashMap<Object,Object> map = new HashMap<Object,Object>();
             if ( jsonValue instanceof JSONObject) {
                 Type keyType;
                 Type valueType;
@@ -149,9 +152,10 @@ public class JSONHelper {
                     keyType = valueType = keyClass = valueClass = Object.class;
                 }
                 JSONObject obj = (JSONObject) jsonValue;
-                for (Object key : obj.keySet()) {
-                    Object value = obj.get( key );
-                    map.put( handleArgument( keyClass, keyType, key), handleArgument( valueClass, valueType, value));
+                for (Object e : obj.entrySet()) {
+                	Map.Entry<?, ?> entry = (Entry<?, ?>) e;
+                    map.put( handleArgument( keyClass, keyType, entry.getKey()), 
+                    		 handleArgument( valueClass, valueType, entry.getValue()));
                 }
             } else {
                 throw new BadRequestException();
