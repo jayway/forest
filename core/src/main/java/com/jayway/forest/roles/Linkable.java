@@ -4,23 +4,23 @@ package com.jayway.forest.roles;
  */
 public class Linkable {
 
-    private String id;
+    private String href;
     private String name;
     private String rel;
 
-    public Linkable( String id, String name, String rel ) {
-        this(id, name);
+    public Linkable( String href, String name, String rel ) {
+        this(href, name);
         this.rel = rel;
     }
 
-    public Linkable( String id, String name ) {
-        this.id = id;
+    public Linkable( String href, String name ) {
+        this.href = href;
         this.name = name;
     }
 
 
-    public String id() {
-        return id;
+    public String href() {
+        return href;
     }
 
     public String name() {

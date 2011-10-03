@@ -6,9 +6,14 @@ final public class PagingParameter extends Touchable {
 
     private Integer page;
     private Integer pageSize;
+    private int totalElements;
 
     protected PagingParameter( Integer page, Integer pageSize) {
-        this.page = page;
+        if ( page == null ) {
+            this.page = 1;
+        } else {
+            this.page = page;
+        }
         this.pageSize = pageSize;
     }
 
@@ -22,44 +27,19 @@ final public class PagingParameter extends Touchable {
         return pageSize;
     }
 
-    private int totalElements;
-    private boolean hasNext;
-    private boolean hasPrevious;
-    private int preferredPageSize;
 
     public int getTotalElements() {
         return totalElements;
     }
 
     public void setTotalElements(int totalElements) {
+        touch();
         this.totalElements = totalElements;
+    }
+
+    public Integer offset() {
         touch();
+        return (page-1)*pageSize;
     }
 
-    public boolean hasNext() {
-        return hasNext;
-    }
-
-    public void setHasNext(boolean hasNext) {
-        touch();
-        this.hasNext = hasNext;
-    }
-
-    public boolean hasPrevious() {
-        return hasPrevious;
-    }
-
-    public void setHasPrevious(boolean hasPrevious) {
-        touch();
-        this.hasPrevious = hasPrevious;
-    }
-
-    public int getPreferredPageSize() {
-        return preferredPageSize;
-    }
-
-    public void setPreferredPageSize(int preferredPageSize) {
-        touch();
-        this.preferredPageSize = preferredPageSize;
-    }
 }

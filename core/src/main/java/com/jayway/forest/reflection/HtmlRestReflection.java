@@ -44,7 +44,7 @@ public final class HtmlRestReflection implements RestReflection {
             }
             for (Linkable resource: capabilities.getDiscoveredLinks()) {
                 if ( resource == null ) continue;
-                results.append("<li><a href='").append(resource.id()).append("/'>").append(resource.name()).append("</a></li>");
+                results.append("<li><a href='").append(resource.href()).append("/'>").append(resource.name()).append("</a></li>");
             }
             results.append("</ul>");
         }
@@ -115,7 +115,7 @@ public final class HtmlRestReflection implements RestReflection {
         sb.append("<table><tr>");
         Object element = list.get(0);
         if ( element instanceof Linkable ) {
-            sb.append("<th>id</td>");
+            sb.append("<th>href</td>");
         }
         renderTableHeader( sb, element, element.getClass() );
         sb.append("</tr>");
@@ -123,7 +123,7 @@ public final class HtmlRestReflection implements RestReflection {
             sb.append("<tr>");
             if ( elm instanceof Linkable ) {
                 sb.append("<td>");
-                appendAnchor( sb, ((Linkable) elm).id() + "/", ((Linkable) elm).name(), false);
+                appendAnchor( sb, ((Linkable) elm).href() + "/", ((Linkable) elm).href(), false);
                 sb.append("</td>");
                 renderTableRow(sb, elm.getClass(), elm );
             } else {
@@ -164,10 +164,10 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void iterateFields( Class clazz, Object instance, FieldIterator callback ) {
         for (Field field : clazz.getDeclaredFields()) {
-            if ( Modifier.isFinal( field.getModifiers() )) continue;
+            if ( Modifier.isFinal(field.getModifiers())) continue;
             if ( Modifier.isStatic( field.getModifiers() )) continue;
-            if ( instance instanceof Linkable && field.getName().equals( "id") ) continue;
-            if ( instance instanceof Linkable && field.getName().equals( "name") ) continue;
+            if ( instance instanceof Linkable && field.getName().equals( "href") ) continue;
+            if ( instance instanceof Linkable && field.getName().equals( "rel") ) continue;
             field.setAccessible(true);
             try {
                 callback.field( field );
@@ -183,7 +183,7 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void renderLinkable(StringBuilder sb, Linkable link) {
         sb.append("<li>");
-        appendAnchor( sb, link.id()+"/", link.name(), false );
+        appendAnchor( sb, link.href()+"/", link.name(), false );
         sb.append( "</li>" );
     }
 

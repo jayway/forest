@@ -1,30 +1,42 @@
 package com.jayway.forest.reflection;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  */
-final public class SortingParameter extends Touchable {
+final public class SortingParameter extends Touchable implements Iterable<SortParameter> {
 
-    public static final String SORT_ORDER_DESCENDING = "desc";
-    public static final String SORT_ORDER_ASCENDING = "asc";
-    private String sortBy;
-    private String sortOrder;
-    private Boolean setInURL;
+    private List<SortParameter> parameters;
 
-    protected SortingParameter( String sortBy, String sortOrder, Boolean setInURL ) {
-        this.sortBy = sortBy;
-        this.sortOrder = sortOrder;
-        this.setInURL = setInURL;
+    protected SortingParameter( String sortByUrl ) {
+        parameters = new LinkedList<SortParameter>();
+        String[] sortBy = sortByUrl.split(",");
+        for ( String rawParameter : sortBy ) {
+            parameters.add( new SortParameter( rawParameter ));
+        }
     }
 
-    public String getSortBy() {
-        return sortBy;
+    @Override
+    public Iterator<SortParameter> iterator() {
+        touch();
+        return parameters.iterator();
     }
 
-    public String getSortOrder() {
-        return sortOrder;
+    public String firstParameterName() {
+        touch();
+        if ( parameters.isEmpty() ) return "";
+        return parameters.get(0).name();
     }
 
-    public Boolean setInURL() {
-        return setInURL;
+    public String sortByFirstQuery( boolean ascending, Integer pageSize ) {
+        touch();
+        if ( parameters.isEmpty() ) return "";
+        if ( ascending ) {
+            return "?sortBy=" + parameters.get(0).name() + "&pageSize="+pageSize;
+        } else {
+            return "?sortBy=-" + parameters.get(0).name() + "&pageSize="+pageSize;
+        }
     }
 }

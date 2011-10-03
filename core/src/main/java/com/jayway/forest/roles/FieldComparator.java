@@ -1,29 +1,39 @@
 package com.jayway.forest.roles;
 
 import com.jayway.forest.reflection.ReflectionUtil;
-import com.jayway.forest.reflection.SortingParameter;
+import com.jayway.forest.reflection.SortParameter;
 
 import java.lang.reflect.Field;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  */
 public class FieldComparator implements Comparator<Object> {
 
-    private String fieldName;
-    private String direction;
+    private LinkedList<SortParameter> fieldNames;
+    private Map<SortParameter, Field> fieldCache;
 
-    public FieldComparator( String fieldName, String direction ) {
-        this.fieldName = fieldName;
-        this.direction = direction;
+
+
+    public FieldComparator( Iterator<SortParameter> fieldNames ) {
+        this.fieldCache = new HashMap<SortParameter, Field>();
+        this.fieldNames = new LinkedList<SortParameter>();
+        while ( fieldNames.hasNext() ) {
+            this.fieldNames.addLast(fieldNames.next());
+        }
     }
 
     @Override
     public int compare(Object first, Object second) {
+        return compare( first, second, fieldNames );
+    }
+
+    private int compare(Object first, Object second, LinkedList<SortParameter> fieldNames ) {
+        SortParameter sort = fieldNames.getFirst();
         try {
-            Field f1 = getField(first.getClass());
+            Field f1 = getField(first.getClass(), sort);
             f1.setAccessible( true );
-            Field f2 = getField( second.getClass() );
+            Field f2 = getField( second.getClass(), sort );
             f2.setAccessible( true );
             Object v1 = f1.get(first);
             Object v2 = f2.get(second);
@@ -32,11 +42,18 @@ public class FieldComparator implements Comparator<Object> {
                 v1 = v1.toString();
                 v2 = v2.toString();
             }
-            if ( direction.equals(SortingParameter.SORT_ORDER_ASCENDING)) {
-                return basicCompare( v1, v2);
+            int compare;
+            if ( sort.isAscending() ) {
+                compare = basicCompare(v1, v2);
             } else {
-                return basicCompare(v2, v1);
+                compare = basicCompare(v2, v1);
             }
+            if ( compare == 0 && fieldNames.size() >1) {
+                SortParameter firstField = fieldNames.removeFirst();
+                compare = compare(first, second, fieldNames);
+                fieldNames.addFirst( firstField );
+            }
+            return compare;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
@@ -45,12 +62,19 @@ public class FieldComparator implements Comparator<Object> {
         return 0;
     }
 
-    private Field getField( Class clazz ) throws NoSuchFieldException {
+    private Field getField( Class clazz, SortParameter sort ) throws NoSuchFieldException {
+        if ( fieldCache.containsKey( sort) ) {
+            return fieldCache.get(sort);
+        }
         try {
-            return clazz.getDeclaredField( fieldName );
+            Field field = clazz.getDeclaredField(sort.name());
+            if ( !fieldCache.containsKey( sort )) {
+                fieldCache.put( sort, field );
+            }
+            return field;
         } catch (NoSuchFieldException e) {
             if ( clazz == Object.class ) throw e;
-            return getField( clazz.getSuperclass() );
+            return getField( clazz.getSuperclass(), sort );
         }
     }
 

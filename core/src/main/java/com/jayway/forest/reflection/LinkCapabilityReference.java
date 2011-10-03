@@ -12,7 +12,7 @@ public class LinkCapabilityReference implements CapabilityReference {
 
 	@Override
 	public String name() {
-		return linkable.id();
+		return linkable.href();
 	}
 
 	@Override

@@ -6,6 +6,8 @@ import static com.jayway.forest.grove.RoleManager.role;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jayway.forest.constraint.Doc;
+import com.jayway.forest.reflection.SortingParameter;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
@@ -17,7 +19,7 @@ import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 public class AccountsResource implements Resource, IdDiscoverableResource {
 
 
-    // returns a list that cannot be transformed
+    @Doc("returning a list of CheckingAccount that cannot be transformed to Linkable")
     public List<CheckingAccount> overdrawscheckingaccounts() {
         List<CheckingAccount> overdrawn = new ArrayList<CheckingAccount>();
         for (Account account : role(AccountRepository.class).all()) {
@@ -25,7 +27,8 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
         }
         return overdrawn;
     }
-    
+
+    @Doc("returning a list of Account which can be transformed to AccountLinkable")
     public List<Account> overdrawn() {
         List<Account> overdrawn = new ArrayList<Account>();
         for (Account account : role(AccountRepository.class).all()) {
@@ -41,6 +44,7 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
         return new AccountResource();
     }
 
+    @Doc("returning a list of Linkable")
     @Override
     public List<Linkable> discover() {
         return ResponseHandler.mapList(Account.class, role(AccountRepository.class).all(), "number", "name" );
