@@ -1,5 +1,6 @@
 package com.jayway.forest.reflection;
 
+import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.roles.Linkable;
 
 import java.lang.reflect.Field;
@@ -17,7 +18,7 @@ public final class HtmlRestReflection implements RestReflection {
 
     @Override
     public Object renderCapabilities(Capabilities capabilities) {
-        StringBuilder results = new StringBuilder( );
+        StringBuilder results = new StringBuilder( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
         results.append("<h1>"+ capabilities.getName()  +"</h1>");
         if (!capabilities.getQueries().isEmpty()) {
             results.append("<h2>Queries</h2>");
@@ -49,12 +50,16 @@ public final class HtmlRestReflection implements RestReflection {
             results.append("</ul>");
         }
         if ( capabilities.getPagedSortedListResponse() != null ) {
-            appendPagingInfo( results, capabilities.getPagedSortedListResponse(), true);
+            PagedSortedListResponse response = capabilities.getPagedSortedListResponse();
+            appendPagingInfo( results, response, true);
+            appendAnchor( results, response.getOrderByAsc().get( "name"), "asc", true);
+            appendAnchor( results, response.getOrderByDesc().get( "name"), "desc", true);
         }
 
         if (capabilities.getDescriptionResult() != null ) {
-            results.append("<h2>Description</h2>").append( capabilities.getDescriptionResult());
+            results.append("<h2>Description</h2>").append( new JSONHelper().toJSON( capabilities.getDescriptionResult() ));
         }
+        results.append("</body></html>");
         return results.toString();
     }
 
@@ -85,18 +90,20 @@ public final class HtmlRestReflection implements RestReflection {
 
         appendAnchor( sb, response.getPrevious(), "previous", stripName );
         appendAnchor( sb, response.getNext(), "next" , stripName);
-        appendAnchor( sb, response.getOrderByAsc().get( "name"), "asc", stripName);
-        appendAnchor( sb, response.getOrderByDesc().get( "name"), "desc", stripName);
     }
 
     @Override
     public Object renderListResponse(PagedSortedListResponse response ) {
-        StringBuilder htmlListResponse = new StringBuilder( "<h1>").append( response.getName()).append("</h1>");
+        StringBuilder htmlListResponse = new StringBuilder( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
+        htmlListResponse.append( "<h1>").append(response.getName()).append("</h1>");
         appendPagingInfo( htmlListResponse, response, false );
 
         List<?> list = response.getList();
         if ( !list.isEmpty() ) {
             if ( list.get( 0 ) instanceof Linkable ) {
+                appendAnchor( htmlListResponse, response.getOrderByAsc().get( "name"), "asc", false);
+                appendAnchor( htmlListResponse, response.getOrderByDesc().get( "name"), "desc", false);
+
                 if (list.get(0).getClass() == Linkable.class) {
                     htmlListResponse.append( "<ul>" );
                     for (Object elm : list) {
@@ -106,18 +113,20 @@ public final class HtmlRestReflection implements RestReflection {
                     return htmlListResponse;
                 }
             }
-            renderTable(htmlListResponse, list );
+            renderTable(htmlListResponse, list, response );
         }
-        return htmlListResponse;
+        return htmlListResponse.append("</body></html>");
     }
 
-    private void renderTable(StringBuilder sb, List<?> list ) {
+    private void renderTable(StringBuilder sb, List<?> list, PagedSortedListResponse response ) {
         sb.append("<table><tr>");
         Object element = list.get(0);
         if ( element instanceof Linkable ) {
-            sb.append("<th>href</td>");
+            sb.append("<th>href");
+            generateSortOption( sb, "href", response );
+            sb.append("</th>");
         }
-        renderTableHeader( sb, element, element.getClass() );
+        renderTableHeader( sb, element, element.getClass(), response );
         sb.append("</tr>");
         for ( Object elm: list ) {
             sb.append("<tr>");
@@ -142,14 +151,28 @@ public final class HtmlRestReflection implements RestReflection {
         sb.append( "  <a href=\"" ).append( id ).append("\">").append(name).append("</a>");
     }
 
-    private void renderTableHeader( final StringBuilder sb, Object instance, Class clazz ) {
+    private void renderTableHeader( final StringBuilder sb, Object instance, Class clazz, final PagedSortedListResponse response ) {
         if ( clazz == Object.class ) return;
         iterateFields(clazz, instance, new FieldIterator() {
             public void field(Field field) {
-                sb.append("<th>").append(field.getName()).append("</th>");
+                sb.append("<th>").append(field.getName());
+                generateSortOption(sb, field.getName(), response);
+                sb.append("</th>");
             }
         });
-        renderTableHeader( sb, instance, clazz.getSuperclass() );
+        renderTableHeader( sb, instance, clazz.getSuperclass(), response );
+    }
+
+    private void generateSortOption(StringBuilder sb, String name, PagedSortedListResponse response) {
+        String asc = response.getOrderByAsc().get(name);
+        String desc = response.getOrderByDesc().get(name);
+        if ( asc != null ) {
+            sb.append( " <a href=\"" ).append( asc ).append( "\">^</a>");
+        }
+        if ( desc != null ) {
+            sb.append( " <a href=\"").append(desc).append("\">v</a>");
+        }
+
     }
 
     private void renderTableRow( final StringBuilder sb, Class clazz, final Object element ) {

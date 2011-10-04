@@ -16,9 +16,11 @@ public class RestfulServlet extends HttpServlet {
 	private static final long serialVersionUID = 1;
 	
 	private final ForestCore forest;
+    private DependencyInjectionSPI dependencyInjectionSPI;
 
     public RestfulServlet(Application application, DependencyInjectionSPI dependencyInjectionSPI) {
 		this.forest = new ForestCore(application, dependencyInjectionSPI);
+        this.dependencyInjectionSPI = dependencyInjectionSPI;
 	}
     
     /**
@@ -31,7 +33,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
+        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI ).invoke(req, resp, new Runner() {
             public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws IOException {
                 return forest.evaluateGet(req);
             }
@@ -40,7 +42,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
+        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI  ).invoke(req, resp, new Runner() {
             @SuppressWarnings("unchecked")
 			public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
                 if ( mediaType.contentTypeFormUrlEncoded() ) {
@@ -60,7 +62,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper() ).invoke(req, resp, new Runner() {
+        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI ).invoke(req, resp, new Runner() {
             public String run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
                 forest.evaluateDelete(req);
                 return ResponseHandler.SUCCESS_RESPONSE;

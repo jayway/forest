@@ -60,7 +60,7 @@ public class JSONHelper {
             try {
                 Object value = field.get(dto);
                 if ( value != null ) {
-                    result.put(field.getName(), value);
+                    result.put(field.getName(), toJSON( value ));
                 }
             } catch (IllegalAccessException e) { }
         }

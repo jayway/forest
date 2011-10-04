@@ -1,5 +1,6 @@
 package com.jayway.forest.reflection;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -9,12 +10,19 @@ public class UrlParameter {
     private String sortBy;
     private Integer page;
     private Integer pageSize;
+    private Map<String, String> parameters;
 
     public UrlParameter( Map<String, String[]> queryParams ) {
-        String page = getFirst(queryParams, "page");
-        String pageSize = getFirst(queryParams, "pageSize");
+        parameters = new HashMap<String, String>();
 
-        sortBy = getFirst(queryParams, "sortBy");
+        for (Map.Entry<String, String[]> entry : queryParams.entrySet()) {
+            // multiple parameters with same name not supported
+            parameters.put(entry.getKey(), entry.getValue()[0] );
+        }
+        String pageSize = parameters.get( "pageSize" );
+        String page = parameters.get( "page" );
+        sortBy = parameters.get( "sortBy" );
+
         this.page = parse( page );
         this.pageSize = parse( pageSize );
     }
@@ -28,25 +36,31 @@ public class UrlParameter {
         }
     }
 
-
-    private String getFirst( Map<String, String[]> map, String key ) {
-        String[] strings = map.get(key);
-        if ( strings == null ) return null;
-        return strings[0];
+    public String linkSortBy( String sort, boolean ascending ) {
+        StringBuilder sb = new StringBuilder("?sortBy=");
+        if ( !ascending ) sb.append("-");
+        sb.append(sort);
+        String sortBy = parameters.remove("sortBy");
+        appendParameters(sb);
+        if ( sortBy != null ) {
+            parameters.put( "sortBy", sortBy );
+        }
+        return sb.toString();
     }
 
     public String linkTo( Integer page ) {
-        StringBuilder sb = new StringBuilder("page=").append( page );
+        StringBuilder sb = new StringBuilder("?page=").append( page );
+        String currentPage = parameters.remove( "page" );
         appendParameters( sb );
+        if ( currentPage != null ) {
+            parameters.put( "page", currentPage );
+        }
         return sb.toString();
     }
 
     private void appendParameters( StringBuilder sb ) {
-        if ( pageSize != null ) {
-            sb.append("&pageSize=").append( pageSize );
-        }
-        if ( sortBy != null ) {
-            sb.append("&sortBy=").append( sortBy );
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            sb.append("&").append( entry.getKey() ).append("=").append(entry.getValue());
         }
     }
 

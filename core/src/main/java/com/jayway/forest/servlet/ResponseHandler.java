@@ -2,14 +2,18 @@ package com.jayway.forest.servlet;
 
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.*;
 import com.jayway.forest.reflection.*;
+import com.jayway.forest.roles.BaseUrl;
 import com.jayway.forest.roles.Linkable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,31 +47,44 @@ public class ResponseHandler {
     private HttpServletResponse response;
     private ExceptionMapper exceptionMapper;
 
-    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper ) {
+    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) {
         mediaTypeHandler = new MediaTypeHandler(request.getHeader("Accept"), request.getHeader("Content-Type"));
         this.response = response;
         this.exceptionMapper = exceptionMapper;
+
+        // add request specifics to the current context
+        // old version added request and response, but that seems too much
+        String url = request.getRequestURL().toString();
+        String path = request.getPathInfo();
+        dependencyInjectionSPI.addRequestContext(BaseUrl.class, new BaseUrl(url.substring(0, url.length() - path.length() + 1 ) ));
     }
 
     public void handleResponse( Object responseObject ) throws IOException {
         if (responseObject != null) {
+            OutputStreamWriter writer = new OutputStreamWriter( response.getOutputStream(), Charset.forName("UTF-8"));
+            String responseString;
             if ( responseObject instanceof Capabilities ) {
-                responseObject = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
-                response.getOutputStream().print( responseObject.toString() );
+                responseString = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
             } else if ( responseObject instanceof PagedSortedListResponse ) {
-                responseObject = restReflection().renderListResponse( (PagedSortedListResponse) responseObject );
-                response.getOutputStream().print( responseObject.toString() );
+                responseString = restReflection().renderListResponse( (PagedSortedListResponse) responseObject ).toString();
             } else {
                 if (mediaTypeHandler.acceptJSSON()) {
                     if (responseObject instanceof String) {
-                        response.getOutputStream().print("\"" + responseObject + "\"");
+                        responseString = "\"" + responseObject + "\"";
                     } else {
-                        response.getOutputStream().print(new JSONHelper().toJSON(responseObject).toString());
+                        responseString = new JSONHelper().toJSON(responseObject).toString();
                     }
                 } else {
-                    response.getOutputStream().print( responseObject.toString() );
+                    if ( responseObject instanceof String ) {
+                        responseString = responseObject.toString();
+                    } else {
+                        // complex object are JSON serialized for html output
+                        responseString = new JSONHelper().toJSON(responseObject).toString();
+                    }
                 }
             }
+            writer.write( responseString, 0, responseString.length() );
+            writer.flush();
         }
     }
 

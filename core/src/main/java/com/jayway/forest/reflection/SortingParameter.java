@@ -24,19 +24,4 @@ final public class SortingParameter extends Touchable implements Iterable<SortPa
         return parameters.iterator();
     }
 
-    public String firstParameterName() {
-        touch();
-        if ( parameters.isEmpty() ) return "";
-        return parameters.get(0).name();
-    }
-
-    public String sortByFirstQuery( boolean ascending, Integer pageSize ) {
-        touch();
-        if ( parameters.isEmpty() ) return "";
-        if ( ascending ) {
-            return "?sortBy=" + parameters.get(0).name() + "&pageSize="+pageSize;
-        } else {
-            return "?sortBy=-" + parameters.get(0).name() + "&pageSize="+pageSize;
-        }
-    }
 }
