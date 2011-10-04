@@ -37,7 +37,9 @@ public class QueryForListCapability extends QueryCapability {
             if ( !(listElementType instanceof ParameterizedType) ) {
                 listElementClass = (Class) listElementType;
             }
-            transformer = transformers.get( listElementClass );
+            if ( transformers != null ) {
+                transformer = transformers.get( listElementClass );
+            }
         }
 
         SortingParameter sorting = sortingParameter( urlParameter );
