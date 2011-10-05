@@ -4,15 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * finds the search/sort parameters from the request
+ * Holder for the actual url parameters of the request
+ * <br></br>
+ * This is only used by the framework
+ *
  */
-public class UrlParameter {
+public final class UrlParameter {
     private String sortBy;
     private Integer page;
     private Integer pageSize;
     private Map<String, String> parameters;
 
-    public UrlParameter( Map<String, String[]> queryParams ) {
+    protected UrlParameter( Map<String, String[]> queryParams ) {
         parameters = new HashMap<String, String>();
 
         for (Map.Entry<String, String[]> entry : queryParams.entrySet()) {
@@ -36,7 +39,7 @@ public class UrlParameter {
         }
     }
 
-    public String linkSortBy( String sort, boolean ascending ) {
+    protected String linkSortBy( String sort, boolean ascending ) {
         StringBuilder sb = new StringBuilder("?sortBy=");
         if ( !ascending ) sb.append("-");
         sb.append(sort);
@@ -48,7 +51,7 @@ public class UrlParameter {
         return sb.toString();
     }
 
-    public String linkTo( Integer page ) {
+    protected String linkTo( Integer page ) {
         StringBuilder sb = new StringBuilder("?page=").append( page );
         String currentPage = parameters.remove( "page" );
         appendParameters( sb );
@@ -64,16 +67,21 @@ public class UrlParameter {
         }
     }
 
+    protected void setPageSize( int pageSize ) {
+        this.pageSize = pageSize;
+        parameters.remove( "pageSize" );
+        parameters.put( "pageSize", ""+pageSize);
+    }
 
-    public Integer page() {
+    protected Integer page() {
         return page;
     }
 
-    public Integer pageSize() {
+    protected Integer pageSize() {
         return pageSize;
     }
 
-    public String sortBy() {
+    protected String sortBy() {
         return sortBy;
     }
 }

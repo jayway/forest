@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This object is returned when a method returns a List
  */
 public class PagedSortedListResponse {
     private String name;
     private Integer page;
     private Integer pageSize;
-    private Integer totalElements;
+    private Long totalElements;
     private Integer totalPages;
     private List<?> list;
     private String next;
@@ -45,11 +46,11 @@ public class PagedSortedListResponse {
         this.pageSize = pageSize;
     }
 
-    public Integer getTotalElements() {
+    public Long getTotalElements() {
         return totalElements;
     }
 
-    public void setTotalElements(Integer totalElements) {
+    public void setTotalElements(Long totalElements) {
         this.totalElements = totalElements;
     }
 
@@ -93,11 +94,7 @@ public class PagedSortedListResponse {
         if ( orderByAsc == null ) {
             orderByAsc = new HashMap<String, String>();
         }
-        orderByAsc.put( field, href );
-    }
-
-    public Map<String, String> getOrderByDesc() {
-        return orderByDesc;
+        orderByAsc.put( field, href);
     }
 
     public void addOrderByDesc( String field, String href ) {
@@ -106,4 +103,9 @@ public class PagedSortedListResponse {
         }
         orderByDesc.put( field, href );
     }
+
+    public Map<String, String> getOrderByDesc() {
+        return orderByDesc;
+    }
+
 }
