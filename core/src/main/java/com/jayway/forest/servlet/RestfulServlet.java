@@ -15,14 +15,14 @@ import com.jayway.forest.di.DependencyInjectionSPI;
 public class RestfulServlet extends HttpServlet {
 	private static final long serialVersionUID = 1;
 	
-	private final ForestCore forest;
+	private ForestCore forest;
     private DependencyInjectionSPI dependencyInjectionSPI;
 
-    public RestfulServlet(Application application, DependencyInjectionSPI dependencyInjectionSPI) {
-		this.forest = new ForestCore(application, dependencyInjectionSPI);
+    public void initForest( Application application, DependencyInjectionSPI dependencyInjectionSPI){
+        this.forest = new ForestCore(application, dependencyInjectionSPI);
         this.dependencyInjectionSPI = dependencyInjectionSPI;
-	}
-    
+    }
+
     /**
      * Override this to add custom exception mapping
      * @return
@@ -44,11 +44,11 @@ public class RestfulServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI  ).invoke(req, resp, new Runner() {
             @SuppressWarnings("unchecked")
-			public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
-                if ( mediaType.contentTypeFormUrlEncoded() ) {
-                    forest.evaluatePostPut(req, null, req.getParameterMap(), mediaType );
+            public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
+                if (mediaType.contentTypeFormUrlEncoded()) {
+                    forest.evaluatePostPut(req, null, req.getParameterMap(), mediaType);
                 } else {
-                    forest.evaluatePostPut(req, req.getInputStream(), null, mediaType );
+                    forest.evaluatePostPut(req, req.getInputStream(), null, mediaType);
                 }
                 return ResponseHandler.SUCCESS_RESPONSE;
             }

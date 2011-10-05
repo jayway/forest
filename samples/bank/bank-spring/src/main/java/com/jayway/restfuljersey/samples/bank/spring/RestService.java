@@ -1,9 +1,12 @@
 package com.jayway.restfuljersey.samples.bank.spring;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.reflection.Transformer;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.jayway.forest.core.Application;
@@ -18,29 +21,32 @@ import com.jayway.restfuljersey.samples.bank.spring.resources.RootResource;
 
 import java.util.Map;
 
-public class RestService extends RestfulServlet {
-	
-	public RestService() {
-		super(new Application() {
-			@Override
-			public void setupRequestContext() {
-			}
-			
-			@Override
-			public Resource root() {
-		        return new RootResource();
-			}
+public class RestService extends RestfulServlet implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        Application application = new Application() {
+            @Override
+            public void setupRequestContext() {
+            }
+
+            @Override
+            public Resource root() {
+                return new RootResource();
+            }
 
             @Override
             public Map<Class, Transformer> transformers() {
                 return null;
             }
-        }, getDI());
-	}
-	
-	private static ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-	
-    private static DependencyInjectionSPI getDI() {
+        };
+        initForest(application, getDI());
+    }
+
+    private DependencyInjectionSPI getDI() {
 		return applicationContext.getBean(DependencyInjectionSPI.class);
 	}
 
@@ -56,5 +62,10 @@ public class RestService extends RestfulServlet {
                 return null;
             }
         };
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

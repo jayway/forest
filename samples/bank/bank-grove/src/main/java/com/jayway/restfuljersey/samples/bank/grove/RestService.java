@@ -24,8 +24,9 @@ import java.util.Map;
 
 public class RestService extends RestfulServlet {
 
-	public RestService() {
-		super(new Application() {
+    @Override
+	public void init() {
+		initForest(new Application() {
 			@Override
 			public Resource root() {
 				return new RootResource();
