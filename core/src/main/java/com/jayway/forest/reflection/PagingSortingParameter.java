@@ -64,15 +64,16 @@ final public class PagingSortingParameter extends Touchable {
         return (page-1)*pageSize;
     }
 
-    public Iterator<SortParameter> sortParameters() {
+    public List<SortParameter> sortParameters() {
         touch();
-        return parameters.iterator();
+        return parameters;
     }
 
     public void addSortByField( String field ) {
         touch();
         if ( addedSortingFields == null ) addedSortingFields = new HashSet<String>();
         addedSortingFields.add( field );
+        parameters.add( new SortParameter( field ));
     }
 
     protected Set<String> getAddedSortFields() {

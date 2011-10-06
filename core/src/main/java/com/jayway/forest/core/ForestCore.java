@@ -25,7 +25,7 @@ public class ForestCore {
 	public ForestCore(Application application, DependencyInjectionSPI dependencyInjectionSPI) {
 		this.application = application;
 		this.dependencyInjectionSPI = dependencyInjectionSPI;
-		resourceUtil = new ResourceUtil(dependencyInjectionSPI, application.transformers());
+		resourceUtil = new ResourceUtil(dependencyInjectionSPI);
 	}
 
     private PathAndMethod setup(HttpServletRequest request) {
@@ -65,7 +65,7 @@ public class ForestCore {
     }
 
     private Resource evaluatePath( List<String> segments ) {
-        Resource current = application.root();
+        Resource current = dependencyInjectionSPI.postCreate( application.root() );
         for ( String pathSegment: segments ) {
             current = resourceUtil.invokePathMethod( current, pathSegment );
             current = dependencyInjectionSPI.postCreate(current);

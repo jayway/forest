@@ -3,11 +3,9 @@ package com.jayway.restfuljersey.samples.bank.spring;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import com.jayway.forest.reflection.Transformer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.jayway.forest.core.Application;
 import com.jayway.forest.di.DependencyInjectionSPI;
@@ -18,8 +16,6 @@ import com.jayway.forest.servlet.RestfulServlet;
 import com.jayway.restfuljersey.samples.bank.exceptions.CannotDepositException;
 import com.jayway.restfuljersey.samples.bank.exceptions.OverdrawException;
 import com.jayway.restfuljersey.samples.bank.spring.resources.RootResource;
-
-import java.util.Map;
 
 public class RestService extends RestfulServlet implements ApplicationContextAware {
 
@@ -38,10 +34,6 @@ public class RestService extends RestfulServlet implements ApplicationContextAwa
                 return new RootResource();
             }
 
-            @Override
-            public Map<Class, Transformer> transformers() {
-                return null;
-            }
         };
         initForest(application, getDI());
     }

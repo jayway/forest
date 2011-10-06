@@ -13,13 +13,17 @@ public class FieldComparator implements Comparator<Object> {
     private LinkedList<SortParameter> fieldNames;
     private Map<SortParameter, Field> fieldCache;
 
+    public FieldComparator( SortParameter sortField ) {
+        fieldCache = new HashMap<SortParameter, Field>();
+        fieldNames = new LinkedList<SortParameter>();
+        fieldNames.addLast( sortField );
+    }
 
-
-    public FieldComparator( Iterator<SortParameter> fieldNames ) {
-        this.fieldCache = new HashMap<SortParameter, Field>();
-        this.fieldNames = new LinkedList<SortParameter>();
-        while ( fieldNames.hasNext() ) {
-            this.fieldNames.addLast(fieldNames.next());
+    public FieldComparator( List<SortParameter> sortParameters ) {
+        fieldCache = new HashMap<SortParameter, Field>();
+        fieldNames = new LinkedList<SortParameter>();
+        for (SortParameter sortParameter : sortParameters) {
+            fieldNames.addLast( sortParameter );
         }
     }
 

@@ -33,11 +33,9 @@ public class ResourceUtil {
 
     static Logger log = LoggerFactory.getLogger(ResourceUtil.class);
 	private final DependencyInjectionSPI dependencyInjectionSPI;
-    private Map<Class, Transformer> transformers;
 
-    public ResourceUtil(DependencyInjectionSPI dependencyInjectionSPI, Map<Class, Transformer> transformers) {
+    public ResourceUtil(DependencyInjectionSPI dependencyInjectionSPI) {
 		this.dependencyInjectionSPI = dependencyInjectionSPI;
-        this.transformers = transformers;
 	}
 
     public boolean checkConstraint(Resource resource, Method method) {
@@ -111,7 +109,7 @@ public class ResourceUtil {
                     if (method.getParameterTypes().length == 0) return new SubResource(resource, method, name, documentation);
                     else if (resource instanceof IdResource) return new IdCapability((IdResource) resource, name, documentation);
                 } else if ( List.class.isAssignableFrom( method.getReturnType() )) {
-                    return new QueryForListCapability(dependencyInjectionSPI, transformers, resource, method, name, documentation );
+                    return new QueryForListCapability(dependencyInjectionSPI, resource, method, name, documentation );
                 } else {
                     return new QueryCapability(resource, method, name, documentation);
                 }

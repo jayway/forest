@@ -35,13 +35,10 @@ public abstract class BaseReflectionCapability extends Capability {
         for ( Field f : o.getClass().getDeclaredFields() ) {
             if ( Modifier.isFinal(f.getModifiers()) ) continue;
             f.setAccessible(true);
-            String value = getFirst(formParams, prefix + "." + f.getName());
-
-            if ( value == null ) {
-                Object innerDto = populateDTO( f.getType(), formParams, prefix + "." +f.getName() );
-                f.set( o, innerDto );
-            } else {
-                f.set( o, mapBasic( f.getType(), value ));
+            try {
+                f.set( o, mapBasic( f.getType(), getFirst(formParams, prefix + "." + f.getName())));
+            } catch ( BadRequestException e ) {
+                f.set( o, populateDTO( f.getType(), formParams, prefix + "." +f.getName() ));
             }
         }
         return o;

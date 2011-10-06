@@ -57,6 +57,8 @@ public class ResponseHandler {
         String url = request.getRequestURL().toString();
         String path = request.getPathInfo();
         dependencyInjectionSPI.addRequestContext(BaseUrl.class, new BaseUrl(url.substring(0, url.length() - path.length() + 1 ) ));
+        dependencyInjectionSPI.addRequestContext(HttpServletRequest.class, request);
+        dependencyInjectionSPI.addRequestContext(HttpServletResponse.class, response);
     }
 
     public void handleResponse( Object responseObject ) throws IOException {

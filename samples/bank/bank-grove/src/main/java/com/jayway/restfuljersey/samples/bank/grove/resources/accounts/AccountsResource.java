@@ -5,6 +5,7 @@ import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.ResponseHandler;
+import com.jayway.restfuljersey.samples.bank.dto.AccountLinkable;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.model.CheckingAccount;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
@@ -25,7 +26,7 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
         return list;
     }
 
-    @Doc("returning a list of CheckingAccount that cannot be transformed to Linkable")
+    @Doc("returning a list of something not Linkable")
     public List<CheckingAccount> overdrawscheckingaccounts() {
         List<CheckingAccount> overdrawn = new ArrayList<CheckingAccount>();
         for (Account account : role(AccountRepository.class).all()) {
@@ -34,11 +35,11 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
         return overdrawn;
     }
 
-    @Doc("returning a list of Account which can be transformed to AccountLinkable")
-    public List<Account> overdrawn() {
-        List<Account> overdrawn = new ArrayList<Account>();
+    @Doc("returning a list of AccountLinkable")
+    public List<AccountLinkable> overdrawn() {
+        List<AccountLinkable> overdrawn = new ArrayList<AccountLinkable>();
         for (Account account : role(AccountRepository.class).all()) {
-            if ( account.getBalance() < 0 ) overdrawn.add( account );
+            if ( account.getBalance() < 0 ) overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() ));
         }
         return overdrawn;
     }

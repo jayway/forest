@@ -3,7 +3,6 @@ package com.jayway.forest.service;
 import com.jayway.forest.core.Application;
 import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
 import com.jayway.forest.grove.RoleManager;
-import com.jayway.forest.reflection.Transformer;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.RestfulServlet;
 
@@ -36,10 +35,6 @@ public class RestfulServletService extends RestfulServlet {
                 }
             }
 
-            @Override
-            public Map<Class, Transformer> transformers() {
-                return null;
-            }
         }, new GroveDependencyInjectionImpl());
     }
 

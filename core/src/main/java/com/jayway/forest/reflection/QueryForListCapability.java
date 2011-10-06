@@ -12,12 +12,10 @@ import java.util.*;
 public class QueryForListCapability extends QueryCapability {
 
     private DependencyInjectionSPI dependencyInjectionSPI;
-    private Map<Class, Transformer> transformers;
 
-    public QueryForListCapability(DependencyInjectionSPI dependencyInjectionSPI, Map<Class, Transformer> transformers, Resource resource, Method method, String name, String documentation) {
+    public QueryForListCapability(DependencyInjectionSPI dependencyInjectionSPI, Resource resource, Method method, String name, String documentation) {
         super(resource, method, name, documentation);
         this.dependencyInjectionSPI = dependencyInjectionSPI;
-        this.transformers = transformers;
     }
 
     @Override
@@ -29,32 +27,16 @@ public class QueryForListCapability extends QueryCapability {
 
         // actual call to the resource method
         List<?> returnedList = (List<?>) super.get(request);
-        boolean touched = pagingSortingParameter.isTouched();
-
-        Class listElementClass = inferListType();
-        Transformer transformer = null;
-        if ( transformers != null ) {
-            transformer = transformers.get( listElementClass );
-        }
-        if ( listElementClass == Linkable.class || transformer != null || urlParameter.sortBy() != null) {
-            // If there is a transformer, we have to transform all elements
-            transformList(returnedList, transformer);
-            // since this is a linkable we must be able to sort on href and name
-            pagingSortingParameter.addSortByField( "href" );
-            pagingSortingParameter.addSortByField( "name" );
-        }
 
         PagedSortedListResponse response = new PagedSortedListResponse();
-        response.setName(name());
-        urlParameter.setPageSize(pagingSortingParameter.getPageSize());
-        if ( touched ) {
+        if (pagingSortingParameter.isTouched()) {
             // the resource has handled the paging
             // so just copy the values to the pagedSortedListResponse
-            response.setPage( pagingSortingParameter.getPage() );
-            response.setList( returnedList );
-            response.setPageSize( pagingSortingParameter.getPageSize() );
-            response.setTotalElements( pagingSortingParameter.getTotalElements() );
-            response.setTotalPages( calculateTotalPages(response.getTotalElements(), response.getPageSize()) );
+            urlParameter.setPageSize(pagingSortingParameter.getPageSize());
+            response.setPage(pagingSortingParameter.getPage());
+            response.setList(returnedList);
+            response.setPageSize(pagingSortingParameter.getPageSize());
+            response.setTotalElements(pagingSortingParameter.getTotalElements());
             if ( pagingSortingParameter.getPage() < response.getTotalPages() ) {
                 response.setNext( name() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
             }
@@ -67,32 +49,33 @@ public class QueryForListCapability extends QueryCapability {
                 response.addOrderByDesc(sortField, name() + urlParameter.linkSortBy(sortField, false));
             }
         } else {
-            // assume resource has not used the parameters
-            // to split the result list according to the
-            // passed in paging parameters
+            // resource has not used the parameters so handle sorting/paging here
             if ( returnedList != null && !returnedList.isEmpty() ) {
                 List<String> sortingParameters = new LinkedList<String>();
                 inferSortParameters(sortingParameters, returnedList.get(0).getClass());
 
+                // add possible search strings to the response
                 for (String sortField : sortingParameters) {
-                    response.addOrderByAsc( sortField, name() + urlParameter.linkSortBy(sortField, true));
+                    response.addOrderByAsc(sortField, name() + urlParameter.linkSortBy(sortField, true));
                     response.addOrderByDesc(sortField, name() + urlParameter.linkSortBy(sortField, false));
                 }
-                Collections.sort(returnedList, new FieldComparator(pagingSortingParameter.sortParameters() ));
+                if (urlParameter.sortBy() != null) {
+                    // urlParameters have been parsed and passed to pagingSortingParameter, so sort based on these
+                    Collections.sort(returnedList, new FieldComparator( pagingSortingParameter.sortParameters() ));
+                } else if (Linkable.class.isAssignableFrom(inferListType())) {
+                    // a Linkable is default sorted by name
+                    Collections.sort(returnedList, new FieldComparator(new SortParameter("name")));
+                }
             }
 
-            Integer page = pagingSortingParameter.getPage();
-            Integer pageSize = pagingSortingParameter.getPageSize();
-
             // build response
-            response.setPage(page);
-            response.setPageSize(pageSize);
-            response.setTotalElements( returnedList == null ? 0 : ((Integer)returnedList.size()).longValue() );
-            response.setTotalPages(  calculateTotalPages(response.getTotalElements(), response.getPageSize()) );
+            response.setPage(pagingSortingParameter.getPage());
+            response.setPageSize(pagingSortingParameter.getPageSize());
+            response.setTotalElements(returnedList == null ? 0 : ((Integer) returnedList.size()).longValue());
 
             long actualListSize = response.getTotalElements();
-            int maxIndex = page * pageSize;
-            int minIndex = ( page - 1 )*pageSize;
+            int maxIndex = response.getPage() * response.getPageSize();
+            int minIndex = ( response.getPage() - 1 )*response.getPageSize();
             if (actualListSize >= minIndex) {
                 List<Object> resultList = new ArrayList<Object>();
                 for ( int i=minIndex; i<actualListSize && i<maxIndex; i++ ) {
@@ -108,6 +91,8 @@ public class QueryForListCapability extends QueryCapability {
                 }
             }
         }
+        response.setTotalPages(  calculateTotalPages(response.getTotalElements(), response.getPageSize()) );
+        response.setName(name());
 
         return response;
     }
@@ -141,14 +126,6 @@ public class QueryForListCapability extends QueryCapability {
         return 1+(int)Math.ceil(totalElements / pageSize );
     }
 
-    private void transformList(List list, Transformer transformer) {
-        if ( list != null && list.size() > 0 && transformer != null ) {
-            for ( int i=0; i<list.size(); i++ ) {
-                list.add(i, transformer.transform(list.remove(i)));
-            }
-        }
-    }
-
     private PagingSortingParameter pagingParameter( UrlParameter urlParameter ) {
         // todo set as a property of the application
         Integer pageSize = 10;
@@ -156,10 +133,6 @@ public class QueryForListCapability extends QueryCapability {
             pageSize = urlParameter.pageSize();
         }
         String sortBy = urlParameter.sortBy();
-        if ( sortBy == null ) {
-            // default sorting
-            sortBy = "name";
-        }
         return new PagingSortingParameter( urlParameter.page(), pageSize, sortBy );
     }
 
