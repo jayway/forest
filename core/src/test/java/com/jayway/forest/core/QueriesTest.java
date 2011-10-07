@@ -5,10 +5,14 @@ import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+
+import static com.jayway.restassured.RestAssured.get;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 
 public class QueriesTest  extends AbstractRunner {
 
@@ -16,38 +20,35 @@ public class QueriesTest  extends AbstractRunner {
     public void testInvokeIndex() throws IOException {
         StateHolder.set("Expected String");
 
-        StringDTO returned = get("/bank/other/description", StringDTO.class);
-        Assert.assertEquals( "Expected String", returned.string() );
+        StringDTO returned = get("/other/description").as(StringDTO.class);
+        assertEquals("Expected String", returned.string());
     }
 
     @Test
     public void testQueryWithInteger() throws IOException {
-        queryParam("argument1", "60");
-        IntegerDTO integer = get( "/bank/addten", IntegerDTO.class );
+        final IntegerDTO integer = given().param("argument1", "60").when().get("/addten").andReturn().as(IntegerDTO.class);
 
-        Assert.assertEquals(70, integer.getInteger().intValue());
+        assertEquals(70, integer.getInteger().intValue());
     }
 
     @Test
     public void testQueryWithIntegerWrongInput() throws IOException {
-
-        queryParam( "argument1", "x6f?0");
-        try {
-            get( "/bank/addten", IntegerDTO.class );
-            Assert.fail();
-        } catch (IOException e ) {
-            // Todo what is correct here
-            //Assert.assertTrue( e.getMessage().contains( "code: 400"));
-        }
+        given().
+                queryParam( "argument1", "x6f?0").
+        expect().
+                statusCode(405).
+        when().
+                get("/addten").statusLine();
     }
-
 
     @Test
     public void testQueryWithIntegerAndInteger() throws IOException {
-        queryParam( "argument1", "60");
-        queryParam( "argument2.IntegerDTO.integer", "13");
-        Integer aLong = get("/bank/add", Integer.class);
-        Assert.assertEquals(73, aLong.intValue());
+        given().
+                queryParam("argument1", "60").
+                queryParam("argument2.IntegerDTO.integer", "13").
+        expect().
+                body(is("73")).
+        when().
+                get("/add");
     }
-
 }

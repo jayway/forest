@@ -6,13 +6,15 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.jayway.restassured.RestAssured.get;
+
 /**
  */
 public class CapabilitiesTest extends AbstractRunner {
     
     @Test
     public void testRoot() throws IOException {
-        System.out.println( get( "/bank/", Object.class, "text/html" ) );
+        System.out.println( get("/").asString() );
     }
 
 /*    @Test

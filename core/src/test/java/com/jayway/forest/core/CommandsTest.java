@@ -2,77 +2,80 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
-
-import junit.framework.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
  */
 public class CommandsTest extends AbstractRunner {
 
-
     @Test
     public void testEchoMethod() throws IOException {
-        post( "/bank/command", "\"second\"" );
-        Assert.assertEquals( "second", StateHolder.get());
+        given().
+                body("\"second\"").
+        expect().
+                statusCode(200).
+                body(containsString("Operation completed successfully")).
+        when().
+                post("/command");
+
+        assertThat(StateHolder.get().toString(), equalTo("second"));
     }
 
     @Test
     public void wrongMethod() {
-        try {
-            get( "/bank/command", Object.class);
-            Assert.fail();
-        } catch ( IOException e) {
-            Assert.assertTrue( e.getMessage().contains("code: 405"));
-        }
+        expect().statusCode(405).when().get( "/command");
     }
-
 
     @Test
     public void testAddCommand() throws IOException {
-        post( "/bank/addcommand", "[10, { \"integer\": 32}]" );
-        Assert.assertEquals( 42, StateHolder.get());
+        given().body("[10, { \"integer\": 32}]").when().post("/addcommand");
+        assertEquals(42, StateHolder.get());
     }
 
     @Test
     public void testCommandList() throws IOException {
-        post( "/bank/commandlist", "[\"Hello\"]" );
-        Assert.assertEquals( "SuccessHello", StateHolder.get());
+        given().body("[\"Hello\"]").when().post("/commandlist");
+
+        assertEquals( "SuccessHello", StateHolder.get());
     }
 
-    @Test
+@Test
     public void testIllegalList() throws IOException {
-        try {
-            post( "/bank/commandlist", "[[\"Hello\"], \"World\"]" );
-            Assert.fail( "Must fail!");
-        } catch (IOException e ) {
-            Assert.assertTrue(e.getMessage().contains("code: 400"));
-        }
+            given().
+                    body("[[\"Hello\"], \"World\"]").
+            expect().
+                    statusCode(400).
+            when().
+                    post( "/commandlist");
     }
 
     @Test @SuppressWarnings("unchecked")
     public void testCommandAddToList() throws IOException {
-        post( "/bank/addtolist", "[[\"Hello\"], \"World\"]" );
+        given().body("[[\"Hello\"], \"World\"]").when().post( "/addtolist");
 
-        
 		List<String> list = (List<String>) StateHolder.get();
-        Assert.assertEquals("HelloWorld", list.get(0) + list.get(1));
+        assertEquals("HelloWorld", list.get(0) + list.get(1));
     }
 
     @Test @SuppressWarnings("unchecked")
     public void testComplex() throws IOException {
-        post( "/bank/complex", "[[[\"Hello\", \"World\"]]]" );
-        
+        given().body("[[[\"Hello\", \"World\"]]]").when().post("/complex");
+
 		List<List<List<String>>> list = (List<List<List<String>>>) StateHolder.get();
         String result = "";
         for ( String elm : list.get(0).get(0) ) {
             result += elm;
         }
-        Assert.assertEquals( "HelloWorldNEW", result );
-
+        assertEquals("HelloWorldNEW", result);
     }
-
 }
