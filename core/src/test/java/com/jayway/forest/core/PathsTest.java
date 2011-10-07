@@ -1,12 +1,13 @@
 package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
-
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
 
 /**
  */
@@ -15,42 +16,27 @@ public class PathsTest extends AbstractRunner {
 
     @Test
     public void testDiscoverId() throws IOException {
-        String nameId = get("/bank/other/id/", String.class, "text/html");
-        String nameName = get("/bank/other/name/", String.class, "text/html");
+        String nameId = given().spec(acceptTextHtml()).and().get("/other/id/").asString();
+        String nameName = given().spec(acceptTextHtml()).and().get("/other/name/").asString();
 
-        Assert.assertEquals( nameId, nameName );
+        assertEquals(nameId, nameName);
     }
 
    @Test
     public void invokeIdResourceAsQuery() {
-       try {
-           get( "/bank/other/id", String.class );
-           Assert.fail();
-       } catch (IOException e) {
-           Assert.assertTrue( e instanceof FileNotFoundException );
-       }
+       expect().statusCode(404).when().get("/other/id");
     }
 
     @Test
     public void invokeIdResourceAsQuery2() {
-        try {
-            get( "/bank/other/idid", String.class );
-            Assert.fail();
-        } catch (IOException e) {
-            Assert.assertTrue(e instanceof FileNotFoundException);
-        }
+        expect().statusCode(404).when().get( "/other/idid");
     }
-
 
     @Test
     public void invokeResourceAsQuery() {
-        try {
-            get( "/bank/other", String.class );
-            Assert.fail();
-        } catch (IOException e) {
-            Assert.assertTrue(e instanceof FileNotFoundException);
-        }
+        expect().statusCode(404).when().get( "/other");
     }
+
 /*
     @Test
     public void invokeIdResourceAsCommand() {
