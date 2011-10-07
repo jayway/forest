@@ -48,6 +48,7 @@ public class QueryCapability extends BaseReflectionCapability {
             } catch ( IllegalAccessException e) {
                 throw internalServerError( e );
             } catch ( InvocationTargetException e) {
+                log.error("Exception occurred: ", e);
                 throw internalServerError( e );
             }
         }

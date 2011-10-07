@@ -2,6 +2,9 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  */
 public class MediaTypeHandler {
@@ -15,19 +18,19 @@ public class MediaTypeHandler {
     private boolean contentTypeFormUrlEncoded;
 
     /**
-     * Handler for the accept and content type headers.
-     *
-     * Default value of the headers are application/json
-     * @param acceptHeader
-     * @param contentTypeHeader
+     * Handler for the accept and content type headers.     *
      */
-    public MediaTypeHandler( String acceptHeader, String contentTypeHeader ) {
+    public MediaTypeHandler( HttpServletRequest request, HttpServletResponse response ) {
+        //request.getHeader("Accept"), request.getHeader("Content-Type"));
+        String acceptHeader = request.getHeader("Accept");
+        String contentTypeHeader = request.getHeader("Content-Type");
         // TODO this is not working correctly, wildcards are not considered
         // accept defaults to JSON
         if ( acceptHeader != null ) {
             acceptApplicationJSON = true;
             if ( acceptHeader.contains(APPLICATION_JSON) ) {
                 acceptApplicationJSON = true;
+                response.setHeader( "Content-Type", APPLICATION_JSON);
             } else {
                 acceptApplicationJSON = !acceptHeader.contains(TEXT_HTML);
             }
@@ -45,6 +48,8 @@ public class MediaTypeHandler {
                 // default to JSON
                 contentTypeApplicationJSON = true;
             }
+        } else {
+            contentTypeApplicationJSON = true;
         }
     }
 

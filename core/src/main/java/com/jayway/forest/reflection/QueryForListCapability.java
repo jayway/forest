@@ -37,7 +37,7 @@ public class QueryForListCapability extends QueryCapability {
             response.setList(returnedList);
             response.setPageSize(pagingSortingParameter.getPageSize());
             response.setTotalElements(pagingSortingParameter.getTotalElements());
-            if ( pagingSortingParameter.getPage() < response.getTotalPages() ) {
+            if ( pagingSortingParameter.getPage()*pagingSortingParameter.getPageSize() < pagingSortingParameter.getTotalElements() ) {
                 response.setNext( name() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
             }
             if ( pagingSortingParameter.getPage() > 1 ) {

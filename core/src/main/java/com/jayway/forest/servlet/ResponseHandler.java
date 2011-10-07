@@ -48,7 +48,8 @@ public class ResponseHandler {
     private ExceptionMapper exceptionMapper;
 
     public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) {
-        mediaTypeHandler = new MediaTypeHandler(request.getHeader("Accept"), request.getHeader("Content-Type"));
+        //mediaTypeHandler = new MediaTypeHandler(request.getHeader("Accept"), request.getHeader("Content-Type"));
+        mediaTypeHandler = new MediaTypeHandler(request, response );
         this.response = response;
         this.exceptionMapper = exceptionMapper;
 
@@ -118,7 +119,8 @@ public class ResponseHandler {
         }
 
         if ( e instanceof BadRequestException) {
-            return new Response( SC_BAD_REQUEST, "Bad Request");
+            String message = e.getMessage() != null ? e.getMessage() : "Bad Request";
+            return new Response( SC_BAD_REQUEST, message );
         } else if ( e instanceof ConflictException) {
             return new Response( SC_CONFLICT,"Conflict" );
         } else if ( e instanceof InternalServerErrorException) {

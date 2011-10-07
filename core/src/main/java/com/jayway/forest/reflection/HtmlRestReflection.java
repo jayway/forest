@@ -45,15 +45,19 @@ public final class HtmlRestReflection implements RestReflection {
             }
             for (Linkable resource: capabilities.getDiscoveredLinks()) {
                 if ( resource == null ) continue;
-                results.append("<li><a href='").append(resource.href()).append("/'>").append(resource.name()).append("</a></li>");
+                results.append("<li><a href='").append(resource.href()).append("'>").append(resource.name()).append("</a></li>");
             }
             results.append("</ul>");
         }
         if ( capabilities.getPagedSortedListResponse() != null ) {
             PagedSortedListResponse response = capabilities.getPagedSortedListResponse();
             appendPagingInfo( results, response, true);
-            appendAnchor( results, response.getOrderByAsc().get( "name"), "asc", true);
-            appendAnchor( results, response.getOrderByDesc().get( "name"), "desc", true);
+            if ( response.getOrderByAsc() != null ) {
+                appendAnchor( results, response.getOrderByAsc().get( "name"), "asc", true);
+            }
+            if ( response.getOrderByDesc() != null) {
+                appendAnchor( results, response.getOrderByDesc().get( "name"), "desc", true);
+            }
         }
 
         if (capabilities.getDescriptionResult() != null ) {
@@ -65,9 +69,6 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void appendMethod( StringBuilder sb, Capability method ) {
         sb.append("<li><a href='").append( method.name() );
-        if ( method instanceof SubResource ) {
-            sb.append("/");
-        }
         sb.append("'>").append( method.name() ).append("</a>");
         if ( method.isDocumented() ) {
             sb.append(" <i>(").append( method.documentation() ).append("</i>)");
@@ -101,8 +102,10 @@ public final class HtmlRestReflection implements RestReflection {
         List<?> list = response.getList();
         if ( !list.isEmpty() ) {
             if ( list.get( 0 ) instanceof Linkable ) {
-                appendAnchor( htmlListResponse, response.getOrderByAsc().get( "name"), "asc", false);
-                appendAnchor( htmlListResponse, response.getOrderByDesc().get( "name"), "desc", false);
+                if ( response.getOrderByAsc() != null && response.getOrderByDesc() != null ) {
+                    appendAnchor( htmlListResponse, response.getOrderByAsc().get( "name"), "asc", false);
+                    appendAnchor( htmlListResponse, response.getOrderByDesc().get( "name"), "desc", false);
+                }
 
                 if (list.get(0).getClass() == Linkable.class) {
                     htmlListResponse.append( "<ul>" );

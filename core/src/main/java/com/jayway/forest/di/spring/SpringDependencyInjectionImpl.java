@@ -17,13 +17,23 @@ public class SpringDependencyInjectionImpl implements DependencyInjectionSPI, Ap
 		RequestContextHolder.getRequestAttributes().setAttribute(clazz.getName(), object, RequestAttributes.SCOPE_REQUEST);
 	}
 
-	@Override
+    @Override
 	public <T> T postCreate(T object) {
 		applicationContext.getAutowireCapableBeanFactory().autowireBean(object);
 		return object;
 	}
 
-	@Override
+    @Override
+    public <T> T getRequestContext(Class<T> clazz) {
+        return (T) RequestContextHolder.getRequestAttributes().getAttribute(clazz.getName(), RequestAttributes.SCOPE_REQUEST);
+    }
+
+    @Override
+    public void clear() {
+        RequestContextHolder.resetRequestAttributes();
+    }
+
+    @Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}

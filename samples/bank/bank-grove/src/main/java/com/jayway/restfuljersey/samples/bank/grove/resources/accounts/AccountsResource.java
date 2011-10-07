@@ -11,6 +11,7 @@ import com.jayway.restfuljersey.samples.bank.model.CheckingAccount;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.jayway.forest.grove.RoleManager.addRole;
@@ -21,8 +22,8 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
     @Doc("Dummy for testing list queries with argument")
     public List<Linkable> search( String name ) {
         List<Linkable> list = new ArrayList<Linkable>();
-        list.add( new Linkable( name, name));
-        list.add( new Linkable( "other"+name, "other"+name));
+        list.add( new Linkable( name + "/", name));
+        list.add( new Linkable( "other"+name + "/", "other"+name));
         return list;
     }
 
@@ -54,6 +55,10 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
     @Doc("returning a list of Linkable")
     @Override
     public List<Linkable> discover() {
-        return ResponseHandler.mapList(Account.class, role(AccountRepository.class).all(), "number", "name" );
+        List<Linkable> links = new LinkedList<Linkable>();
+        for (Account account : role(AccountRepository.class).all()) {
+            links.add( new Linkable( account.getAccountNumber() + "/", account.getName() ));
+        }
+        return links;
     }
 }

@@ -38,6 +38,10 @@ public abstract class BaseReflectionCapability extends Capability {
             try {
                 f.set( o, mapBasic( f.getType(), getFirst(formParams, prefix + "." + f.getName())));
             } catch ( BadRequestException e ) {
+                // two cases
+                // 1: simple field and value was not given
+                if ( ReflectionUtil.basicTypes.contains( f.getType() ) ) continue;
+                // 2: complex type, so recurse
                 f.set( o, populateDTO( f.getType(), formParams, prefix + "." +f.getName() ));
             }
         }

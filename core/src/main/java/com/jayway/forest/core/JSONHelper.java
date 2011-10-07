@@ -56,6 +56,7 @@ public class JSONHelper {
         final JSONObject result = new JSONObject();
         for (Field field : dto.getClass().getDeclaredFields() ) {
             if (Modifier.isFinal(field.getModifiers()) ) continue;
+            //if (Modifier.isStatic(field.getModifiers()) ) continue;
             field.setAccessible( true );
             try {
                 Object value = field.get(dto);
