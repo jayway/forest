@@ -1,6 +1,7 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
 import com.jayway.forest.constraint.Doc;
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
@@ -14,8 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.jayway.forest.grove.RoleManager.addRole;
-import static com.jayway.forest.grove.RoleManager.role;
+import static com.jayway.forest.core.RoleManager.*;
 
 public class AccountsResource implements Resource, IdDiscoverableResource {
 

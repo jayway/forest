@@ -1,7 +1,6 @@
 package com.jayway.forest.di.grove;
 
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.grove.RoleManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +17,7 @@ public class GroveDependencyInjectionImpl implements DependencyInjectionSPI {
 
 	@Override
 	public <T> void addRequestContext(Class<T> clazz, T object) {
-		roleMap.get().put(clazz, object );
-        RoleManager.addRole(clazz, object);
+		roleMap.get().put(clazz, object);
 	}
 
     @Override

@@ -1,8 +1,8 @@
 package com.jayway.forest.service;
 
 import com.jayway.forest.core.Application;
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
-import com.jayway.forest.grove.RoleManager;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.RestfulServlet;
 

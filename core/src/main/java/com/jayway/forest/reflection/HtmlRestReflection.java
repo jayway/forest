@@ -69,6 +69,9 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void appendMethod( StringBuilder sb, Capability method ) {
         sb.append("<li><a href='").append( method.name() );
+        if ( method instanceof SubResource ) {
+            sb.append("/");
+        }
         sb.append("'>").append( method.name() ).append("</a>");
         if ( method.isDocumented() ) {
             sb.append(" <i>(").append( method.documentation() ).append("</i>)");

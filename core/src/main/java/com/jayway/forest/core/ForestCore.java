@@ -13,7 +13,6 @@ import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
-import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 
 public class ForestCore {
@@ -34,6 +33,7 @@ public class ForestCore {
             throw new NotFoundException();
         }
 
+        RoleManager.spi = dependencyInjectionSPI;
         // call application specific context setup
         application.setupRequestContext();
         return new PathAndMethod(path);
@@ -65,7 +65,7 @@ public class ForestCore {
     }
 
     private Resource evaluatePath( List<String> segments ) {
-        Resource current = dependencyInjectionSPI.postCreate( application.root() );
+        Resource current = dependencyInjectionSPI.postCreate(application.root());
         for ( String pathSegment: segments ) {
             current = resourceUtil.invokePathMethod( current, pathSegment );
             current = dependencyInjectionSPI.postCreate(current);

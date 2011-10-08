@@ -1,9 +1,11 @@
-package com.jayway.forest.di;
+package com.jayway.forest.core;
+
+import com.jayway.forest.di.DependencyInjectionSPI;
 
 /**
  */
 public class RoleManager {
-    static DependencyInjectionSPI spi;
+    protected static DependencyInjectionSPI spi;
 
     public static <T> T role(Class<T> clazz) {
         return spi.getRequestContext(clazz);

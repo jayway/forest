@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,7 @@ public class ResourceUtil {
         Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
         try {
             @SuppressWarnings("unchecked")
-			ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
+            ConstraintEvaluator<Annotation, Resource> constraintEvaluator = constraint.value().newInstance();
             constraintEvaluator = dependencyInjectionSPI.postCreate(constraintEvaluator);
             return constraintEvaluator.isValid( annotation, resource);
 

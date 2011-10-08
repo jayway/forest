@@ -1,7 +1,6 @@
 package com.jayway.restfuljersey.samples.bank.spring.resources;
 
-import static com.jayway.forest.grove.RoleManager.role;
-
+import com.jayway.forest.core.RoleManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jayway.forest.roles.DescribedResource;
@@ -16,6 +15,8 @@ import com.jayway.restfuljersey.samples.bank.spring.ResourceWithAccount;
 import com.jayway.restfuljersey.samples.bank.spring.constraints.DepositAllowed;
 import com.jayway.restfuljersey.samples.bank.spring.constraints.HasCredit;
 import com.jayway.restfuljersey.samples.bank.spring.constraints.IsWithdrawable;
+
+import static com.jayway.forest.core.RoleManager.*;
 
 public class AccountResource implements Resource, DescribedResource, ResourceWithAccount {
 

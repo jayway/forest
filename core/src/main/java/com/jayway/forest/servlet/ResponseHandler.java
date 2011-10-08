@@ -48,7 +48,6 @@ public class ResponseHandler {
     private ExceptionMapper exceptionMapper;
 
     public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) {
-        //mediaTypeHandler = new MediaTypeHandler(request.getHeader("Accept"), request.getHeader("Content-Type"));
         mediaTypeHandler = new MediaTypeHandler(request, response );
         this.response = response;
         this.exceptionMapper = exceptionMapper;
@@ -96,7 +95,6 @@ public class ResponseHandler {
             response.setStatus( responseError.status() );
             response.getOutputStream().print(  responseError.message() );
         } catch ( IOException ioe) {
-            //log
             response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
 

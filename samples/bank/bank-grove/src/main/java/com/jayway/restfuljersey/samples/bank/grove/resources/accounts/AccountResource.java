@@ -1,7 +1,6 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
-import static com.jayway.forest.grove.RoleManager.role;
-
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.Resource;
 import com.jayway.restfuljersey.samples.bank.dto.AccountLinkable;
@@ -17,6 +16,8 @@ import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
+import static com.jayway.forest.core.RoleManager.*;
 
 public class AccountResource implements Resource, DescribedResource {
 
