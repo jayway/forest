@@ -1,10 +1,12 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import com.jayway.forest.exceptions.BadRequestException;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.ReflectionUtil;
 
 public abstract class BaseReflectionCapability extends Capability {
 	public BaseReflectionCapability(String name, String documentation) {
@@ -40,9 +42,9 @@ public abstract class BaseReflectionCapability extends Capability {
             } catch ( BadRequestException e ) {
                 // two cases
                 // 1: simple field and value was not given
-                if ( ReflectionUtil.basicTypes.contains( f.getType() ) ) continue;
+                if ( ReflectionUtil.basicTypes.contains(f.getType()) ) continue;
                 // 2: complex type, so recurse
-                f.set( o, populateDTO( f.getType(), formParams, prefix + "." +f.getName() ));
+                f.set(o, populateDTO(f.getType(), formParams, prefix + "." + f.getName()));
             }
         }
         return o;

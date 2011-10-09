@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import java.util.HashMap;
 import java.util.List;

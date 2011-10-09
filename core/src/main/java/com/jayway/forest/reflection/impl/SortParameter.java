@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 /**
  */

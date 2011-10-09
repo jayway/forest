@@ -48,8 +48,7 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
     @Override
     public Resource id(String id) {
         Account account = role(AccountRepository.class).findById(id);
-        addRole(Account.class, account);
-        return new AccountResource();
+        return new AccountResource( account );
     }
 
     @Doc("returning a list of Linkable")

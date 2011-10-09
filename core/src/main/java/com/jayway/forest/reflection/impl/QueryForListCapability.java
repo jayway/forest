@@ -1,6 +1,7 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.di.DependencyInjectionSPI;
+import com.jayway.forest.reflection.PagingSortingParameter;
 import com.jayway.forest.roles.FieldComparator;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
@@ -22,7 +23,7 @@ public class QueryForListCapability extends QueryCapability {
     public PagedSortedListResponse get(HttpServletRequest request) {
         // setup Paging and Sorting parameter
         UrlParameter urlParameter = new UrlParameter(request.getParameterMap());
-        PagingSortingParameter pagingSortingParameter = pagingParameter( urlParameter );
+        PagingSortingParameterImpl pagingSortingParameter = pagingParameter( urlParameter );
         dependencyInjectionSPI.addRequestContext( PagingSortingParameter.class, pagingSortingParameter );
 
         // actual call to the resource method
@@ -81,7 +82,7 @@ public class QueryForListCapability extends QueryCapability {
                 for ( int i=minIndex; i<actualListSize && i<maxIndex; i++ ) {
                     resultList.add(returnedList.get(i));
                 }
-                response.setList( resultList );
+                response.setList(resultList);
 
                 if ( maxIndex < actualListSize ) {
                     response.setNext( name() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
@@ -126,14 +127,14 @@ public class QueryForListCapability extends QueryCapability {
         return 1+(int)Math.ceil(totalElements / pageSize );
     }
 
-    private PagingSortingParameter pagingParameter( UrlParameter urlParameter ) {
+    private PagingSortingParameterImpl pagingParameter( UrlParameter urlParameter ) {
         // todo set as a property of the application
         Integer pageSize = 10;
         if ( urlParameter.pageSize() != null ) {
             pageSize = urlParameter.pageSize();
         }
         String sortBy = urlParameter.sortBy();
-        return new PagingSortingParameter( urlParameter.page(), pageSize, sortBy );
+        return new PagingSortingParameterImpl( urlParameter.page(), pageSize, sortBy );
     }
 
 }

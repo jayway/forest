@@ -1,6 +1,6 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
-import com.jayway.forest.core.RoleManager;
+import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.Resource;
 import com.jayway.restfuljersey.samples.bank.dto.AccountLinkable;
@@ -14,20 +14,18 @@ import com.jayway.restfuljersey.samples.bank.model.Depositable;
 import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
-import static com.jayway.forest.core.RoleManager.*;
+import static com.jayway.forest.core.RoleManager.role;
 
 public class AccountResource implements Resource, DescribedResource {
 
+    private Account account;
+
+    public AccountResource(Account account) {
+        if ( account == null ) throw new NotFoundException();
+        this.account = account;
+    }
+
     private AccountLinkable convertAccount() {
-        //Method convertAccount = this.getClass().getDeclaredMethod("convertAccount");
-        //if ( Modifier.isPrivate( convertAccount.getModifiers() ) ) do...
-        //convertAccount.setAccessible( true );
-        //Object object = convertAccount.invoke(this);
-        //if ( field.getClass().isAssignableFrom( object.getClass()) ) -> fill values
-        Account account = role(Account.class);
         return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() );
     }
 
@@ -36,25 +34,25 @@ public class AccountResource implements Resource, DescribedResource {
 
 
     public void allowexceeddepositlimit( Boolean allow ) {
-    	role(Account.class).setAllowExceedBalanceLimit(allow);
+    	account.setAllowExceedBalanceLimit(allow);
     }
 
     @DepositAllowed
     public void deposit( Integer amount ) {
-        role(AccountManager.class).deposit((Depositable) role(Account.class), amount);
+        role(AccountManager.class).deposit((Depositable) account, amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void withdraw( Integer amount ) {
-        role(AccountManager.class).withdraw((Withdrawable) role(Account.class), amount);
+        role(AccountManager.class).withdraw((Withdrawable) account, amount);
     }
 
     @HasCredit
     @IsWithdrawable
     public void transfer( TransferToDTO transfer ) {
         Depositable depositable = role(AccountRepository.class).findWithRole(transfer.getDestinationAccount(), Depositable.class);
-        Withdrawable withdrawable = (Withdrawable) role(Account.class);
+        Withdrawable withdrawable = (Withdrawable) account;
 
         role(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
     }
@@ -62,7 +60,6 @@ public class AccountResource implements Resource, DescribedResource {
 
     @Override
     public Object description() {
-        Account account = role(Account.class);
         return String.format( Account.HTML_DESCRIPTION, account.getAccountNumber(), account.getBalance(), account.isAllowExceedBalanceLimit() );
     }
 }

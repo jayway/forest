@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -6,15 +6,21 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.MethodNotAllowedException;
 import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.roles.IdResource;
 import com.jayway.forest.roles.Resource;
 
-public class CapabilityNotFound extends Capability {
-	public static final CapabilityNotFound INSTANCE = new CapabilityNotFound();
-	private CapabilityNotFound() {
-		super(null, null);
+public class IdCapability extends Capability {
+
+	private final IdResource idResource;
+
+	public IdCapability(IdResource idResource, String name, String documentation) {
+		super(name, documentation);
+		this.idResource = idResource;
 	}
+
 	@Override
 	public Object get(HttpServletRequest request) {
 		throw new NotFoundException();
@@ -25,13 +31,14 @@ public class CapabilityNotFound extends Capability {
 	}
 	@Override
 	public void delete() {
-		// since the delete method was not found this means that the resource is not implementing DeletableResource!
-		throw new MethodNotAllowedException();
-	}
-	@Override
-	public Resource subResource(String path) {
 		throw new NotFoundException();
 	}
+
+	@Override
+	public Resource subResource(String path) {
+        return idResource.id( path );
+	}
+
 	@Override
 	public String httpMethod() {
 		return "GET";

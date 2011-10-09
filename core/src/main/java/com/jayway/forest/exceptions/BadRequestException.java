@@ -1,18 +1,17 @@
 package com.jayway.forest.exceptions;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  */
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends AbstractHtmlException  {
 	private static final long serialVersionUID = 1;
-    private String message;
 
     public BadRequestException() {
+        super(HttpServletResponse.SC_BAD_REQUEST, "Bad Request" );
     }
 
     public BadRequestException( String message ) {
-        this.message = message;
-    }
-    public String getMessage() {
-        return message;
+        super( HttpServletResponse.SC_BAD_REQUEST, message );
     }
 }

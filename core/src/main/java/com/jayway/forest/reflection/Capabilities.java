@@ -1,5 +1,6 @@
 package com.jayway.forest.reflection;
 
+import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
 
 import java.util.Collections;

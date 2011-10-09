@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -6,12 +6,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.exceptions.MethodNotAllowedException;
 import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
-public class CapabilityNotAllowed extends Capability {
-	public CapabilityNotAllowed(String name) {
-		super(name, null);
+public class CapabilityNotFound extends Capability {
+	public static final CapabilityNotFound INSTANCE = new CapabilityNotFound();
+	private CapabilityNotFound() {
+		super(null, null);
 	}
 	@Override
 	public Object get(HttpServletRequest request) {
@@ -23,7 +27,8 @@ public class CapabilityNotAllowed extends Capability {
 	}
 	@Override
 	public void delete() {
-		throw new NotFoundException();
+		// since the delete method was not found this means that the resource is not implementing DeletableResource!
+		throw new MethodNotAllowedException();
 	}
 	@Override
 	public Resource subResource(String path) {
@@ -33,6 +38,7 @@ public class CapabilityNotAllowed extends Capability {
 	public String httpMethod() {
 		return "GET";
 	}
+
 	@Override
 	public Object renderForm(RestReflection restReflection) {
 		throw new UnsupportedOperationException();

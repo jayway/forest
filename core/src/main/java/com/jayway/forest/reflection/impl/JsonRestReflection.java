@@ -1,5 +1,10 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
+import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.CapabilityReference;
+import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.reflection.impl.LinkCapabilityReference;
+import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
 
 import java.lang.reflect.Field;
@@ -34,7 +39,7 @@ public final class JsonRestReflection implements RestReflection {
 	}
 
     private void appendMethod( StringBuilder sb, CapabilityReference method ) {
-        sb.append("{\"href\": \"").append( method.name()).append( "\"");
+        sb.append("{\"href\": \"").append(method.name()).append( "\"");
         sb.append(",\"method\":\"").append(method.httpMethod()).append("\"}");
         // todo JSONTemplate
         // sb.append(",\"jsonTemplate\": generateTemplate( method ) );
@@ -95,7 +100,7 @@ public final class JsonRestReflection implements RestReflection {
         sb.append("[");
         final Map<String, Field> fields = new HashMap<String, Field>();
         // what if first element extends list type -> rte
-        iterateFields( list.get(0).getClass(), list.get(0), new FieldIterator() {
+        iterateFields( list.get(0).getClass(), list.get(0), new HtmlRestReflection.FieldIterator() {
             public void field(Field field) {
                 field.setAccessible( true );
                 fields.put(field.getName(), field);
@@ -131,7 +136,7 @@ public final class JsonRestReflection implements RestReflection {
         }
     }
 
-    private void iterateFields( Class clazz, Object instance, FieldIterator callback ) {
+    private void iterateFields( Class clazz, Object instance, HtmlRestReflection.FieldIterator callback ) {
         for (Field field : clazz.getDeclaredFields()) {
             if ( Modifier.isFinal(field.getModifiers())) continue;
             if ( Modifier.isStatic( field.getModifiers() )) continue;
@@ -145,9 +150,6 @@ public final class JsonRestReflection implements RestReflection {
         }
     }
 
-    interface FieldIterator {
-        void field( Field field ) throws IllegalAccessException;
-    }
 
     static class IterableCallback<T> {
         static <T> void element( StringBuilder sb, Iterable<T> iterable, Callback<T> callback ) {

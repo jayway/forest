@@ -1,6 +1,7 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
+import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.Linkable;
 
 import java.lang.reflect.Field;
@@ -69,7 +70,7 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void appendMethod( StringBuilder sb, Capability method ) {
         sb.append("<li><a href='").append( method.name() );
-        if ( method instanceof SubResource ) {
+        if ( method instanceof SubResource) {
             sb.append("/");
         }
         sb.append("'>").append( method.name() ).append("</a>");
@@ -206,7 +207,7 @@ public final class HtmlRestReflection implements RestReflection {
         }
     }
 
-    interface FieldIterator {
+    public interface FieldIterator {
         void field( Field field ) throws IllegalAccessException;
     }
 

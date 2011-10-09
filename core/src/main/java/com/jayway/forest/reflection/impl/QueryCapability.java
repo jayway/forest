@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -11,6 +11,7 @@ import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
 public class QueryCapability extends BaseReflectionCapability {

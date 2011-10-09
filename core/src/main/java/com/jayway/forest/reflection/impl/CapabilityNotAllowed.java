@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -7,18 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.roles.IdResource;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
-public class IdCapability extends Capability {
-
-	private final IdResource idResource;
-
-	public IdCapability(IdResource idResource, String name, String documentation) {
-		super(name, documentation);
-		this.idResource = idResource;
+public class CapabilityNotAllowed extends Capability {
+	public CapabilityNotAllowed(String name) {
+		super(name, null);
 	}
-
 	@Override
 	public Object get(HttpServletRequest request) {
 		throw new NotFoundException();
@@ -31,17 +27,14 @@ public class IdCapability extends Capability {
 	public void delete() {
 		throw new NotFoundException();
 	}
-
 	@Override
 	public Resource subResource(String path) {
-        return idResource.id( path );
+		throw new NotFoundException();
 	}
-
 	@Override
 	public String httpMethod() {
 		return "GET";
 	}
-
 	@Override
 	public Object renderForm(RestReflection restReflection) {
 		throw new UnsupportedOperationException();

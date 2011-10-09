@@ -1,5 +1,6 @@
-package com.jayway.forest.reflection;
+package com.jayway.forest.reflection.impl;
 
+import com.jayway.forest.reflection.CapabilityReference;
 import com.jayway.forest.roles.Linkable;
 
 public class LinkCapabilityReference implements CapabilityReference {

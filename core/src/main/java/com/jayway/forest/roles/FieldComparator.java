@@ -1,7 +1,7 @@
 package com.jayway.forest.roles;
 
 import com.jayway.forest.reflection.ReflectionUtil;
-import com.jayway.forest.reflection.SortParameter;
+import com.jayway.forest.reflection.impl.SortParameter;
 
 import java.lang.reflect.Field;
 import java.util.*;

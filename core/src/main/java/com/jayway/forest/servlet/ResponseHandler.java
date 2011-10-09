@@ -3,8 +3,12 @@ package com.jayway.forest.servlet;
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.exceptions.*;
-import com.jayway.forest.reflection.*;
+import com.jayway.forest.exceptions.AbstractHtmlException;
+import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.reflection.impl.HtmlRestReflection;
+import com.jayway.forest.reflection.impl.JsonRestReflection;
+import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.BaseUrl;
 import com.jayway.forest.roles.Linkable;
 
@@ -18,8 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static javax.servlet.http.HttpServletResponse.*;
 
 /**
  */
@@ -67,7 +69,7 @@ public class ResponseHandler {
             String responseString;
             if ( responseObject instanceof Capabilities ) {
                 responseString = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
-            } else if ( responseObject instanceof PagedSortedListResponse ) {
+            } else if ( responseObject instanceof PagedSortedListResponse) {
                 responseString = restReflection().renderListResponse( (PagedSortedListResponse) responseObject ).toString();
             } else {
                 if (mediaTypeHandler.acceptJSSON()) {
@@ -116,23 +118,8 @@ public class ResponseHandler {
             }
         }
 
-        if ( e instanceof BadRequestException) {
-            String message = e.getMessage() != null ? e.getMessage() : "Bad Request";
-            return new Response( SC_BAD_REQUEST, message );
-        } else if ( e instanceof ConflictException) {
-            return new Response( SC_CONFLICT,"Conflict" );
-        } else if ( e instanceof InternalServerErrorException) {
-            return new Response( SC_INTERNAL_SERVER_ERROR, "Internal Server Error" );
-        } else if ( e instanceof MethodNotAllowedException) {
-            return new Response(SC_METHOD_NOT_ALLOWED, "Method Not Allowed" );
-        } else if ( e instanceof MethodNotAllowedRenderTemplateException) {
-            Capability method = ((MethodNotAllowedRenderTemplateException) e).method();
-            Object form = method.renderForm(restReflection());
-            return new Response(SC_METHOD_NOT_ALLOWED, form.toString() );
-        } else if ( e instanceof NotFoundException) {
-            return new Response(SC_NOT_FOUND, "Not Found" );
-        } else if ( e instanceof UnsupportedMediaTypeException ) {
-            return new Response( SC_UNSUPPORTED_MEDIA_TYPE,  "Unsupported Media Type" );
+        if ( e instanceof AbstractHtmlException ) {
+            return new Response( ((AbstractHtmlException) e).getCode(), e.getMessage() );
         } else {
             return new Response( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage() );
         }

@@ -4,13 +4,12 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.jayway.forest.reflection.*;
+import com.jayway.forest.reflection.impl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,13 +17,11 @@ import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintEvaluator;
 import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.reflection.CommandCapability;
-import com.jayway.forest.reflection.CapabilityNotAllowed;
-import com.jayway.forest.reflection.IdCapability;
-import com.jayway.forest.reflection.CapabilityNotFound;
-import com.jayway.forest.reflection.QueryCapability;
+import com.jayway.forest.reflection.impl.CommandCapability;
+import com.jayway.forest.reflection.impl.IdCapability;
+import com.jayway.forest.reflection.impl.QueryCapability;
 import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.SubResource;
+import com.jayway.forest.reflection.impl.SubResource;
 import com.jayway.forest.roles.IdResource;
 import com.jayway.forest.roles.Resource;
 

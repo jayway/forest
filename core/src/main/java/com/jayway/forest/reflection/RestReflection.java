@@ -1,5 +1,7 @@
 package com.jayway.forest.reflection;
 
+import com.jayway.forest.reflection.impl.PagedSortedListResponse;
+
 import java.lang.reflect.Method;
 
 

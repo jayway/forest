@@ -12,11 +12,7 @@ import java.util.*;
 public class AccountRepository {
 
     public Account findById( String id ) {
-        Account account = accounts.get(id);
-        if ( account == null ) {
-            throw new NotFoundException();
-        }
-        return account;
+        return accounts.get(id);
     }
 
     public <T> T findWithRole(String id, Class<T> role) {
