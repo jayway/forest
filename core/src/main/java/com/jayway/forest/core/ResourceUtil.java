@@ -36,22 +36,22 @@ public class ResourceUtil {
 		this.dependencyInjectionSPI = dependencyInjectionSPI;
 	}
 
-    public boolean checkConstraint(Resource resource, Method method) {
-        for ( Annotation a : method.getAnnotations() ) {
-            if ( a.annotationType().getAnnotation(Constraint.class) != null ) {
-                if ( !constraintEvaluator( resource, a ) ) return false;
-            }
-        }
-        return true;
-    }
-
-    public String getDocumentation( Method method ) {
+    private String getDocumentation( Method method ) {
         for ( Annotation a : method.getAnnotations() ) {
             if ( a instanceof Doc) {
                 return ((Doc) a).value();
             }
         }
         return null;
+    }
+
+    private boolean checkConstraint(Resource resource, Method method) {
+        for ( Annotation a : method.getAnnotations() ) {
+            if ( a.annotationType().getAnnotation(Constraint.class) != null ) {
+                if ( !constraintEvaluator( resource, a ) ) return false;
+            }
+        }
+        return true;
     }
 
     private boolean constraintEvaluator( Resource resource, Annotation annotation ) {
@@ -88,7 +88,6 @@ public class ResourceUtil {
             }
         }
         if (resource instanceof IdResource) {
-        	// TODO: find documentation for IdResource
         	return new IdCapability((IdResource) resource, name, null);
         }
         return CapabilityNotFound.INSTANCE;

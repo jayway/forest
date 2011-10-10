@@ -7,6 +7,7 @@ import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.ResponseHandler;
 import com.jayway.restfuljersey.samples.bank.dto.AccountLinkable;
+import com.jayway.restfuljersey.samples.bank.dto.AccountTransformer;
 import com.jayway.restfuljersey.samples.bank.model.Account;
 import com.jayway.restfuljersey.samples.bank.model.CheckingAccount;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
@@ -54,10 +55,6 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
     @Doc("returning a list of Linkable")
     @Override
     public List<Linkable> discover() {
-        List<Linkable> links = new LinkedList<Linkable>();
-        for (Account account : role(AccountRepository.class).all()) {
-            links.add( new Linkable( account.getAccountNumber() + "/", account.getName() ));
-        }
-        return links;
+        return ResponseHandler.transform( role(AccountRepository.class).all(), AccountTransformer.INSTANCE );
     }
 }

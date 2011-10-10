@@ -18,6 +18,7 @@ import com.jayway.forest.reflection.impl.SubResource;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.UriInfo;
 
 public class ForestCore {
 
@@ -70,9 +71,11 @@ public class ForestCore {
 
     private Resource evaluatePath( List<String> segments ) {
         Resource current = dependencyInjectionSPI.postCreate(application.root());
+        UriInfo uriInfo = dependencyInjectionSPI.getRequestContext(UriInfo.class);
         for ( String pathSegment: segments ) {
             current = resourceUtil.invokePathMethod( current, pathSegment );
             current = dependencyInjectionSPI.postCreate(current);
+            uriInfo.addPath( pathSegment );
         }
         return current;
     }

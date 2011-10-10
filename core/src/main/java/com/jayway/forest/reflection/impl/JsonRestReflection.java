@@ -1,5 +1,6 @@
 package com.jayway.forest.reflection.impl;
 
+import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.CapabilityReference;
 import com.jayway.forest.reflection.RestReflection;
@@ -84,6 +85,15 @@ public final class JsonRestReflection implements RestReflection {
         appendList(sb, (List<Object>) response.getList());
         sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public Object renderQueryResponse(Object responseObject) {
+        if (responseObject instanceof String) {
+            return "\"" + responseObject + "\"";
+        } else {
+            return new JSONHelper().toJSON(responseObject);
+        }
     }
 
     private void appendLink( StringBuilder sb, String name, String link ) {

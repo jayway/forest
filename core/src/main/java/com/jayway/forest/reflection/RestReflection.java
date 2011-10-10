@@ -10,4 +10,5 @@ public interface RestReflection {
 	Object renderCommandForm(Method method);
 	Object renderQueryForm(Method method);
     Object renderListResponse(PagedSortedListResponse responseObject);
+    Object renderQueryResponse(Object responseObject);
 }

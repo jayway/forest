@@ -28,7 +28,6 @@ public class RestfulServletService extends RestfulServlet {
 
             @Override
             public void setupRequestContext() {
-                RoleManager.clear();
                 Set<Entry<Class<?>,Object>> entrySet = map.entrySet();
                 for (Entry<Class<?>, Object> entry : entrySet) {
                     RoleManager.addRole(entry.getKey(), entry.getValue());

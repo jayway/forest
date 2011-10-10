@@ -10,29 +10,30 @@ import javax.servlet.http.HttpServletResponse;
 public class MediaTypeHandler {
 
     public static final String APPLICATION_JSON = "application/json";
-    public static final String TEXT_HTML = "text/html";
+    public static final String TEXT_HTML        = "text/html";
     public static final String FORM_URL_ENCODED = "application/x-www-form-urlencoded";
+    public static final String APPLICATION_ATOM = "application/atom+xml";
 
-    private boolean acceptApplicationJSON;
     private boolean contentTypeApplicationJSON;
     private boolean contentTypeFormUrlEncoded;
+
+    private String accept;
 
     /**
      * Handler for the accept and content type headers.     *
      */
     public MediaTypeHandler( HttpServletRequest request, HttpServletResponse response ) {
-        //request.getHeader("Accept"), request.getHeader("Content-Type"));
         String acceptHeader = request.getHeader("Accept");
         String contentTypeHeader = request.getHeader("Content-Type");
-        // TODO this is not working correctly, wildcards are not considered
         // accept defaults to JSON
         if ( acceptHeader != null ) {
-            acceptApplicationJSON = true;
+            accept = APPLICATION_JSON;
             if ( acceptHeader.contains(APPLICATION_JSON) ) {
-                acceptApplicationJSON = true;
                 response.setHeader( "Content-Type", APPLICATION_JSON);
-            } else {
-                acceptApplicationJSON = !acceptHeader.contains(TEXT_HTML);
+            } else if ( acceptHeader.contains(APPLICATION_ATOM) ) {
+                accept = APPLICATION_ATOM;
+            } else if ( acceptHeader.contains(TEXT_HTML) ) {
+                accept = TEXT_HTML;
             }
         }
 
@@ -53,9 +54,8 @@ public class MediaTypeHandler {
         }
     }
 
-
-    public boolean acceptJSSON() {
-        return acceptApplicationJSON;
+    public String accept() {
+        return accept;
     }
 
     public boolean contentTypeJSON() {

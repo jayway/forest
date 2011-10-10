@@ -10,10 +10,18 @@ import java.lang.reflect.Method;
  */
 public class AtomRestReflection implements RestReflection {
 
+    public static final AtomRestReflection INSTANCE = new AtomRestReflection();
+    private AtomRestReflection() {}
+
     @Override
     public Object renderListResponse(PagedSortedListResponse responseObject) {
         // TODO use a velocity template
         return null;
+    }
+
+    @Override
+    public Object renderQueryResponse(Object responseObject) {
+        throw new UnsupportedMediaTypeException();
     }
 
     @Override

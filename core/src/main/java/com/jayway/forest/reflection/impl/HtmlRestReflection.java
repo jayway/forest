@@ -125,6 +125,16 @@ public final class HtmlRestReflection implements RestReflection {
         return htmlListResponse.append("</body></html>");
     }
 
+    @Override
+    public Object renderQueryResponse(Object responseObject) {
+        if ( responseObject instanceof String ) {
+            return responseObject.toString();
+        } else {
+            // complex object are JSON serialized for html output
+            return new JSONHelper().toJSON(responseObject).toString();
+        }
+    }
+
     private void renderTable(StringBuilder sb, List<?> list, PagedSortedListResponse response ) {
         sb.append("<table><tr>");
         Object element = list.get(0);

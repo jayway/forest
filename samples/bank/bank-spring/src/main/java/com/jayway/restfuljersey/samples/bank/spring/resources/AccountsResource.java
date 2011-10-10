@@ -2,6 +2,7 @@ package com.jayway.restfuljersey.samples.bank.spring.resources;
 
 import java.util.List;
 
+import com.jayway.restfuljersey.samples.bank.dto.AccountTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jayway.forest.roles.IdDiscoverableResource;
@@ -24,6 +25,6 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
 
     @Override
     public List<Linkable> discover() {
-        return ResponseHandler.mapList(Account.class, accountRepository.all(), "number", "number" );
+        return ResponseHandler.transform( accountRepository.all(), AccountTransformer.INSTANCE );
     }
 }

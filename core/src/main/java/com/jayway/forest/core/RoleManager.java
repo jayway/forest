@@ -18,9 +18,4 @@ public class RoleManager {
             throw new IllegalArgumentException("Object cannot be cast to "+clazz.getSimpleName());
         }
     }
-
-    public static void clear() {
-        spi.clear();
-    }
-
 }
