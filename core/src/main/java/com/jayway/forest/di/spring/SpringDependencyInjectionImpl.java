@@ -30,7 +30,6 @@ public class SpringDependencyInjectionImpl implements DependencyInjectionSPI, Ap
 
     @Override
     public void clear() {
-        RequestContextHolder.resetRequestAttributes();
     }
 
     @Override
