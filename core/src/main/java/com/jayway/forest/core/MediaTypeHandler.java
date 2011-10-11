@@ -26,8 +26,8 @@ public class MediaTypeHandler {
         String acceptHeader = request.getHeader("Accept");
         String contentTypeHeader = request.getHeader("Content-Type");
         // accept defaults to JSON
+        accept = APPLICATION_JSON;
         if ( acceptHeader != null ) {
-            accept = APPLICATION_JSON;
             if ( acceptHeader.contains(APPLICATION_JSON) ) {
                 response.setHeader( "Content-Type", APPLICATION_JSON);
             } else if ( acceptHeader.contains(APPLICATION_ATOM) ) {
