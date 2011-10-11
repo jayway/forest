@@ -38,10 +38,10 @@ public class MediaTypeHandler {
         }
 
         if ( contentTypeHeader != null ) {
-            if ( contentTypeHeader.equals( FORM_URL_ENCODED ) ) {
+            if ( contentTypeHeader.contains( FORM_URL_ENCODED ) ) {
                 contentTypeFormUrlEncoded = true;
                 contentTypeApplicationJSON = false;
-            } else if ( contentTypeHeader.equals( APPLICATION_JSON )) {
+            } else if ( contentTypeHeader.contains( APPLICATION_JSON )) {
                 contentTypeFormUrlEncoded = false;
                 contentTypeApplicationJSON = true;
             } else {
