@@ -42,8 +42,8 @@ public final class JsonRestReflection implements RestReflection {
 	}
 
     private void appendMethod( StringBuilder sb, CapabilityReference method ) {
-        sb.append("\"").append(method.name() ).append("\":");
-        sb.append("{\"href\": \"").append(method.href()).append("\",");
+        sb.append("{\"name\":").append("\"").append(method.name() ).append("\",");
+        sb.append("\"href\": \"").append(method.href()).append("\",");
         sb.append("\"method\":\"").append(method.httpMethod()).append("\"");
         if ( method.rel() != null ) {
             sb.append(", \"rel\":\"").append( method.rel() ).append("\"");
