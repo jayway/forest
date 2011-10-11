@@ -14,6 +14,7 @@ import com.jayway.restfuljersey.samples.bank.model.Depositable;
 import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
+import static com.jayway.forest.core.RoleManager.addRole;
 import static com.jayway.forest.core.RoleManager.role;
 
 public class AccountResource implements Resource, DescribedResource {
@@ -22,6 +23,7 @@ public class AccountResource implements Resource, DescribedResource {
 
     public AccountResource(Account account) {
         if ( account == null ) throw new NotFoundException();
+        addRole(Account.class, account);
         this.account = account;
     }
 
@@ -60,6 +62,6 @@ public class AccountResource implements Resource, DescribedResource {
 
     @Override
     public Object description() {
-        return String.format( Account.HTML_DESCRIPTION, account.getAccountNumber(), account.getBalance(), account.isAllowExceedBalanceLimit() );
+        return account;
     }
 }

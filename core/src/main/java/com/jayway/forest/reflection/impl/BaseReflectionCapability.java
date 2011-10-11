@@ -4,13 +4,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.ReflectionUtil;
+import com.jayway.forest.roles.UriInfo;
 
 public abstract class BaseReflectionCapability extends Capability {
-	public BaseReflectionCapability(String name, String documentation) {
-		super(name, documentation);
+	public BaseReflectionCapability(String name, String documentation, String rel) {
+		super(name, documentation, rel);
 	}
 
     protected Object mapArguments( Class<?> dto, Map<String,String[]> formParams, String prefix ) {

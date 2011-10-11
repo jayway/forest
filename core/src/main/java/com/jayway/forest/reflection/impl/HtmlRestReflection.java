@@ -1,8 +1,10 @@
 package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.UriInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -69,10 +71,7 @@ public final class HtmlRestReflection implements RestReflection {
     }
 
     private void appendMethod( StringBuilder sb, Capability method ) {
-        sb.append("<li><a href='").append( method.name() );
-        if ( method instanceof SubResource) {
-            sb.append("/");
-        }
+        sb.append("<li><a href='").append( method.href() );
         sb.append("'>").append( method.name() ).append("</a>");
         if ( method.isDocumented() ) {
             sb.append(" <i>(").append( method.documentation() ).append("</i>)");
@@ -149,7 +148,7 @@ public final class HtmlRestReflection implements RestReflection {
             sb.append("<tr>");
             if ( elm instanceof Linkable ) {
                 sb.append("<td>");
-                appendAnchor( sb, ((Linkable) elm).href() + "/", ((Linkable) elm).href(), false);
+                appendAnchor( sb, ((Linkable) elm).href(), ((Linkable) elm).name(), false);
                 sb.append("</td>");
                 renderTableRow(sb, elm.getClass(), elm );
             } else {
@@ -223,7 +222,7 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void renderLinkable(StringBuilder sb, Linkable link) {
         sb.append("<li>");
-        appendAnchor( sb, link.href()+"/", link.name(), false );
+        appendAnchor( sb, link.href(), link.name(), false );
         sb.append( "</li>" );
     }
 
@@ -247,9 +246,6 @@ public final class HtmlRestReflection implements RestReflection {
             Class<?> type = types[i];
             create( "argument"+(i+1), type, sb, type.getSimpleName() );
         }
-        /*for ( Class<?> type : types ) {
-            createForm( type.getSimpleName(), type, sb, type.getSimpleName() );
-        }*/
         return sb.append( "<input type='submit' /></form></body></html>" ).toString();
     }
 

@@ -1,12 +1,14 @@
 package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.CapabilityReference;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.reflection.impl.LinkCapabilityReference;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.UriInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,7 +25,7 @@ public final class JsonRestReflection implements RestReflection {
 	@Override
 	public Object renderCapabilities(Capabilities capabilities) {
         StringBuilder results = new StringBuilder( );
-        results.append("[");
+        results.append("{");
         List<CapabilityReference> all = new LinkedList<CapabilityReference>();
         all.addAll( capabilities.getQueries() );
         all.addAll( capabilities.getCommands() );
@@ -35,13 +37,17 @@ public final class JsonRestReflection implements RestReflection {
         if ( !all.isEmpty() ) {
             toMapEntries(all, results);
         }
-        results.append("]");
+        results.append("}");
 		return results.toString();
 	}
 
     private void appendMethod( StringBuilder sb, CapabilityReference method ) {
-        sb.append("{\"href\": \"").append(method.name()).append( "\"");
-        sb.append(",\"method\":\"").append(method.httpMethod()).append("\"}");
+        sb.append("\"").append(method.name() ).append("\":");
+        sb.append("{\"href\": \"").append(method.href()).append("\",");
+        sb.append("\"method\":\"").append(method.httpMethod()).append("\"");
+        if ( method.rel() != null ) {
+            sb.append(", \"rel\":\"").append( method.rel() ).append("\"");
+        }
         // todo JSONTemplate
         // sb.append(",\"jsonTemplate\": generateTemplate( method ) );
     }
@@ -49,9 +55,9 @@ public final class JsonRestReflection implements RestReflection {
     private void toMapEntries(List<CapabilityReference> list, StringBuilder results) {
         boolean first = true;
         for (CapabilityReference method : list) {
-            if ( !first ) results.append( ",");
+            if ( !first ) results.append( ",\n");
+            else first = false;
             appendMethod( results, method );
-            first = false;
         }
     }
 

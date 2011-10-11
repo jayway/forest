@@ -13,7 +13,7 @@ public class LinkCapabilityReference implements CapabilityReference {
 
 	@Override
 	public String name() {
-		return linkable.href();
+		return linkable.name();
 	}
 
 	@Override
@@ -21,4 +21,13 @@ public class LinkCapabilityReference implements CapabilityReference {
 		return "GET";
 	}
 
+    @Override
+    public String href() {
+        return linkable.href();
+    }
+
+    @Override
+    public String rel() {
+        return linkable.rel();
+    }
 }

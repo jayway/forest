@@ -7,29 +7,30 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.exceptions.UnauthorizedException;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
 public class CapabilityNotAllowed extends Capability {
 	public CapabilityNotAllowed(String name) {
-		super(name, null);
+		super(name, null, null);
 	}
 	@Override
 	public Object get(HttpServletRequest request) {
-		throw new NotFoundException();
+		throw new UnauthorizedException();
 	}
 	@Override
 	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
-		throw new NotFoundException();
+		throw new UnauthorizedException();
 	}
 	@Override
 	public void delete() {
-		throw new NotFoundException();
+		throw new UnauthorizedException();
 	}
 	@Override
 	public Resource subResource(String path) {
-		throw new NotFoundException();
+		throw new UnauthorizedException();
 	}
 	@Override
 	public String httpMethod() {

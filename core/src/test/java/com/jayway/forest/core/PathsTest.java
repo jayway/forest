@@ -14,13 +14,13 @@ import static org.junit.Assert.assertEquals;
 public class PathsTest extends AbstractRunner {
 
 
-    @Test
+    /*@Test
     public void testDiscoverId() throws IOException {
-        String nameId = given().spec(acceptTextHtml()).and().get("/other/id/").asString();
-        String nameName = given().spec(acceptTextHtml()).and().get("/other/name/").asString();
+        String nameId = given().and().get("/other/id/").asString();
+        String nameName = given().and().get("/other/name/").asString();
 
         assertEquals(nameId, nameName);
-    }
+    }*/
 
    @Test
     public void invokeIdResourceAsQuery() {

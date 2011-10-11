@@ -17,7 +17,7 @@ public class IdCapability extends Capability {
 	private final IdResource idResource;
 
 	public IdCapability(IdResource idResource, String name, String documentation) {
-		super(name, documentation);
+		super(name, documentation, null);
 		this.idResource = idResource;
 	}
 

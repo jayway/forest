@@ -15,7 +15,7 @@ import com.jayway.forest.roles.Resource;
 public class CapabilityNotFound extends Capability {
 	public static final CapabilityNotFound INSTANCE = new CapabilityNotFound();
 	private CapabilityNotFound() {
-		super(null, null);
+		super(null, null, null);
 	}
 	@Override
 	public Object get(HttpServletRequest request) {

@@ -2,6 +2,7 @@ package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
 import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.core.RoleManager;
+import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import static com.jayway.forest.core.RoleManager.*;
 
-public class AccountsResource implements Resource, IdDiscoverableResource {
+public class AccountsResource implements IdDiscoverableResource {
 
     @Doc("Dummy for testing list queries with argument")
     public List<Linkable> search( String name ) {
@@ -57,4 +58,5 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
     public List<Linkable> discover() {
         return ResponseHandler.transform( role(AccountRepository.class).all(), AccountTransformer.INSTANCE );
     }
+
 }

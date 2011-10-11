@@ -18,8 +18,8 @@ public class QueryCapability extends BaseReflectionCapability {
     protected final Resource resource;
     protected final Method method;
 
-    public QueryCapability(Resource resource, Method method, String name, String documentation) {
-        super(name, documentation);
+    public QueryCapability(Resource resource, Method method, String documentation, String rel) {
+        super(method.getName(), documentation, rel);
         this.resource = resource;
         this.method = method;
     }

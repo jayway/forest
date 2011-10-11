@@ -53,18 +53,22 @@ public class JSONHelper {
         }
 
         // JSONObject
-        final JSONObject result = new JSONObject();
-        for (Field field : dto.getClass().getDeclaredFields() ) {
+        return allFields( dto.getClass(), dto, new JSONObject() );
+    }
+
+    public JSONObject allFields( Class<?> clazz, Object instance, JSONObject result ) {
+        for (Field field : clazz.getDeclaredFields() ) {
             if (Modifier.isFinal(field.getModifiers()) ) continue;
             //if (Modifier.isStatic(field.getModifiers()) ) continue;
             field.setAccessible( true );
             try {
-                Object value = field.get(dto);
+                Object value = field.get( instance );
                 if ( value != null ) {
                     result.put(field.getName(), toJSON( value ));
                 }
             } catch (IllegalAccessException e) { }
         }
+        if ( clazz.getSuperclass() != Object.class ) return allFields( clazz.getSuperclass(), instance, result );
         return result;
     }
 

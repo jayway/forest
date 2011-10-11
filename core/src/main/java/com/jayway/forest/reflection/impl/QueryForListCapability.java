@@ -14,8 +14,8 @@ public class QueryForListCapability extends QueryCapability {
 
     private DependencyInjectionSPI dependencyInjectionSPI;
 
-    public QueryForListCapability(DependencyInjectionSPI dependencyInjectionSPI, Resource resource, Method method, String name, String documentation) {
-        super(resource, method, name, documentation);
+    public QueryForListCapability(DependencyInjectionSPI dependencyInjectionSPI, Resource resource, Method method, String documentation) {
+        super( resource, method, documentation, method.getName() );
         this.dependencyInjectionSPI = dependencyInjectionSPI;
     }
 

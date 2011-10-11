@@ -101,14 +101,14 @@ public class ResourceUtil {
             } else {
                 String documentation = getDocumentation(method);
                 if (method.getReturnType().equals(Void.TYPE)) {
-                    return new CommandCapability(method, resource, name, documentation);
+                    return new CommandCapability(method, resource, documentation, method.getName() );
                 } else if (Resource.class.isAssignableFrom(method.getReturnType())) {
-                    if (method.getParameterTypes().length == 0) return new SubResource(resource, method, name, documentation);
+                    if (method.getParameterTypes().length == 0) return new SubResource(resource, method, documentation);
                     else if (resource instanceof IdResource) return new IdCapability((IdResource) resource, name, documentation);
                 } else if ( List.class.isAssignableFrom( method.getReturnType() )) {
-                    return new QueryForListCapability(dependencyInjectionSPI, resource, method, name, documentation );
+                    return new QueryForListCapability(dependencyInjectionSPI, resource, method, documentation );
                 } else {
-                    return new QueryCapability(resource, method, name, documentation);
+                    return new QueryCapability(resource, method, documentation, method.getName());
                 }
             }
         }

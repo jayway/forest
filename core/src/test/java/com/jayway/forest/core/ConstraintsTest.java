@@ -1,16 +1,13 @@
 package com.jayway.forest.core;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.RestfulServletService;
+import org.junit.Test;
+
+import java.io.IOException;
 
 import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.get;
+import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 /**
@@ -30,8 +27,14 @@ public class ConstraintsTest extends AbstractRunner {
 
     @Test
     public void testIlllegalConstraint() {
-        expect().statusCode(404).when().get("/constraint");
+        expect().statusCode(401).when().get("/constraint");
     }
+
+    @Test
+    public void testIlllegalConstraintHtml() {
+        given().spec(acceptTextHtml()).expect().statusCode(401).when().get("/constraint");
+    }
+
 
 /*
     @Test

@@ -16,8 +16,8 @@ import com.jayway.forest.roles.Resource;
 public class SubResource extends Capability {
 	private final Resource resource;
 	private final Method method;
-	public SubResource(Resource resource, Method method, String name, String documentation) {
-		super(name, documentation);
+	public SubResource(Resource resource, Method method, String documentation) {
+		super(method.getName(), documentation, null);
 		this.resource = resource;
 		this.method = method;
 	}
@@ -57,4 +57,9 @@ public class SubResource extends Capability {
 	public Object renderForm(RestReflection restReflection) {
 		throw new UnsupportedOperationException();
 	}
+
+    @Override
+    public String href() {
+        return super.href() + "/";
+    }
 }

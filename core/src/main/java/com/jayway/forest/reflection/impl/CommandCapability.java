@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.NotFoundException;
@@ -17,13 +18,14 @@ import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.reflection.impl.BaseReflectionCapability;
 import com.jayway.forest.roles.DeletableResource;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.UriInfo;
 
 public class CommandCapability extends BaseReflectionCapability {
 	private final Method method;
 	private final Resource resource;
 
-	public CommandCapability(Method method, Resource resource, String name, String documentation) {
-		super(name, documentation);
+	public CommandCapability(Method method, Resource resource, String documentation, String rel) {
+		super(method.getName(), documentation, rel);
 		this.method = method;
 		this.resource = resource;
 	}
