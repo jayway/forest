@@ -3,6 +3,7 @@ package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.Template;
 import com.jayway.restfuljersey.samples.bank.dto.AccountLinkable;
 import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
 import com.jayway.restfuljersey.samples.bank.grove.constraints.DepositAllowed;
@@ -64,4 +65,13 @@ public class AccountResource implements Resource, DescribedResource {
     public Object description() {
         return account;
     }
+
+
+    private String accountDescription() {
+        return account.getDescription();
+    }
+    public void changedescription( @Template("accountDescription") String description ) {
+        account.setDescription(description);
+    }
+
 }

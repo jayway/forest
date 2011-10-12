@@ -9,6 +9,7 @@ public class Account {
     protected int balance;
     private String number;
     private String name;
+    private String description;
     private boolean allowExceedBalanceLimit;
 
     public Account( String number, String name ) {
@@ -28,6 +29,12 @@ public class Account {
 
     public String getName() {
         return name;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription( String description ) {
+        this.description = description;
     }
 
     @Override

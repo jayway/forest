@@ -94,6 +94,6 @@ public class CommandCapability extends BaseReflectionCapability {
 
 	@Override
 	public Object renderForm(RestReflection restReflection) {
-		return restReflection.renderCommandForm(method);
+		return restReflection.renderCommandForm(method, resource);
 	}
 }

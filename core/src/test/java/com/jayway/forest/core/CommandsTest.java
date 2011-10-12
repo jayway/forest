@@ -2,7 +2,6 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -81,15 +80,13 @@ public class CommandsTest extends AbstractRunner {
     }
 
     @Test
-    @Ignore
     public void testTemplate() throws IOException {
         String json = given().expect().statusCode(405).when().get("/updatewithtemplate").andReturn().as(String.class);
 
-        assertEquals("\"Template Content\"", json);
+        assertEquals("Template Content", json);
     }
 
     @Test
-    @Ignore
     public void testCommandSimple() throws IOException {
         String json = given().expect().statusCode(405).when().get("/command").andReturn().as(String.class);
         assertEquals("", json);

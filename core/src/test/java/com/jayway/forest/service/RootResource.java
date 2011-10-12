@@ -10,7 +10,7 @@ import com.jayway.forest.roles.Template;
 
 import java.util.List;
 
-import static com.jayway.forest.core.RoleManager.*;
+import static com.jayway.forest.core.RoleManager.role;
 
 /**
  */
@@ -41,11 +41,29 @@ public class RootResource implements Resource, CreatableResource {
         return first + second.getInteger();
     }
 
+    private Integer defaultInt() {
+        return 17;
+    }
+    private IntegerDTO defaultIntDTO() {
+        return new IntegerDTO(63);
+    }
+    private IntegerDTO evil() {
+        throw new IllegalArgumentException();
+    }
+
+    public Integer addwithtemplates( @Template("defaultInt") Integer first, @Template("defaultIntDTO") IntegerDTO second ) {
+        return first + second.getInteger();
+    }
+
+    public Integer addwithwrongtemplates( @Template("badwrongname") Integer first, @Template("evil") IntegerDTO second ) {
+        return first + second.getInteger();
+    }
+
     public void addcommand( Integer first, IntegerDTO second ) {
         StateHolder.set( first + second.getInteger() );
     }
 
-    public String echo( String input ) {
+    public String echo( @Template("content") String input ) {
         return input;
     }
     
@@ -78,4 +96,24 @@ public class RootResource implements Resource, CreatableResource {
     public String throwingnotfound() {
         throw new NotFoundException("Bad stuff");
     }
+
+
+    public String withwrongtemplatetype( @Template("wrongType") String name ) {
+        return null;
+    }
+    private Double wrongType() {
+        return 5.0;
+    }
+
+    public String withnonexistingtemplate( @Template("nonexistent") String name ) {
+        return null;
+    }
+
+    private String withargument( String argument ) {
+        return "cannot be invoked by framework";
+    }
+    public String templatemethodwithargument( @Template("withargument") String arg) {
+        return null;
+    }
 }
+

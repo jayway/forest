@@ -1,7 +1,6 @@
 package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
-
 import org.junit.Test;
 
 import java.io.IOException;

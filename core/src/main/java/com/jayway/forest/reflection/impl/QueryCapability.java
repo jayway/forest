@@ -79,6 +79,6 @@ public class QueryCapability extends BaseReflectionCapability {
 
     @Override
     public Object renderForm(RestReflection restReflection) {
-        return restReflection.renderQueryForm(method);
+        return restReflection.renderQueryForm(method, resource);
     }
 }

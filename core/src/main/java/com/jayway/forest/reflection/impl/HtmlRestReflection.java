@@ -1,10 +1,9 @@
 package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
-import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.UriInfo;
+import com.jayway.forest.roles.Resource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -71,7 +70,7 @@ public final class HtmlRestReflection implements RestReflection {
     }
 
     private void appendMethod( StringBuilder sb, Capability method ) {
-        sb.append("<li><a href='").append( method.href() );
+        sb.append("<li><a href='").append(method.href());
         sb.append("'>").append( method.name() ).append("</a>");
         if ( method.isDocumented() ) {
             sb.append(" <i>(").append( method.documentation() ).append("</i>)");
@@ -80,13 +79,13 @@ public final class HtmlRestReflection implements RestReflection {
     }
 
     @Override
-    public Object renderCommandForm(Method method) {
-        return createForm(method, "POST");
+    public Object renderCommandForm(Method method, Resource resource) {
+        return createForm(method, "POST", resource);
     }
 
     @Override
-    public Object renderQueryForm(Method method) {
-        return createForm(method, "GET");
+    public Object renderQueryForm(Method method, Resource resource) {
+        return createForm(method, "GET", resource);
     }
 
     private void appendPagingInfo( StringBuilder sb, PagedSortedListResponse response, boolean stripName ) {
@@ -236,48 +235,74 @@ public final class HtmlRestReflection implements RestReflection {
      * @param method
      * @return html form getting the parameters needed for the method
      */
-    protected String createForm( Method method, String httpMethod ) {
+    protected String createForm( Method method, String httpMethod, Resource resource ) {
+        List<Parameter> parameters = ReflectionUtil.parameterList(method, resource);
         Class<?>[] types = method.getParameterTypes();
         StringBuilder sb = new StringBuilder();
         sb.append( "<html><body><form name='generatedform' action='").append(method.getName()).
                 append("' method='").append(httpMethod).append("' >" );
 
-        for ( int i=0; i<types.length; i++ ) {
-            Class<?> type = types[i];
-            create( "argument"+(i+1), type, sb, type.getSimpleName() );
+        for ( int i=0; i<parameters.size(); i++ ) {
+            Parameter parameter = parameters.get(i);
+            htmlForParameter("argument" + (i + 1), parameter.parameterCls(), sb, parameter.parameterCls().getSimpleName(), parameter.getTemplate());
         }
         return sb.append( "<input type='submit' /></form></body></html>" ).toString();
     }
 
-    private void create( String legend, Class<?> dto, StringBuilder sb, String typeName ) {
+    private void htmlForParameter(String legend, Class<?> dto, StringBuilder sb, String typeName, Object templateValue) {
         sb.append("<fieldset><legend>").append(legend).append("</legend>");
         if ( ReflectionUtil.basicTypes.contains( dto ) ) {
-            sb.append(typeName).append(": <input type='text' ").
-                    append("name='").append( legend ).append("'/></br>");
+            // special case for text area
+            if ( templateValue != null && templateValue instanceof String && ( ((String) templateValue).length()> 20)) {
+                String value = (String) templateValue;
+                int rows = lines( value ) + 2;
+                sb.append(typeName).append(": <textarea rows='").append( rows ).append("' cols='80' name='");
+                sb.append(legend).append("'>").append(value).append("</textarea></br>");
+            } else {
+                sb.append(typeName).append(": <input type='text' ");
+                if ( templateValue != null && ReflectionUtil.basicTypes.contains( templateValue.getClass() )) {
+                    sb.append(" value='").append(templateValue).append("' ");
+                }
+                sb.append("name='").append( legend ).append("'/></br>");
+            }
         } else if ( List.class.isAssignableFrom( dto ) ) {
-            // TODO
+            // TODO create textarea and accept a comma separated list of values
         } else if ( Map.class.isAssignableFrom( dto ) ) {
             // TODO
         } else {
             // dto type
-            createForm( dto.getSimpleName(), dto, sb, legend + "." + dto.getSimpleName() );
+            htmlForComposite(dto.getSimpleName(), dto, sb, legend + "." + dto.getSimpleName(), templateValue);
         }
 
         sb.append("</fieldset>");
     }
 
-    private void createForm( String legend, Class<?> dto, StringBuilder sb, String fieldPath ) {
+    private void htmlForComposite(String legend, Class<?> dto, StringBuilder sb, String fieldPath, Object templateValue ) {
         sb.append("<fieldset><legend>").append(legend).append("</legend>");
         for ( Field f : dto.getDeclaredFields() ) {
             if ( Modifier.isFinal(f.getModifiers())) continue;
+            if ( Modifier.isStatic(f.getModifiers())) continue;
+            Object fieldValue = null;
+            if ( templateValue != null ) {
+                f.setAccessible( true );
+                try {
+                    fieldValue = f.get(templateValue);
+                } catch (IllegalAccessException e) {
+                    // ignore
+                }
+            }
             String name = f.getName();
             Class<?> type = f.getType();
             // this must be one of the getters
-            if (ReflectionUtil.basicTypes.contains(  type ) ) {
-                sb.append(name).append(": <input type='").
-                        append( name.equals("password")? "password": "text" ).
-                        append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
+            if ( ReflectionUtil.basicTypes.contains(  type ) ) {
+                sb.append(name).append(": <input type='");
+                sb.append( name.equals("password")? "password": "text" );
+                if ( fieldValue != null ) {
+                    sb.append("' value='").append(fieldValue);
+                }
+                sb.append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
             } else if ( type.isEnum() ) {
+                // TODO handle enums
                 sb.append(name).append( ": <select name='").append( fieldPath ).append( "." ).append(name).append("'>");
                 for ( Object o : type.getEnumConstants() ) {
                     sb.append( "<option value='").append(o).append("'>").append(o).append("</option>");
@@ -286,10 +311,20 @@ public final class HtmlRestReflection implements RestReflection {
             } else {
                 // for now assume DTO subtype
                 // TODO List & Map, (any other???)
-                createForm( name, type, sb, fieldPath + "." + name );
+                htmlForComposite(name, type, sb, fieldPath + "." + name, fieldValue);
             }
         }
         sb.append("</fieldset>");
+    }
+
+    private int lines(String contents ) {
+        int count = 0;
+        for (int i=0; i < contents.length(); i++) {
+            if (contents.charAt(i) == '\n') {
+                count++;
+            }
+        }
+        return count;
     }
 
 }

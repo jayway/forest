@@ -3,11 +3,7 @@ package com.jayway.forest.core;
 import com.jayway.forest.service.AbstractRunner;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
 
 /**
  */

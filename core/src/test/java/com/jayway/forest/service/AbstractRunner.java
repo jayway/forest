@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mortbay.jetty.testing.ServletTester;
 
-import static com.jayway.restassured.RestAssured.baseURI;
-import static com.jayway.restassured.RestAssured.defaultParser;
 import static com.jayway.restassured.parsing.Parser.JSON;
 
 /**
