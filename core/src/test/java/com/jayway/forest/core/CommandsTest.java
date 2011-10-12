@@ -2,6 +2,7 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class CommandsTest extends AbstractRunner {
     public void testCommandList() throws IOException {
         given().body("[\"Hello\"]").when().post("/commandlist");
 
-        assertEquals( "SuccessHello", StateHolder.get());
+        assertEquals("SuccessHello", StateHolder.get());
     }
 
 @Test
@@ -61,7 +62,7 @@ public class CommandsTest extends AbstractRunner {
 
     @Test @SuppressWarnings("unchecked")
     public void testCommandAddToList() throws IOException {
-        given().body("[[\"Hello\"], \"World\"]").when().post( "/addtolist");
+        given().body("[[\"Hello\"], \"World\"]").when().post("/addtolist");
 
 		List<String> list = (List<String>) StateHolder.get();
         assertEquals("HelloWorld", list.get(0) + list.get(1));
@@ -77,5 +78,20 @@ public class CommandsTest extends AbstractRunner {
             result += elm;
         }
         assertEquals("HelloWorldNEW", result);
+    }
+
+    @Test
+    @Ignore
+    public void testTemplate() throws IOException {
+        String json = given().expect().statusCode(405).when().get("/updatewithtemplate").andReturn().as(String.class);
+
+        assertEquals("\"Template Content\"", json);
+    }
+
+    @Test
+    @Ignore
+    public void testCommandSimple() throws IOException {
+        String json = given().expect().statusCode(405).when().get("/command").andReturn().as(String.class);
+        assertEquals("", json);
     }
 }

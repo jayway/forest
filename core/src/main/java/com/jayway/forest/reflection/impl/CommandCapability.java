@@ -45,7 +45,6 @@ public class CommandCapability extends BaseReflectionCapability {
         try {
             method.invoke( resource, arguments );
         } catch (InvocationTargetException e) {
-        	// TODO: shouldn't all exceptions be logged???
             if ( e.getCause() instanceof RuntimeException ) {
                 log.error( e.getCause().getMessage(), e);
                 throw (RuntimeException) e.getCause();

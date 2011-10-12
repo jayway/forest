@@ -4,15 +4,17 @@ import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.CapabilityReference;
+import com.jayway.forest.reflection.ReflectionUtil;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.reflection.impl.LinkCapabilityReference;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.Template;
 import com.jayway.forest.roles.UriInfo;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
 import java.util.*;
 
 public final class JsonRestReflection implements RestReflection {
@@ -57,18 +59,19 @@ public final class JsonRestReflection implements RestReflection {
         for (CapabilityReference method : list) {
             if ( !first ) results.append( ",\n");
             else first = false;
-            appendMethod( results, method );
+            appendMethod(results, method);
         }
     }
 
+    // TODO pass in Resource
 	@Override
 	public Object renderCommandForm(Method method) {
-		return createForm(method, "POST");
+		return createForm(method, "POST", null);
 	}
 
 	@Override
 	public Object renderQueryForm(Method method) {
-		return createForm(method, "GET");
+		return createForm(method, "GET", null);
 	}
 
     @Override
@@ -136,8 +139,114 @@ public final class JsonRestReflection implements RestReflection {
         sb.append("]");
     }
 
-    protected String createForm( Method method, String httpMethod ) {
-    	return "N/A";
+    protected String createForm( Method method, String httpMethod, Resource resource ) {
+        if ( method.getParameterTypes().length == 0 ) return "";
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        List<Parameter> parameters = new LinkedList<Parameter>();
+        for ( int i =0; i< method.getParameterTypes().length; i++) {
+            Class<?> aClass = method.getParameterTypes()[i];
+            Annotation[] annotations = parameterAnnotations[i];
+            for (Annotation annotation : annotations) {
+                if ( annotation instanceof Template ) {
+                    String methodName = ((Template) annotation).value();
+                    Parameter parameter = null;
+                    try {
+                        Method template = resource.getClass().getMethod(methodName);
+                        if ( aClass.isAssignableFrom( template.getReturnType() ) && Modifier.isPrivate( template.getModifiers() ) ) {
+                            template.setAccessible( true );
+                            parameters.add( new Parameter( aClass, template.invoke(resource) ));
+                        }
+                    } catch (Throwable e) {
+                        // ignore parameter will be without template
+                    } finally {
+                        if ( parameter == null ) {
+                            parameters.add( new Parameter( aClass ));
+                        } else {
+                            parameters.add( parameter );
+                        }
+                    }
+
+                }
+            }
+        }
+        final StringBuilder sb = new StringBuilder();
+        IterableCallback.element( sb, parameters, new Callback<Parameter>(){
+            public void callback(Parameter parameter) {
+                // TODO check for parameter template and use it
+                jsonTemplateForParameter(sb, parameter.clazz, parameter.clazz);
+            }
+        });
+        return sb.toString();
+    }
+
+    class Parameter {
+        private Class<?> clazz;
+        private Object template;
+
+        Parameter( Class<?> clazz ) {
+            this.clazz = clazz;
+        }
+
+        Parameter( Class<?> clazz, Object template) {
+            this.clazz = clazz;
+            this.template = template;
+        }
+    }
+
+    private void jsonTemplateForParameter(StringBuilder sb, Class<?> clazz, Type genericType) {
+        if ( ReflectionUtil.basicTypes.contains( clazz ) ) {
+            defaultInstanceBasic(sb, clazz);
+        } else {
+            sb.append("{");
+            defaultInstanceComposed(sb, clazz, genericType);
+            sb.append("}");
+        }
+    }
+
+    private void defaultInstanceComposed(StringBuilder sb, Class<?> clazz, Type genericType ) {
+        if ( genericType instanceof ParameterizedType ) {
+            Type rawType = ((ParameterizedType) genericType).getRawType();
+            if (  List.class.isAssignableFrom( (Class) rawType ) ) {
+                sb.append("[");
+                Type type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                jsonTemplateForParameter(sb, (Class) type, type);
+                sb.append("]");
+            } else if ( Map.class.isAssignableFrom( (Class) rawType ) ) {
+                sb.append("{");
+                Type type = ((ParameterizedType) genericType).getActualTypeArguments()[1];
+                jsonTemplateForParameter(sb, (Class) type, type);
+                sb.append("}");
+            }
+            // TODO maybe support general parameterized types
+            return;
+        }
+
+        if ( clazz == Object.class ) {
+            sb.append("{}");
+            return;
+        }
+
+        for (Field field : clazz.getDeclaredFields()) {
+            if ( Modifier.isStatic( field.getModifiers() )) continue;
+            if ( Modifier.isFinal(field.getModifiers())) continue;
+            sb.append("\"").append(field.getName()).append("\":");
+            jsonTemplateForParameter(sb, field.getType(), field.getGenericType());
+        }
+        if ( clazz.getSuperclass() != null && clazz.getSuperclass() != Object.class ) {
+            defaultInstanceComposed(sb, clazz.getSuperclass(), clazz.getSuperclass());
+        }
+    }
+
+    private void defaultInstanceBasic(StringBuilder sb, Class<?> clazz) {
+        if ( clazz == String.class ) {
+            sb.append("\"\"");
+        } else if ( clazz == Long.class || clazz == Integer.class ) {
+            sb.append("0");
+        } else if ( clazz == Double.class ) {
+            sb.append("0.0");
+        } else if ( clazz == Boolean.class ) {
+            sb.append("false");
+        }
     }
 
     private void appendListElement( StringBuilder sb, String name, Field field, Object element ) {

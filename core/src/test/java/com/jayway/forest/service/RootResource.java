@@ -2,9 +2,11 @@ package com.jayway.forest.service;
 
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.dto.IntegerDTO;
+import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.CreatableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.Template;
 
 import java.util.List;
 
@@ -64,5 +66,16 @@ public class RootResource implements Resource, CreatableResource {
     @Override
     public Linkable create(Object... arguments) {
         return new Linkable( "1234", "jayway");
+    }
+
+    private String content() {
+        return "Template Content";
+    }
+
+    public void updatewithtemplate( @Template("content") String content ) {
+    }
+
+    public String throwingnotfound() {
+        throw new NotFoundException("Bad stuff");
     }
 }

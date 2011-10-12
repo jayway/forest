@@ -51,4 +51,9 @@ public class QueriesTest  extends AbstractRunner {
         when().
                 get("/add");
     }
+
+    @Test
+    public void throwsNotFound() throws IOException {
+        given().expect().statusCode(404).body(is("Bad stuff")).get("/throwingnotfound");
+    }
 }
