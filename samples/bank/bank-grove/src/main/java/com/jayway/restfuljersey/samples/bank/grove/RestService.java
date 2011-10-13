@@ -39,7 +39,7 @@ public class RestService extends RestfulServlet {
         return new ExceptionMapper() {
             public Response map(Exception e) {
                 if ( e instanceof CannotDepositException) {
-                    return new Response(HttpServletResponse.SC_CONFLICT, "Deposit not allowed" );
+                    return new Response(HttpServletResponse.SC_CONFLICT, e.getMessage() );
                 } else if ( e instanceof OverdrawException) {
                     return new Response(HttpServletResponse.SC_CONFLICT, "Account cannot be overdrawn");
                 }

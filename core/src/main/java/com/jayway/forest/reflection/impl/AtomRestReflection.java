@@ -4,6 +4,7 @@ import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.Response;
 
 import java.lang.reflect.Method;
 
@@ -23,6 +24,11 @@ public class AtomRestReflection implements RestReflection {
     @Override
     public Object renderQueryResponse(Object responseObject) {
         throw new UnsupportedMediaTypeException();
+    }
+
+    @Override
+    public Object renderError(Response response) {
+        return response.message();
     }
 
     @Override

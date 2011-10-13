@@ -14,6 +14,8 @@ import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.BaseUrl;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.UriInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +30,7 @@ import java.util.Map;
 /**
  */
 public class ResponseHandler {
-
+    private static Logger log = LoggerFactory.getLogger(ResponseHandler.class);
     private static Map<String, RestReflection> reflectors;
 
     static {
@@ -72,7 +74,11 @@ public class ResponseHandler {
             if ( responseObject instanceof Capabilities ) {
                 responseString = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
             } else if ( responseObject instanceof PagedSortedListResponse) {
-                responseString = restReflection().renderListResponse( (PagedSortedListResponse) responseObject ).toString();
+                responseString = restReflection().renderListResponse((PagedSortedListResponse) responseObject).toString();
+            } else if ( responseObject instanceof Response ) {
+                Response error = (Response) responseObject;
+                responseString = restReflection().renderError(error).toString();
+                response.setStatus( error.status() );
             } else {
                 responseString = restReflection().renderQueryResponse( responseObject ).toString();
             }
@@ -81,21 +87,18 @@ public class ResponseHandler {
         }
     }
 
-    public void handleError( Response responseError ) {
-        try {
-            response.setStatus( responseError.status() );
-            response.getOutputStream().print(  responseError.message() );
-        } catch ( IOException ioe) {
-            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-        }
-
-    }
-
     public void invoke( HttpServletRequest req, HttpServletResponse resp, RestfulServlet.Runner runner ) {
+        Object responseObject;
         try {
-            handleResponse(runner.run(req, resp, mediaTypeHandler));
+            responseObject = runner.run(req, resp, mediaTypeHandler);
         } catch ( Exception e ) {
-            handleError(mapInternalException(e));
+            responseObject = mapInternalException(e);
+        }
+        try {
+            handleResponse(responseObject);
+        } catch (IOException e) {
+            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+            log.error("Error sending response", e);
         }
     }
 

@@ -24,6 +24,7 @@ public abstract class BaseReflectionCapability extends Capability {
 
             return populateDTO(dto, formParams, prefix + "." + dto.getSimpleName());
         } catch (Exception e) {
+            log.error( "Could not map arguments to object. Current type: '"+prefix + "." + dto.getSimpleName() + "'",e);
             throw new BadRequestException();
         }
     }

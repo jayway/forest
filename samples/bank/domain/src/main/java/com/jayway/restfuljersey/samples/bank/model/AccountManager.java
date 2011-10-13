@@ -29,7 +29,7 @@ public class AccountManager {
     public void deposit(Depositable depositable, Integer amount) {
         Account account = (Account) depositable;
         if ( account.balance + amount > Account.MAX_ENSURED_BALANCE && !account.isAllowExceedBalanceLimit() ) {
-            throw new CannotDepositException();
+            throw new CannotDepositException( "Trying to deposit "+amount+" cannot be done because that would exceed deposit limit");
         }
         depositable.deposit( amount );
     }

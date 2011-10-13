@@ -1,6 +1,5 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
-import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
@@ -23,7 +22,6 @@ public class AccountResource implements Resource, DescribedResource {
     private Account account;
 
     public AccountResource(Account account) {
-        if ( account == null ) throw new NotFoundException();
         addRole(Account.class, account);
         this.account = account;
     }

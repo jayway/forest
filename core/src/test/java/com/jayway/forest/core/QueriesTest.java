@@ -39,6 +39,17 @@ public class QueriesTest  extends AbstractRunner {
         when().
                 get("/addten").statusLine();
     }
+    @Test
+    public void testQueryWithIntegerWrongInput2() throws IOException {
+        given().
+                queryParam( "arent1", "2").
+        expect().
+                statusCode(405).
+        when().
+                get("/addten").statusLine();
+    }
+
+
 
     @Test
     public void testQueryWithIntegerAndInteger() throws IOException {

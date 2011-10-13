@@ -13,6 +13,7 @@ public class MediaTypeHandler {
     public static final String TEXT_HTML        = "text/html";
     public static final String FORM_URL_ENCODED = "application/x-www-form-urlencoded";
     public static final String APPLICATION_ATOM = "application/atom+xml";
+    public static final String ENCODING         = "; charset=utf-8";
 
     private boolean contentTypeApplicationJSON;
     private boolean contentTypeFormUrlEncoded;
@@ -27,7 +28,7 @@ public class MediaTypeHandler {
         String contentTypeHeader = request.getHeader("Content-Type");
         // accept defaults to JSON
         accept = APPLICATION_JSON;
-        response.setHeader( "Content-Type", APPLICATION_JSON);
+        response.setHeader( "Content-Type", APPLICATION_JSON + ENCODING);
         if ( acceptHeader != null ) {
             if ( acceptHeader.contains(APPLICATION_JSON) ) {
                 // if header contains json do nothing else
@@ -36,7 +37,7 @@ public class MediaTypeHandler {
                 response.setHeader( "Content-Type", APPLICATION_ATOM);
             } else if ( acceptHeader.contains(TEXT_HTML) ) {
                 accept = TEXT_HTML;
-                response.setHeader( "Content-Type", TEXT_HTML);
+                response.setHeader( "Content-Type", TEXT_HTML + ENCODING);
             }
         }
 

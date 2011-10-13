@@ -2,6 +2,7 @@ package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
 import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.core.RoleManager;
+import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
@@ -50,6 +51,7 @@ public class AccountsResource implements IdDiscoverableResource {
     @Override
     public Resource id(String id) {
         Account account = role(AccountRepository.class).findById(id);
+        if ( account == null ) throw new NotFoundException( "No account with id '" +id + "' found" );
         return new AccountResource( account );
     }
 

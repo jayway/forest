@@ -1,10 +1,14 @@
 package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
+import com.jayway.forest.exceptions.AbstractHtmlException;
 import com.jayway.forest.reflection.*;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.Response;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -131,6 +135,21 @@ public final class HtmlRestReflection implements RestReflection {
             // complex object are JSON serialized for html output
             return new JSONHelper().toJSON(responseObject).toString();
         }
+    }
+
+    @Override
+    public Object renderError( Response response ) {
+        if ( response.status() == 405) {
+            return response.message();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><h1>HTTP Error ").append(response.status()).append("</h1>");
+        String description = AbstractHtmlException.messageMapping.get(response.status());
+        if ( description != null ) {
+            sb.append("<code>").append( description).append("</code>");
+        }
+        sb.append("<h2>Message</h2>").append( response.message() ).append("</html>");
+        return sb.toString();
     }
 
     private void renderTable(StringBuilder sb, List<?> list, PagedSortedListResponse response ) {

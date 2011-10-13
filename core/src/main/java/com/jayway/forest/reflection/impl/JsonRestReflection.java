@@ -7,6 +7,7 @@ import com.jayway.forest.reflection.ReflectionUtil;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.Response;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -97,6 +98,11 @@ public final class JsonRestReflection implements RestReflection {
         } else {
             return new JSONHelper().toJSON(responseObject);
         }
+    }
+
+    @Override
+    public Object renderError(Response response) {
+        return response.message();
     }
 
     private void appendLink( StringBuilder sb, String name, String link ) {

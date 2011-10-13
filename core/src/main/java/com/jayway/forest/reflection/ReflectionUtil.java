@@ -3,6 +3,8 @@ package com.jayway.forest.reflection;
 import com.jayway.forest.reflection.impl.Parameter;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -10,7 +12,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 public abstract class ReflectionUtil {
-	private ReflectionUtil() {}
+	protected static Logger log = LoggerFactory.getLogger(ReflectionUtil.class);
+    private ReflectionUtil() {}
 
 	public static Set<Class<?>> basicTypes;
 
@@ -43,7 +46,7 @@ public abstract class ReflectionUtil {
                             parameter.setTemplate( template.invoke(resource) );
                         }
                     } catch (Throwable e) {
-                        // ignore. parameter template will be null
+                        log.debug("Could not evaluate template method. Template methods must be private have zero arguments and return type must match argument type", e);
                     }
                 }
             }

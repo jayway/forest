@@ -2,6 +2,7 @@ package com.jayway.forest.reflection;
 
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.Response;
 
 import java.lang.reflect.Method;
 
@@ -12,4 +13,5 @@ public interface RestReflection {
 	Object renderQueryForm(Method method, Resource resource);
     Object renderListResponse(PagedSortedListResponse responseObject);
     Object renderQueryResponse(Object responseObject);
+    Object renderError( Response response );
 }
