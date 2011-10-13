@@ -79,16 +79,5 @@ public class CommandsTest extends AbstractRunner {
         assertEquals("HelloWorldNEW", result);
     }
 
-    @Test
-    public void testTemplate() throws IOException {
-        String json = given().expect().statusCode(405).when().get("/updatewithtemplate").andReturn().as(String.class);
 
-        assertEquals("Template Content", json);
-    }
-
-    @Test
-    public void testCommandSimple() throws IOException {
-        String json = given().expect().statusCode(405).when().get("/command").andReturn().as(String.class);
-        assertEquals("", json);
-    }
 }
