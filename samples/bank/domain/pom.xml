@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>com.jayway.forest</groupId>
-            <artifactId>forest</artifactId>
+            <artifactId>forest-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
