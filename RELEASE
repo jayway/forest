@@ -6,13 +6,13 @@ Deploying a snapshot:
 Preparing a release (dry run):
 
  % mvn clean
- % mvn release:prepare -DdryRun=true -Prelease
+ % mvn release:prepare -DdryRun=true -DautoVersionSubmodules=true -Prelease
  <enter your gpg passphrase>
 
 Preparing a release:
 
  % mvn clean
- % mvn release:prepare -Prelease
+ % mvn release:prepare -DautoVersionSubmodules=true -Prelease
  <enter your gpg passphrase>
 
 Performing a release:
