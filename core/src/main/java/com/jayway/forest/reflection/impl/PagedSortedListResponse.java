@@ -7,13 +7,13 @@ import java.util.Map;
 /**
  * This object is returned when a method returns a List
  */
-public class PagedSortedListResponse {
+public class PagedSortedListResponse<T> {
     private String name;
-    private Integer page;
-    private Integer pageSize;
+    private Long page;
+    private Long pageSize;
     private Long totalElements;
-    private Integer totalPages;
-    private List<?> list;
+    private Long totalPages;
+    private List<T> list;
     private String next;
     private String previous;
 
@@ -26,23 +26,23 @@ public class PagedSortedListResponse {
         return list;
     }
 
-    public void setList(List<?> list) {
+    public void setList(List<T> list) {
         this.list = list;
     }
 
-    public Integer getPage() {
+    public Long getPage() {
         return page;
     }
 
-    public void setPage(Integer page) {
+    public void setPage(Long page) {
         this.page = page;
     }
 
-    public Integer getPageSize() {
+    public Long getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(Integer pageSize) {
+    public void setPageSize(Long pageSize) {
         this.pageSize = pageSize;
     }
 
@@ -54,11 +54,11 @@ public class PagedSortedListResponse {
         this.totalElements = totalElements;
     }
 
-    public Integer getTotalPages() {
+    public Long getTotalPages() {
         return totalPages;
     }
 
-    public void setTotalPages(Integer totalPages) {
+    public void setTotalPages(Long totalPages) {
         this.totalPages = totalPages;
     }
 

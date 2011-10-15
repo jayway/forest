@@ -11,7 +11,7 @@ public interface RestReflection {
 	Object renderCapabilities(Capabilities capabilities);
 	Object renderCommandForm(Method method, Resource resource);
 	Object renderQueryForm(Method method, Resource resource);
-    Object renderListResponse(PagedSortedListResponse responseObject);
+    Object renderListResponse(PagedSortedListResponse<?> responseObject);
     Object renderQueryResponse(Object responseObject);
     Object renderError( Response response );
 }

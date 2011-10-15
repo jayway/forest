@@ -74,12 +74,12 @@ public class QueryForListCapability extends QueryCapability {
             response.setPageSize(pagingSortingParameter.getPageSize());
             response.setTotalElements(returnedList == null ? 0 : ((Integer) returnedList.size()).longValue());
 
-            long actualListSize = response.getTotalElements();
-            int maxIndex = response.getPage() * response.getPageSize();
-            int minIndex = ( response.getPage() - 1 )*response.getPageSize();
+            Long actualListSize = response.getTotalElements();
+            Long maxIndex = response.getPage() * response.getPageSize();
+            Long minIndex = ( response.getPage() - 1 )*response.getPageSize();
             if (actualListSize >= minIndex) {
                 List<Object> resultList = new ArrayList<Object>();
-                for ( int i=minIndex; i<actualListSize && i<maxIndex; i++ ) {
+                for ( int i=minIndex.intValue(); i<actualListSize && i<maxIndex; i++ ) {
                     resultList.add(returnedList.get(i));
                 }
                 response.setList(resultList);
@@ -123,13 +123,16 @@ public class QueryForListCapability extends QueryCapability {
         }
     }
 
-    private int calculateTotalPages( Long totalElements, Integer pageSize ) {
-        return 1+(int)Math.ceil(totalElements / pageSize );
+    private Long calculateTotalPages( Long totalElements, Long pageSize ) {
+        if ( totalElements % pageSize == 0) {
+            return totalElements / pageSize;
+        }
+        return 1+(long)Math.floor(totalElements / pageSize );
     }
 
     private PagingSortingParameterImpl pagingParameter( UrlParameter urlParameter ) {
         // todo set as a property of the application
-        Integer pageSize = 10;
+        Long pageSize = 10l;
         if ( urlParameter.pageSize() != null ) {
             pageSize = urlParameter.pageSize();
         }

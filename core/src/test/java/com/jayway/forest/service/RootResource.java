@@ -2,12 +2,14 @@ package com.jayway.forest.service;
 
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.dto.IntegerDTO;
+import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.CreatableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jayway.forest.core.RoleManager.role;
@@ -114,6 +116,28 @@ public class RootResource implements Resource, CreatableResource {
     }
     public String templatemethodwithargument( @Template("withargument") String arg) {
         return null;
+    }
+
+    public List<String> list() {
+        List<String> list = new ArrayList<String>();
+        list.add("world");
+        list.add( "hello");
+        return list;
+    }
+
+    public List<StringDTO> liststringdto() {
+        List<StringDTO> list = new ArrayList<StringDTO>();
+        list.add( new StringDTO("world"));
+        list.add( new StringDTO("hello"));
+        return list;
+    }
+
+    public List<StringDTO> listhowlong( Integer size ) {
+        List<StringDTO> list = new ArrayList<StringDTO>(size);
+        for ( int i=0; i<size; i++ ) {
+            list.add( new StringDTO(""+i) );
+        }
+        return list;
     }
 }
 

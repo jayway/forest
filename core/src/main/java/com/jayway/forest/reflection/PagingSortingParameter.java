@@ -13,15 +13,15 @@ import java.util.List;
  * has not been done and it will handle sorting
  * and paging itself.
  */public interface PagingSortingParameter {
-    Integer getPage();
+    Long getPage();
 
-    Integer getPageSize();
+    Long getPageSize();
 
-    void setPageSize(int pageSize);
+    void setPageSize(Long pageSize);
 
     void setTotalElements(Long totalElements);
 
-    Integer offset();
+    Long offset();
 
     List<SortParameter> sortParameters();
 

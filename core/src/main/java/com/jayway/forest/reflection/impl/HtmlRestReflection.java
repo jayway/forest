@@ -56,7 +56,7 @@ public final class HtmlRestReflection implements RestReflection {
             results.append("</ul>");
         }
         if ( capabilities.getPagedSortedListResponse() != null ) {
-            PagedSortedListResponse response = capabilities.getPagedSortedListResponse();
+            PagedSortedListResponse<?> response = capabilities.getPagedSortedListResponse();
             appendPagingInfo( results, response, true);
             if ( response.getOrderByAsc() != null ) {
                 appendAnchor( results, response.getOrderByAsc().get( "name"), "asc", true);
@@ -100,7 +100,7 @@ public final class HtmlRestReflection implements RestReflection {
     }
 
     @Override
-    public Object renderListResponse(PagedSortedListResponse response ) {
+    public Object renderListResponse(PagedSortedListResponse<?> response ) {
         StringBuilder htmlListResponse = new StringBuilder( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
         htmlListResponse.append( "<h1>").append(response.getName()).append("</h1>");
         appendPagingInfo( htmlListResponse, response, false );
@@ -197,7 +197,7 @@ public final class HtmlRestReflection implements RestReflection {
         renderTableHeader( sb, instance, clazz.getSuperclass(), response );
     }
 
-    private void generateSortOption(StringBuilder sb, String name, PagedSortedListResponse response) {
+    private void generateSortOption(StringBuilder sb, String name, PagedSortedListResponse<?> response) {
         String asc = response.getOrderByAsc().get(name);
         String desc = response.getOrderByDesc().get(name);
         if ( asc != null ) {

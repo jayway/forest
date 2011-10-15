@@ -52,7 +52,7 @@ public class Capabilities {
         if ( discovered == null ) return Collections.emptyList();
         return (List<Linkable>) discovered.getList();
     }
-    public PagedSortedListResponse getPagedSortedListResponse() {
+    public PagedSortedListResponse<?> getPagedSortedListResponse() {
         return discovered;
     }
 }

@@ -86,7 +86,7 @@ public final class JsonRestReflection implements RestReflection {
         sb.append("\"totalPages\":").append( response.getTotalPages() ).append(",");
         sb.append("\"totalElements\":").append( response.getTotalElements() ).append(",");
         sb.append("\"list\":");
-        appendList(sb, (List<Object>) response.getList());
+        appendRawList( sb, response.getList() );
         sb.append("}");
         return sb.toString();
     }
@@ -111,32 +111,13 @@ public final class JsonRestReflection implements RestReflection {
         }
     }
 
-    private void appendList( final StringBuilder sb, List<Object> list ) {
+    private void appendRawList( StringBuilder sb, List<?> list ) {
         if ( list == null || list.size() == 0 ) {
             sb.append("[]");
-            return;
+        } else {
+            JSONHelper helper = new JSONHelper();
+            sb.append( helper.toJSON( list ).toString() );
         }
-        sb.append("[");
-        final Map<String, Field> fields = new HashMap<String, Field>();
-        // what if first element extends list type -> rte
-        iterateFields( list.get(0).getClass(), list.get(0), new HtmlRestReflection.FieldIterator() {
-            public void field(Field field) {
-                field.setAccessible( true );
-                fields.put(field.getName(), field);
-            }
-        });
-        IterableCallback.element( sb, list, new Callback<Object>() {
-            public void callback(final Object element) {
-                sb.append("{\"");
-                IterableCallback.element( sb, fields.entrySet(), new Callback<Map.Entry<String,Field>>() {
-                    public void callback(Map.Entry<String, Field> entry) {
-                        appendListElement( sb, entry.getKey(), entry.getValue(), element );
-                    }
-                });
-                sb.append("}");
-            }
-        });
-        sb.append("]");
     }
 
     protected String createForm( Method method, String httpMethod, Resource resource ) {
@@ -237,33 +218,6 @@ public final class JsonRestReflection implements RestReflection {
             sb.append( false );
         }
     }
-
-    private void appendListElement( StringBuilder sb, String name, Field field, Object element ) {
-        try {
-            sb.append( name ).append("\":\"").append(field.get(element));
-            if ( element instanceof Linkable && name.equals("href") ) {
-                sb.append("/");
-            }
-            sb.append("\"");
-        } catch (IllegalAccessException e) {
-            sb.append( "\"\"" );
-        }
-    }
-
-    private void iterateFields( Class clazz, Object instance, HtmlRestReflection.FieldIterator callback ) {
-        for (Field field : clazz.getDeclaredFields()) {
-            if ( Modifier.isFinal(field.getModifiers())) continue;
-            if ( Modifier.isStatic( field.getModifiers() )) continue;
-            if ( instance instanceof Linkable && field.getName().equals( "rel") ) continue;
-            field.setAccessible(true);
-            try {
-                callback.field( field );
-            } catch (IllegalAccessException e) {
-                // ignore
-            }
-        }
-    }
-
 
     static class IterableCallback<T> {
         static <T> void element( StringBuilder sb, Iterable<T> iterable, Callback<T> callback ) {

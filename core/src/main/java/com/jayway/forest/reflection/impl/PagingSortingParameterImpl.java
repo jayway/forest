@@ -7,15 +7,15 @@ import java.util.*;
 
 final public class PagingSortingParameterImpl extends Touchable implements PagingSortingParameter {
 
-    private Integer page;
-    private Integer pageSize;
+    private Long page;
+    private Long pageSize;
     private Long totalElements;
     private List<SortParameter> parameters;
     private Set<String> addedSortingFields;
 
-    protected PagingSortingParameterImpl(Integer page, Integer pageSize, String sortByFromUrl) {
+    protected PagingSortingParameterImpl(Long page, Long pageSize, String sortByFromUrl) {
         if ( page == null ) {
-            this.page = 1;
+            this.page = 1l;
         } else {
             this.page = page;
         }
@@ -34,19 +34,19 @@ final public class PagingSortingParameterImpl extends Touchable implements Pagin
     }
 
     @Override
-    public Integer getPage() {
+    public Long getPage() {
         touch();
         return page;
     }
 
     @Override
-    public Integer getPageSize() {
+    public Long getPageSize() {
         touch();
         return pageSize;
     }
 
     @Override
-    public void setPageSize(int pageSize) {
+    public void setPageSize(Long pageSize) {
         touch();
         this.pageSize = pageSize;
     }
@@ -58,7 +58,7 @@ final public class PagingSortingParameterImpl extends Touchable implements Pagin
     }
 
     @Override
-    public Integer offset() {
+    public Long offset() {
         touch();
         return (page-1)*pageSize;
     }

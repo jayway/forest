@@ -1,10 +1,5 @@
 package com.jayway.forest.dto;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-/**
- */
-@XmlRootElement( name = "integerholder" )
 public class IntegerDTO {
 
     private Integer integer;
