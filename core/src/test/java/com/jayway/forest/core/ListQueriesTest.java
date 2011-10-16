@@ -53,6 +53,15 @@ public class ListQueriesTest extends AbstractRunner {
         Assert.assertEquals("asdf", 2, response.getTotalPages().intValue());
     }
 
+    @Test
+    public void testImmutableIterable() {
+        JSONArray list = getList("/immutableiterable?sortBy=string");
+        Assert.assertEquals("Size must be 2", 2, list.size());
+        Assert.assertEquals("{\"string\":\"hello\"}", list.get(0).toString());
+        Assert.assertEquals("{\"string\":\"world\"}", list.get(1).toString());
+    }
+
+
     // cannot get the contained list to be correctly typed
     // unless manually parsing the string representation
     private JSONArray getList(String url) {

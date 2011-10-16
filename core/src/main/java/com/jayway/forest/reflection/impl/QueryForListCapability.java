@@ -50,10 +50,13 @@ public class QueryForListCapability extends QueryCapability {
                 response.addOrderByDesc(sortField, name() + urlParameter.linkSortBy(sortField, false));
             }
         } else {
+            List<?> safeList = new ArrayList();
+
             // resource has not used the parameters so handle sorting/paging here
             if ( returnedList != null && !returnedList.isEmpty() ) {
+                safeList = new ArrayList(returnedList);
                 List<String> sortingParameters = new LinkedList<String>();
-                inferSortParameters(sortingParameters, returnedList.get(0).getClass());
+                inferSortParameters(sortingParameters, safeList.get(0).getClass());
 
                 // add possible search strings to the response
                 for (String sortField : sortingParameters) {
@@ -62,17 +65,17 @@ public class QueryForListCapability extends QueryCapability {
                 }
                 if (urlParameter.sortBy() != null) {
                     // urlParameters have been parsed and passed to pagingSortingParameter, so sort based on these
-                    Collections.sort(returnedList, new FieldComparator( pagingSortingParameter.sortParameters() ));
+                    Collections.sort(safeList, new FieldComparator( pagingSortingParameter.sortParameters() ));
                 } else if (Linkable.class.isAssignableFrom(inferListType())) {
                     // a Linkable is default sorted by name
-                    Collections.sort(returnedList, new FieldComparator(new SortParameter("name")));
+                    Collections.sort(safeList, new FieldComparator(new SortParameter("name")));
                 }
             }
 
             // build response
             response.setPage(pagingSortingParameter.getPage());
             response.setPageSize(pagingSortingParameter.getPageSize());
-            response.setTotalElements(returnedList == null ? 0 : ((Integer) returnedList.size()).longValue());
+            response.setTotalElements( ((Integer)safeList.size()).longValue() );
 
             Long actualListSize = response.getTotalElements();
             Long maxIndex = response.getPage() * response.getPageSize();
@@ -80,7 +83,7 @@ public class QueryForListCapability extends QueryCapability {
             if (actualListSize >= minIndex) {
                 List<Object> resultList = new ArrayList<Object>();
                 for ( int i=minIndex.intValue(); i<actualListSize && i<maxIndex; i++ ) {
-                    resultList.add(returnedList.get(i));
+                    resultList.add(safeList.get(i));
                 }
                 response.setList(resultList);
 

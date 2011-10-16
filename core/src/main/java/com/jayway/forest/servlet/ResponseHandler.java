@@ -117,7 +117,11 @@ public class ResponseHandler {
         } else if ( e instanceof AbstractHtmlException ) {
             return new Response( ((AbstractHtmlException) e).getCode(), e.getMessage() );
         } else {
-            return new Response( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage() );
+            if ( e.getMessage() == null ) {
+                return new Response( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getClass().getSimpleName() );
+            } else {
+                return new Response( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage() );
+            }
         }
     }
 

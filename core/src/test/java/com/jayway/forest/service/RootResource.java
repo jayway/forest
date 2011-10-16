@@ -10,6 +10,7 @@ import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.jayway.forest.core.RoleManager.role;
@@ -138,6 +139,13 @@ public class RootResource implements Resource, CreatableResource {
             list.add( new StringDTO(""+i) );
         }
         return list;
+    }
+
+    public Iterable<StringDTO> immutableiterable( ) {
+        List<StringDTO> list = new ArrayList<StringDTO>();
+        list.add( new StringDTO("world"));
+        list.add( new StringDTO("hello"));
+        return Collections.unmodifiableList(list);
     }
 }
 
