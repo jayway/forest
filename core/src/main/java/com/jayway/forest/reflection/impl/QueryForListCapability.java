@@ -5,10 +5,13 @@ import com.jayway.forest.reflection.PagingSortingParameter;
 import com.jayway.forest.roles.FieldComparator;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.UriInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.*;
 import java.util.*;
+
+import static com.jayway.forest.core.RoleManager.role;
 
 public class QueryForListCapability extends QueryCapability {
 
@@ -87,11 +90,12 @@ public class QueryForListCapability extends QueryCapability {
                 }
                 response.setList(resultList);
 
+                String self = role(UriInfo.class).getSelf();
                 if ( maxIndex < actualListSize ) {
-                    response.setNext( name() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
+                    response.setNext( href() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
                 }
                 if ( minIndex > 0 ) {
-                    response.setPrevious( name() + urlParameter.linkTo( pagingSortingParameter.getPage()-1) );
+                    response.setPrevious( href() + urlParameter.linkTo( pagingSortingParameter.getPage()-1) );
                 }
             }
         }

@@ -147,5 +147,13 @@ public class RootResource implements Resource, CreatableResource {
         list.add( new StringDTO("hello"));
         return Collections.unmodifiableList(list);
     }
+
+    public Iterable<Linkable> linkables() {
+        List<Linkable> list = new ArrayList<Linkable>(15);
+        for (int i=0; i<15; i++) {
+            list.add( new Linkable(""+i+"/", "number"+i, "linkable", "This is element number "+i + " in the long line of elements in this list"));
+        }
+        return list;
+    }
 }
 

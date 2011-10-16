@@ -26,14 +26,6 @@ public class AccountResource implements Resource, DescribedResource {
         this.account = account;
     }
 
-    private AccountLinkable convertAccount() {
-        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() );
-    }
-
-    //public void update( @Template("convertAccount") AccountLinkable account ) {
-    //}
-
-
     public void allowexceeddepositlimit( Boolean allow ) {
     	account.setAllowExceedBalanceLimit(allow);
     }
@@ -63,7 +55,6 @@ public class AccountResource implements Resource, DescribedResource {
     public Object description() {
         return account;
     }
-
 
     private String accountDescription() {
         return account.getDescription();

@@ -26,13 +26,15 @@ public class MediaTypeHandler {
     public MediaTypeHandler( HttpServletRequest request, HttpServletResponse response ) {
         String acceptHeader = request.getHeader("Accept");
         String contentTypeHeader = request.getHeader("Content-Type");
+        String format = request.getParameter("format");
+        if ( format == null ) format = "";
         // accept defaults to JSON
         accept = APPLICATION_JSON;
         response.setHeader( "Content-Type", APPLICATION_JSON + ENCODING);
         if ( acceptHeader != null ) {
             if ( acceptHeader.contains(APPLICATION_JSON) ) {
                 // if header contains json do nothing else
-            } else if ( acceptHeader.contains(APPLICATION_ATOM) ) {
+            } else if ( acceptHeader.contains(APPLICATION_ATOM) || format.equals("atom") ) {
                 accept = APPLICATION_ATOM;
                 response.setHeader( "Content-Type", APPLICATION_ATOM);
             } else if ( acceptHeader.contains(TEXT_HTML) ) {

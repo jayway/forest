@@ -1,5 +1,7 @@
 package com.jayway.forest.roles;
 
+import static com.jayway.forest.core.RoleManager.role;
+
 /**
  */
 public class Linkable {
@@ -7,6 +9,12 @@ public class Linkable {
     private String href;
     private String name;
     private String rel;
+    private String description;
+
+    public Linkable( String href, String name, String rel, String description ) {
+        this( href, name, rel);
+        this.description = description;
+    }
 
     public Linkable( String href, String name, String rel ) {
         this(href, name);
@@ -14,21 +22,28 @@ public class Linkable {
     }
 
     public Linkable( String href, String name ) {
-        this.href = href;
+        if ( !href.startsWith("http://")) {
+            this.href = role( UriInfo.class).getSelf() + href;
+        } else {
+            this.href = href;
+        }
         this.name = name;
     }
 
 
-    public String href() {
+    public String getHref() {
         return href;
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
-    public String rel() {
+    public String getRel() {
         return rel;
     }
 
+    public String getDescription() {
+        return description;
+    }
 }

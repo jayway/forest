@@ -49,4 +49,9 @@ public class AbstractRunner {
     protected RequestSpecification acceptTextHtml() {
         return new RequestSpecBuilder().addHeader("Accept", "text/html").build();
     }
+
+    protected RequestSpecification acceptAtomXml() {
+        return new RequestSpecBuilder().addHeader("Accept", "application/atom+xml").build();
+    }
+
 }

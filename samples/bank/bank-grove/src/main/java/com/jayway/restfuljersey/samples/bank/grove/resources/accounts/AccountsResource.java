@@ -1,6 +1,7 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
 import com.jayway.forest.constraint.Doc;
+import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.DescribedResource;
@@ -42,8 +43,12 @@ public class AccountsResource implements IdDiscoverableResource {
     @Doc("returning a list of AccountLinkable")
     public List<AccountLinkable> overdrawn() {
         List<AccountLinkable> overdrawn = new ArrayList<AccountLinkable>();
+        JSONHelper jsonHelper = new JSONHelper();
         for (Account account : role(AccountRepository.class).all()) {
-            if ( account.getBalance() < 0 ) overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() ));
+            if ( account.getBalance() < 0 ) {
+                String description = jsonHelper.toJSON(account).toString();
+                overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), description ,account.getBalance() ));
+            }
         }
         return overdrawn;
     }

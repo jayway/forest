@@ -2,6 +2,7 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.service.AbstractRunner;
+import com.jayway.restassured.RestAssured;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -42,7 +43,7 @@ public class ListQueriesTest extends AbstractRunner {
     public void testListComplexPaging() {
         PagedSortedListResponse response = get("/liststringdto?pageSize=1&page=2").as(PagedSortedListResponse.class);
         Assert.assertEquals( "Must have two total elements", 2, response.getTotalElements().intValue() );
-        Assert.assertEquals("liststringdto?page=1&pageSize=1", response.getPrevious() );
+        Assert.assertEquals(RestAssured.baseURI + RestAssured.basePath + "/liststringdto?page=1&pageSize=1", response.getPrevious() );
         Assert.assertEquals( "Must have two pages", 2, response.getTotalPages().intValue() );
     }
 

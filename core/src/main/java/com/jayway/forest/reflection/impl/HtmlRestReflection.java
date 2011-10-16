@@ -51,7 +51,7 @@ public final class HtmlRestReflection implements RestReflection {
             }
             for (Linkable resource: capabilities.getDiscoveredLinks()) {
                 if ( resource == null ) continue;
-                results.append("<li><a href='").append(resource.href()).append("'>").append(resource.name()).append("</a></li>");
+                results.append("<li><a href='").append(resource.getHref()).append("'>").append(resource.getName()).append("</a></li>");
             }
             results.append("</ul>");
         }
@@ -166,7 +166,7 @@ public final class HtmlRestReflection implements RestReflection {
             sb.append("<tr>");
             if ( elm instanceof Linkable ) {
                 sb.append("<td>");
-                appendAnchor( sb, ((Linkable) elm).href(), ((Linkable) elm).name(), false);
+                appendAnchor( sb, ((Linkable) elm).getHref(), ((Linkable) elm).getName(), false);
                 sb.append("</td>");
                 renderTableRow(sb, elm.getClass(), elm );
             } else {
@@ -240,7 +240,7 @@ public final class HtmlRestReflection implements RestReflection {
 
     private void renderLinkable(StringBuilder sb, Linkable link) {
         sb.append("<li>");
-        appendAnchor( sb, link.href(), link.name(), false );
+        appendAnchor( sb, link.getHref(), link.getName(), false );
         sb.append( "</li>" );
     }
 
