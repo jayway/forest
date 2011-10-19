@@ -11,8 +11,8 @@ import java.util.Map;
  */
 public final class UrlParameter {
     private String sortBy;
-    private Long page;
-    private Long pageSize;
+    private Integer page;
+    private Integer pageSize;
     private Map<String, String> parameters;
 
     protected UrlParameter( Map<String, String[]> queryParams ) {
@@ -30,10 +30,10 @@ public final class UrlParameter {
         this.pageSize = parse( pageSize );
     }
 
-    private Long parse( String number ) {
+    private Integer parse( String number ) {
         if ( number == null ) return null;
         try {
-            return Long.parseLong( number );
+            return Integer.parseInt( number );
         } catch (NumberFormatException e ) {
             return null;
         }
@@ -51,7 +51,7 @@ public final class UrlParameter {
         return sb.toString();
     }
 
-    protected String linkTo( Long page ) {
+    protected String linkTo( Integer page ) {
         StringBuilder sb = new StringBuilder("?page=").append( page );
         String currentPage = parameters.remove( "page" );
         appendParameters( sb );
@@ -67,17 +67,17 @@ public final class UrlParameter {
         }
     }
 
-    protected void setPageSize( Long pageSize ) {
+    protected void setPageSize( Integer pageSize ) {
         this.pageSize = pageSize;
         parameters.remove( "pageSize" );
         parameters.put( "pageSize", ""+pageSize);
     }
 
-    protected Long page() {
+    protected Integer page() {
         return page;
     }
 
-    protected Long pageSize() {
+    protected Integer pageSize() {
         return pageSize;
     }
 

@@ -3,8 +3,8 @@ package com.jayway.forest.service;
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
+import com.jayway.forest.dto.Value;
 import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.roles.CreatableResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
@@ -17,7 +17,7 @@ import static com.jayway.forest.core.RoleManager.role;
 
 /**
  */
-public class RootResource implements Resource, CreatableResource {
+public class RootResource implements Resource {
 
     public RootResource sub() {
         return new RootResource();
@@ -25,6 +25,10 @@ public class RootResource implements Resource, CreatableResource {
 
     public void command( String input ) {
         StateHolder.set(input);
+    }
+
+    public void commandenum( Value value ) {
+        StateHolder.set( value );
     }
 
     public void commandlist( List<String> list ) {
@@ -82,11 +86,6 @@ public class RootResource implements Resource, CreatableResource {
     public void complex( List<List<List<String>>> list ) {
         list.get(0).get(0).add("NEW");
         StateHolder.set(list);
-    }
-
-    @Override
-    public Linkable create(Object... arguments) {
-        return new Linkable( "1234", "jayway");
     }
 
     private String content() {

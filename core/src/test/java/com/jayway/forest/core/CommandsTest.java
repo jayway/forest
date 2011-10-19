@@ -37,8 +37,8 @@ public class CommandsTest extends AbstractRunner {
     }
 
     @Test
-    public void testAddCommand() throws IOException {
-        given().body("[10, { \"integer\": 32}]").when().post("/addcommand");
+    public void testAddCommand() {
+        given().body("[10, \n{ \"integer\": 32}]").when().post("/addcommand");
         assertEquals(42, StateHolder.get());
     }
 

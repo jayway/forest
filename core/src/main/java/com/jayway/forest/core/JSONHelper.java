@@ -7,14 +7,11 @@ import com.jayway.forest.reflection.ReflectionUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import sun.misc.IOUtils;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -22,7 +19,7 @@ import java.util.Map.Entry;
 public class JSONHelper {
 
     @SuppressWarnings({ "unchecked" })
-	public Object toJSON(final Object dto ) {
+    public Object toJSON(final Object dto ) {
         if ( dto == null ) return null;
         // basic types or ENUM
         if ( dto instanceof Enum ) {
@@ -47,8 +44,8 @@ public class JSONHelper {
             JSONObject mapResult = new JSONObject();
             Map<?,?> map = (Map<?,?>) dto;
             for (Map.Entry<?, ?> entry : map.entrySet()) {
-            	mapResult.put( entry.getKey(), toJSON(entry.getValue()) );
-			}
+                mapResult.put( entry.getKey(), toJSON(entry.getValue()) );
+            }
             return mapResult;
         }
 
@@ -76,8 +73,11 @@ public class JSONHelper {
         int argumentCount = m.getParameterTypes().length;
         if ( argumentCount == 0 ) return new Object[0];
 
-        Object parse = JSONValue.parse(new InputStreamReader(stream));
-        if ( parse == null ) throw new BadRequestException();
+        String jsonContent = convertWholeStreamToString(stream);
+        Object parse = JSONValue.parse(jsonContent);
+        if ( parse == null ) {
+            throw new BadRequestException( "Could not parse: "+ jsonContent);
+        }
 
         if ( argumentCount == 1 ) {
             return new Object[] { handleArgument( m.getParameterTypes()[0], m.getGenericParameterTypes()[0], parse ) };
@@ -97,12 +97,20 @@ public class JSONHelper {
 
     }
 
+    private String convertWholeStreamToString(InputStream stream) {
+        return new Scanner(stream).useDelimiter("\\A").next();
+    }
+
     @SuppressWarnings("unchecked")
-	public <T> T fromJSON( Class<T> clazz, Object jsonValue ) {
+    public <T> T fromJSON( Class<T> clazz, Object jsonValue ) {
         return (T) handleArgument(clazz, clazz, jsonValue);
     }
 
     private Object handleArgument( Class<?> argumentClass, Type type, Object jsonValue ) {
+        if ( argumentClass.isEnum() ) {
+            return Enum.valueOf((Class<Enum>) argumentClass, jsonValue.toString());
+        }
+
         // basic type
         if ( ReflectionUtil.basicTypes.contains( argumentClass ) ) {
             Object value = basicType(jsonValue, argumentClass);
@@ -158,9 +166,9 @@ public class JSONHelper {
                 }
                 JSONObject obj = (JSONObject) jsonValue;
                 for (Object e : obj.entrySet()) {
-                	Map.Entry<?, ?> entry = (Entry<?, ?>) e;
-                    map.put( handleArgument( keyClass, keyType, entry.getKey()), 
-                    		 handleArgument( valueClass, valueType, entry.getValue()));
+                    Map.Entry<?, ?> entry = (Entry<?, ?>) e;
+                    map.put( handleArgument( keyClass, keyType, entry.getKey()),
+                            handleArgument( valueClass, valueType, entry.getValue()));
                 }
             } else {
                 throw new BadRequestException();

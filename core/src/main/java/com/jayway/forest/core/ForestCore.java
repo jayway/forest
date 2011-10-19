@@ -41,7 +41,7 @@ public class ForestCore {
         RoleManager.spi = dependencyInjectionSPI;
         // call application specific context setup
         application.setupRequestContext();
-        return new PathAndMethod(path);
+        return new PathAndMethod(path, request.getMethod() );
     }
 
     public Object evaluateGet( HttpServletRequest request) {
@@ -55,7 +55,6 @@ public class ForestCore {
     public void evaluatePostPut( HttpServletRequest request, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
     	PathAndMethod pathAndMethod = setup(request);
         if ( pathAndMethod.method() == null ) {
-            // TODO allow post if CreatableResource
             throw new MethodNotAllowedException();
         }
         resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
@@ -64,6 +63,7 @@ public class ForestCore {
     public void evaluateDelete( HttpServletRequest request ) {
     	PathAndMethod pathAndMethod = setup(request);
         if ( pathAndMethod.method() != null ) {
+            // TODO allow delete if DeletableResource
             throw new MethodNotAllowedException();
         }
         resourceUtil.invokeDelete(evaluatePath(pathAndMethod.pathSegments()));

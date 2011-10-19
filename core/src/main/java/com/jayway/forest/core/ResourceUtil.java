@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.reflection.impl.*;
+import com.jayway.forest.roles.CreatableResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +82,9 @@ public class ResourceUtil {
 
     Capability findMethod( Resource resource, String name ) {
         Class<? extends Resource> clazz = resource.getClass();
+        if ( name == null && resource instanceof CreatableResource ) {
+
+        }
         for ( Method method : clazz.getDeclaredMethods() ) {
             if ( method.isSynthetic() ) continue;
             if ( method.getName().equals( name ) ) {

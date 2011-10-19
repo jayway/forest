@@ -9,10 +9,10 @@ import java.util.Map;
  */
 public class PagedSortedListResponse<T> {
     private String name;
-    private Long page;
-    private Long pageSize;
-    private Long totalElements;
-    private Long totalPages;
+    private Integer page;
+    private Integer pageSize;
+    private Integer totalElements;
+    private Integer totalPages;
     private List<T> list;
     private String next;
     private String previous;
@@ -30,35 +30,35 @@ public class PagedSortedListResponse<T> {
         this.list = list;
     }
 
-    public Long getPage() {
+    public Integer getPage() {
         return page;
     }
 
-    public void setPage(Long page) {
+    public void setPage(Integer page) {
         this.page = page;
     }
 
-    public Long getPageSize() {
+    public Integer getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(Long pageSize) {
+    public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
 
-    public Long getTotalElements() {
+    public Integer getTotalElements() {
         return totalElements;
     }
 
-    public void setTotalElements(Long totalElements) {
+    public void setTotalElements(Integer totalElements) {
         this.totalElements = totalElements;
     }
 
-    public Long getTotalPages() {
+    public Integer getTotalPages() {
         return totalPages;
     }
 
-    public void setTotalPages(Long totalPages) {
+    public void setTotalPages(Integer totalPages) {
         this.totalPages = totalPages;
     }
 

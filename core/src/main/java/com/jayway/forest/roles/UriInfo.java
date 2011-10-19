@@ -5,7 +5,6 @@ package com.jayway.forest.roles;
 public class UriInfo {
     private String baseUrl;
     private String relativeUrl;
-    private String self;
 
     public UriInfo( String baseUrl ) {
         this.baseUrl = baseUrl;

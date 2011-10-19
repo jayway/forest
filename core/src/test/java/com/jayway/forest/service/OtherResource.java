@@ -1,14 +1,11 @@
 package com.jayway.forest.service;
 
 import com.jayway.forest.dto.StringDTO;
-import com.jayway.forest.roles.DeletableResource;
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.IdResource;
-import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.*;
 
 /**
  */
-public class OtherResource implements Resource, IdResource, DescribedResource, DeletableResource {
+public class OtherResource implements Resource, IdResource, DescribedResource, DeletableResource, CreatableResource {
 
     @Override
     public Resource id(String id) {
@@ -28,5 +25,15 @@ public class OtherResource implements Resource, IdResource, DescribedResource, D
     @Override
     public void delete() {
         StateHolder.set("Delete invoked");
+    }
+
+    @Override
+    public Linkable create( Object... arguments ) {
+        StringBuilder sb = new StringBuilder();
+        for (Object argument : arguments) {
+            sb.append( argument );
+        }
+        StateHolder.set( sb.toString() );
+        return new Linkable( "1234", "jayway", "appendabletest" );
     }
 }
