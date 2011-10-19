@@ -4,6 +4,7 @@ import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -65,6 +66,15 @@ public class QueriesTest  extends AbstractRunner {
     @Test
     public void throwsNotFound() throws IOException {
         given().expect().statusCode(404).body(is("Bad stuff")).get("/throwingnotfound");
+    }
+
+    @Test
+    public void escapedStrings() {
+        StateHolder.set( new StringDTO("Man shouts :\"My GOD http://localhost?!!\""));
+        String result = given().expect().statusCode(200).get("/getstring").andReturn().asString();
+
+        System.out.println( result );
+        Assert.assertEquals("{\"string\":\"Man shouts :\\\"My GOD http:\\/\\/localhost?!!\\\"\"}", result );
     }
 
 }

@@ -154,5 +154,10 @@ public class RootResource implements Resource {
         }
         return list;
     }
+
+    public StringDTO getstring() {
+        Object string = StateHolder.get();
+        return (StringDTO) string;
+    }
 }
 
