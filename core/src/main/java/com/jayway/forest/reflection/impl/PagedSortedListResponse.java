@@ -11,7 +11,7 @@ public class PagedSortedListResponse<T> {
     private String name;
     private Integer page;
     private Integer pageSize;
-    private Integer totalElements;
+    private Long totalElements;
     private Integer totalPages;
     private List<T> list;
     private String next;
@@ -46,11 +46,11 @@ public class PagedSortedListResponse<T> {
         this.pageSize = pageSize;
     }
 
-    public Integer getTotalElements() {
+    public Long getTotalElements() {
         return totalElements;
     }
 
-    public void setTotalElements(Integer totalElements) {
+    public void setTotalElements(Long totalElements) {
         this.totalElements = totalElements;
     }
 

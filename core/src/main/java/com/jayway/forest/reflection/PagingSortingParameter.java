@@ -19,7 +19,7 @@ import java.util.List;
 
     void setPageSize(Integer pageSize);
 
-    void setTotalElements(Integer totalElements);
+    void setTotalElements(Long totalElements);
 
     Integer offset();
 

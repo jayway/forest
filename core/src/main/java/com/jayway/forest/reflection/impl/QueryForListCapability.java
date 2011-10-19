@@ -78,9 +78,9 @@ public class QueryForListCapability extends QueryCapability {
             // build response
             response.setPage(pagingSortingParameter.getPage());
             response.setPageSize(pagingSortingParameter.getPageSize());
-            response.setTotalElements( safeList.size() );
+            response.setTotalElements( ((Integer) safeList.size()).longValue() );
 
-            Integer actualListSize = response.getTotalElements();
+            Long actualListSize = response.getTotalElements();
             Integer maxIndex = response.getPage() * response.getPageSize();
             Integer minIndex = ( response.getPage() - 1 )*response.getPageSize();
             if (actualListSize >= minIndex) {
@@ -130,9 +130,9 @@ public class QueryForListCapability extends QueryCapability {
         }
     }
 
-    private Integer calculateTotalPages( Integer totalElements, Integer pageSize ) {
+    private Integer calculateTotalPages( Long totalElements, Integer pageSize ) {
         if ( totalElements % pageSize == 0) {
-            return totalElements / pageSize;
+            return (int) (totalElements / pageSize);
         }
         return 1+(int)Math.floor(totalElements / pageSize );
     }

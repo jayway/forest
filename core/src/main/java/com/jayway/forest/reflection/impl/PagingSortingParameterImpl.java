@@ -9,7 +9,7 @@ final public class PagingSortingParameterImpl extends Touchable implements Pagin
 
     private Integer page;
     private Integer pageSize;
-    private Integer totalElements;
+    private Long totalElements;
     private List<SortParameter> parameters;
     private Set<String> addedSortingFields;
 
@@ -29,7 +29,7 @@ final public class PagingSortingParameterImpl extends Touchable implements Pagin
         }
     }
 
-    protected Integer getTotalElements() {
+    protected Long getTotalElements() {
         return totalElements;
     }
 
@@ -52,7 +52,7 @@ final public class PagingSortingParameterImpl extends Touchable implements Pagin
     }
 
     @Override
-    public void setTotalElements(Integer totalElements) {
+    public void setTotalElements(Long totalElements) {
         touch();
         this.totalElements = totalElements;
     }
