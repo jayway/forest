@@ -117,6 +117,7 @@ public class ResponseHandler {
         } else if ( e instanceof AbstractHtmlException ) {
             return new Response( ((AbstractHtmlException) e).getCode(), e.getMessage() );
         } else {
+            log.error("Exception " + e.getClass().getSimpleName() + " is not mapped", e);
             if ( e.getMessage() == null ) {
                 return new Response( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getClass().getSimpleName() );
             } else {
