@@ -17,6 +17,9 @@ import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
 
 public class RestService extends RestfulServlet {
 
+    private AccountRepository repository;
+    private AccountManager manager;
+
     @Override
 	public void init() {
 		initForest(new Application() {
@@ -27,11 +30,15 @@ public class RestService extends RestfulServlet {
 
             @Override
             public void setupRequestContext() {
-                RoleManager.addRole(AccountRepository.class, new AccountRepository());
-                RoleManager.addRole(AccountManager.class, new AccountManager());
+                RoleManager.addRole(AccountRepository.class, repository );
+                RoleManager.addRole(AccountManager.class, manager );
             }
 
         }, new GroveDependencyInjectionImpl());
+
+        manager = new AccountManager();
+        repository = new AccountRepository();
+        repository.initializeDummyAccounts( manager );
 	}
 
     @Override

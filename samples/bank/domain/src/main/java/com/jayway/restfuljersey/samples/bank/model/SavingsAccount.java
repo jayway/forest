@@ -10,6 +10,6 @@ public class SavingsAccount extends Account implements Depositable {
 
     @Override
     public void deposit(int amount) {
-        balance += amount;
+        increaseBalance( amount );
     }
 }

@@ -1,6 +1,7 @@
 package com.jayway.restfuljersey.samples.bank.grove.resources.accounts;
 
 import com.jayway.forest.roles.DescribedResource;
+import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 import com.jayway.restfuljersey.samples.bank.dto.AccountLinkable;
@@ -8,11 +9,10 @@ import com.jayway.restfuljersey.samples.bank.dto.TransferToDTO;
 import com.jayway.restfuljersey.samples.bank.grove.constraints.DepositAllowed;
 import com.jayway.restfuljersey.samples.bank.grove.constraints.HasCredit;
 import com.jayway.restfuljersey.samples.bank.grove.constraints.IsWithdrawable;
-import com.jayway.restfuljersey.samples.bank.model.Account;
-import com.jayway.restfuljersey.samples.bank.model.AccountManager;
-import com.jayway.restfuljersey.samples.bank.model.Depositable;
-import com.jayway.restfuljersey.samples.bank.model.Withdrawable;
+import com.jayway.restfuljersey.samples.bank.model.*;
 import com.jayway.restfuljersey.samples.bank.repository.AccountRepository;
+
+import java.util.List;
 
 import static com.jayway.forest.core.RoleManager.addRole;
 import static com.jayway.forest.core.RoleManager.role;
@@ -50,7 +50,6 @@ public class AccountResource implements Resource, DescribedResource {
         role(AccountManager.class).transfer(withdrawable, depositable, transfer.getAmount() );
     }
 
-
     @Override
     public Object description() {
         return account;
@@ -59,8 +58,12 @@ public class AccountResource implements Resource, DescribedResource {
     private String accountDescription() {
         return account.getDescription();
     }
+
     public void changedescription( @Template("accountDescription") String description ) {
         account.setDescription(description);
     }
 
+    public List<Transaction> transactions() {
+        return role( AccountManager.class ).getTransactionLog( account );
+    }
 }
