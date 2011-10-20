@@ -1,18 +1,17 @@
 package com.jayway.forest.reflection.impl;
 
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 public class QueryCapability extends BaseReflectionCapability {
     protected final Resource resource;
@@ -50,7 +49,6 @@ public class QueryCapability extends BaseReflectionCapability {
                 throw internalServerError( e );
             } catch ( InvocationTargetException e) {
                 if ( e.getCause() instanceof RuntimeException ) {
-                    log.error( e.getCause().getMessage(), e);
                     throw (RuntimeException) e.getCause();
                 }
                 throw internalServerError( e );
