@@ -26,7 +26,10 @@ public class TypeTest extends AbstractRunner {
 
     @Test
     public void acceptFloatForm() {
-        //given().spec( contentTypeFormUrlEncoded() ).formParam("argument1.Float", "3.5").expect().statusCode(200).post("/postfloat");
+        given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(200).post("/postfloat?argument1=3.875");
+
+        Float result = (Float) StateHolder.get();
+        Assert.assertEquals( result, new Float(3.875));
     }
 
 }
