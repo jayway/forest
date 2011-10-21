@@ -1,6 +1,8 @@
 package com.jayway.forest.service;
 
+import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.constraint.RolesInContext;
+import com.jayway.forest.constraint.RolesNotInContext;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.dto.Value;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jayway.forest.core.RoleManager.addRole;
 import static com.jayway.forest.core.RoleManager.role;
 
 /**
@@ -174,6 +177,8 @@ public class RootResource implements Resource {
         throw new IOException();
     }
 
+    @Doc("Just to try using the constraint")
+    @RolesNotInContext( IntegerDTO.class )
     public String unmappedunchecket() {
         throw new RuntimeException();
     }
@@ -191,7 +196,7 @@ public class RootResource implements Resource {
     }
 
     public void unmappedunchecketcommand() {
-        throw new RuntimeException();
+        addRole(Integer.class, "will throw IllegalArgument Exception");
     }
 
     public Float getfloat() {

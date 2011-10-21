@@ -22,7 +22,7 @@ public final class JsonRestReflection implements RestReflection {
 	@Override
 	public Object renderCapabilities(Capabilities capabilities) {
         StringBuilder results = new StringBuilder( );
-        results.append("{");
+        results.append("[");
         List<CapabilityReference> all = new LinkedList<CapabilityReference>();
         all.addAll( capabilities.getQueries() );
         all.addAll( capabilities.getCommands() );
@@ -34,7 +34,7 @@ public final class JsonRestReflection implements RestReflection {
         if ( !all.isEmpty() ) {
             toMapEntries(all, results);
         }
-        results.append("}");
+        results.append("]");
 		return results.toString();
 	}
 
@@ -45,6 +45,7 @@ public final class JsonRestReflection implements RestReflection {
         if ( method.rel() != null ) {
             sb.append(", \"rel\":\"").append( method.rel() ).append("\"");
         }
+        sb.append("}");
         // todo JSONTemplate
         // sb.append(",\"jsonTemplate\": generateTemplate( method ) );
     }
