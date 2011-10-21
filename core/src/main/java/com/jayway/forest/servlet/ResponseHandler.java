@@ -4,6 +4,7 @@ import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.AbstractHtmlException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
@@ -67,23 +68,28 @@ public class ResponseHandler {
         dependencyInjectionSPI.addRequestContext(HttpServletResponse.class, response);
     }
 
-    public void handleResponse( Object responseObject ) throws IOException {
+    public void handleResponse( Object responseObject ) {
         if (responseObject != null) {
-            OutputStreamWriter writer = new OutputStreamWriter( response.getOutputStream(), Charset.forName("UTF-8"));
-            String responseString;
-            if ( responseObject instanceof Capabilities ) {
-                responseString = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
-            } else if ( responseObject instanceof PagedSortedListResponse) {
-                responseString = restReflection().renderListResponse((PagedSortedListResponse) responseObject).toString();
-            } else if ( responseObject instanceof Response ) {
-                Response error = (Response) responseObject;
-                responseString = restReflection().renderError(error).toString();
-                response.setStatus( error.status() );
-            } else {
-                responseString = restReflection().renderQueryResponse( responseObject ).toString();
+            try {
+                OutputStreamWriter writer = new OutputStreamWriter( response.getOutputStream(), Charset.forName("UTF-8"));
+                String responseString;
+                if ( responseObject instanceof Capabilities ) {
+                    responseString = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
+                } else if ( responseObject instanceof PagedSortedListResponse) {
+                    responseString = restReflection().renderListResponse((PagedSortedListResponse) responseObject).toString();
+                } else if ( responseObject instanceof Response ) {
+                    Response error = (Response) responseObject;
+                    responseString = restReflection().renderError(error).toString();
+                    response.setStatus( error.status() );
+                } else {
+                    responseString = restReflection().renderQueryResponse( responseObject ).toString();
+                }
+                writer.write( responseString, 0, responseString.length() );
+                writer.flush();
+            } catch (IOException e) {
+                response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+                log.error("Error sending response", e);
             }
-            writer.write( responseString, 0, responseString.length() );
-            writer.flush();
         }
     }
 
@@ -94,15 +100,17 @@ public class ResponseHandler {
         } catch ( Exception e ) {
             responseObject = mapInternalException(e);
         }
-        try {
-            handleResponse(responseObject);
-        } catch (IOException e) {
-            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-            log.error("Error sending response", e);
-        }
+        handleResponse(responseObject);
     }
 
     private Response mapInternalException( Exception e ) {
+        if ( e instanceof WrappedException ) {
+            Throwable cause = e.getCause();
+            if ( cause instanceof Exception ) {
+                e = (Exception) cause;
+            }
+        }
+
         if ( exceptionMapper != null ) {
             Response response = exceptionMapper.map(e);
             if (response != null) {

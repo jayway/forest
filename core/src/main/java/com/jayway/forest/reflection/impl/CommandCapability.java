@@ -2,10 +2,7 @@ package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.BadRequestException;
-import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
+import com.jayway.forest.exceptions.*;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.DeletableResource;
 import com.jayway.forest.roles.Resource;
@@ -44,9 +41,8 @@ public class CommandCapability extends BaseReflectionCapability {
             if ( e.getCause() instanceof RuntimeException ) {
                 throw (RuntimeException) e.getCause();
             }
-            throw new BadRequestException();
+            throw new WrappedException( e.getCause() );
         } catch (IllegalAccessException e) {
-            log.error("Could not access command", e);
             throw internalServerError( e );
         }
     }

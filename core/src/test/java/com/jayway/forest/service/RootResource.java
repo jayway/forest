@@ -9,6 +9,8 @@ import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 
+import javax.naming.OperationNotSupportedException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -159,5 +161,46 @@ public class RootResource implements Resource {
         Object string = StateHolder.get();
         return (StringDTO) string;
     }
+
+    public String mappedchecked() throws OperationNotSupportedException {
+        throw new OperationNotSupportedException();
+    }
+
+    public String mappedunchecket() {
+        throw new NullPointerException();
+    }
+
+    public String unmappedchecket() throws IOException {
+        throw new IOException();
+    }
+
+    public String unmappedunchecket() {
+        throw new RuntimeException();
+    }
+
+    public void mappedcheckedcommand() throws OperationNotSupportedException {
+        throw new OperationNotSupportedException();
+    }
+
+    public void mappedunchecketcommand() {
+        throw new NullPointerException();
+    }
+
+    public void unmappedchecketcommand() throws IOException {
+        throw new IOException();
+    }
+
+    public void unmappedunchecketcommand() {
+        throw new RuntimeException();
+    }
+
+    public Float getfloat() {
+        return 3.9f;
+    }
+
+    public void postfloat( Float f ) {
+        StateHolder.set( f );
+    }
+
 }
 

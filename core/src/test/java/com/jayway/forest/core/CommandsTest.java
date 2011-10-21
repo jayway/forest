@@ -49,8 +49,8 @@ public class CommandsTest extends AbstractRunner {
         assertEquals("SuccessHello", StateHolder.get());
     }
 
-@Test
-    public void testIllegalList() throws IOException {
+    @Test
+    public void testIllegalList() {
             given().
                     body("[[\"Hello\"], \"World\"]").
             expect().
@@ -60,7 +60,7 @@ public class CommandsTest extends AbstractRunner {
     }
 
     @Test @SuppressWarnings("unchecked")
-    public void testCommandAddToList() throws IOException {
+    public void testCommandAddToList() {
         given().body("[[\"Hello\"], \"World\"]").when().post("/addtolist");
 
 		List<String> list = (List<String>) StateHolder.get();
@@ -68,7 +68,7 @@ public class CommandsTest extends AbstractRunner {
     }
 
     @Test @SuppressWarnings("unchecked")
-    public void testComplex() throws IOException {
+    public void testComplex() {
         given().body("[[[\"Hello\", \"World\"]]]").when().post("/complex");
 
 		List<List<List<String>>> list = (List<List<List<String>>>) StateHolder.get();

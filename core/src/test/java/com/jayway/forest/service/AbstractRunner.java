@@ -46,6 +46,10 @@ public class AbstractRunner {
         RestAssured.reset();
     }
 
+    protected RequestSpecification contentTypeFormUrlEncoded() {
+        return new RequestSpecBuilder().addHeader( "Content-type", "application/x-www-form-urlencoded").build();
+    }
+
     protected RequestSpecification acceptTextHtml() {
         return new RequestSpecBuilder().addHeader("Accept", "text/html").build();
     }

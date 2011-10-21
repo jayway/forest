@@ -10,4 +10,13 @@ public class RootResource implements Resource {
     public AccountsResource accounts() {
         return new AccountsResource();
     }
+
+
+    public void postfloat( Float floatvalue ) {
+        System.out.println( floatvalue );
+    }
+
+    public Float getfloat() {
+        return 3.4f;
+    }
 }

@@ -202,6 +202,8 @@ public class JSONHelper {
     private Object basicType( Object value, Class<?> type ) {
         if ( value instanceof Long && type == Integer.class ) {
             return ((Long) value).intValue();
+        } else if ( value instanceof Double && type == Float.class ) {
+            return ((Double) value).floatValue();
         } else {
             return value;
         }

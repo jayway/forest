@@ -4,8 +4,11 @@ import com.jayway.forest.core.Application;
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.servlet.ExceptionMapper;
+import com.jayway.forest.servlet.Response;
 import com.jayway.forest.servlet.RestfulServlet;
 
+import javax.naming.OperationNotSupportedException;
 import javax.servlet.ServletException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +36,6 @@ public class RestfulServletService extends RestfulServlet {
                     RoleManager.addRole(entry.getKey(), entry.getValue());
                 }
             }
-
         }, new GroveDependencyInjectionImpl());
     }
 
@@ -46,4 +48,21 @@ public class RestfulServletService extends RestfulServlet {
 	public static void reset() {
 		map.clear();
 	}
+
+    @Override
+    protected ExceptionMapper exceptionMapper() {
+        return new ExceptionMapper() {
+            @Override
+            public Response map(Exception e) {
+                if ( e instanceof OperationNotSupportedException ) {
+                    return new Response( 409, "Not yet supported" );
+                } else if ( e instanceof NullPointerException ) {
+                    return new Response( 409, "NPE is mapped");
+                }
+
+                // could not map
+                return null;
+            }
+        };
+    }
 }

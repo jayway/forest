@@ -63,6 +63,8 @@ public abstract class BaseReflectionCapability extends Capability {
             return Long.valueOf( value );
         } else if ( clazz == Double.class ) {
             return Double.valueOf( value );
+        } else if ( clazz == Float.class ) {
+            return Float.valueOf( value );
         } else if ( clazz == Boolean.class ) {
             return Boolean.valueOf( value );
         } else if ( clazz.isEnum() ) {

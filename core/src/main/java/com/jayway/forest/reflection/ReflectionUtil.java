@@ -23,6 +23,7 @@ public abstract class ReflectionUtil {
         basicTypes.add( Long.class );
         basicTypes.add( Integer.class);
         basicTypes.add( Double.class );
+        basicTypes.add( Float.class );
         basicTypes.add( Boolean.class );
         ReflectionUtil.basicTypes = Collections.unmodifiableSet(basicTypes);
     }
