@@ -12,12 +12,13 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.jayway.restassured.RestAssured.get;
+import static com.jayway.restassured.RestAssured.given;
 
 public class ListQueriesTest extends AbstractRunner {
 
     @Test
     public void testListBasic() {
-        JSONArray list = getList("/list");
+        JSONArray list = getList("/listresponse/list");
         Assert.assertEquals("Size must be 2", 2, list.size());
         Assert.assertEquals("world", list.get(0));
         Assert.assertEquals("hello", list.get(1));
@@ -25,7 +26,7 @@ public class ListQueriesTest extends AbstractRunner {
 
     @Test
     public void testListComplex() {
-        JSONArray list = getList("/liststringdto");
+        JSONArray list = getList("/listresponse/liststringdto");
         Assert.assertEquals("Size must be 2", 2, list.size());
         Assert.assertEquals("{\"string\":\"world\"}", list.get(0).toString());
         Assert.assertEquals("{\"string\":\"hello\"}", list.get(1).toString());
@@ -33,7 +34,7 @@ public class ListQueriesTest extends AbstractRunner {
 
     @Test
     public void testListComplexSort() {
-        JSONArray list = getList("/liststringdto?sortBy=string");
+        JSONArray list = getList("/listresponse/liststringdto?sortBy=string");
         Assert.assertEquals("Size must be 2", 2, list.size());
         Assert.assertEquals("{\"string\":\"hello\"}", list.get(0).toString());
         Assert.assertEquals("{\"string\":\"world\"}", list.get(1).toString());
@@ -41,27 +42,48 @@ public class ListQueriesTest extends AbstractRunner {
 
     @Test
     public void testListComplexPaging() {
-        PagedSortedListResponse response = get("/liststringdto?pageSize=1&page=2").as(PagedSortedListResponse.class);
+        PagedSortedListResponse response = get("/listresponse/liststringdto?pageSize=1&page=2").as(PagedSortedListResponse.class);
         Assert.assertEquals( "Must have two total elements", 2, response.getTotalElements().intValue() );
-        Assert.assertEquals(RestAssured.baseURI + RestAssured.basePath + "/liststringdto?page=1&pageSize=1", response.getPrevious() );
+        Assert.assertEquals(RestAssured.baseURI + RestAssured.basePath + "/listresponse/liststringdto?page=1&pageSize=1", response.getPrevious() );
         Assert.assertEquals( "Must have two pages", 2, response.getTotalPages().intValue() );
     }
 
     @Test
     public void testListPages() {
-        PagedSortedListResponse response = get("/listhowlong?argument1=7&pageSize=5").as(PagedSortedListResponse.class);
+        PagedSortedListResponse response = get("/listresponse/listhowlong?argument1=7&pageSize=5").as(PagedSortedListResponse.class);
 
         Assert.assertEquals("asdf", 2, response.getTotalPages().intValue());
     }
 
     @Test
     public void testImmutableIterable() {
-        JSONArray list = getList("/immutableiterable?sortBy=string");
+        JSONArray list = getList("/listresponse/immutableiterable?sortBy=string");
         Assert.assertEquals("Size must be 2", 2, list.size());
         Assert.assertEquals("{\"string\":\"hello\"}", list.get(0).toString());
         Assert.assertEquals("{\"string\":\"world\"}", list.get(1).toString());
     }
 
+    @Test
+    public void testHtmlTable() {
+        String s = given().spec(acceptTextHtml()).get("/listresponse/immutableiterable?sortBy=string").asString();
+
+        Assert.assertTrue( "must have a <table> list", s.contains( "<table>"));
+    }
+
+    @Test
+    public void testHtmlTableLinkables() {
+        String s = given().spec(acceptTextHtml()).get("/listresponse/testlinkables").asString();
+
+        Assert.assertTrue( "must have a <table> list", s.contains( "<table>"));
+        Assert.assertTrue( "must have a <th>test", s.contains( "<th>test"));
+    }
+
+    @Test
+    public void testHtmlList() {
+        String s = given().spec(acceptTextHtml()).get("/listresponse/linkables").asString();
+
+        Assert.assertTrue( "must have a <ul> list", s.contains( "<ul>"));
+    }
 
     // cannot get the contained list to be correctly typed
     // unless manually parsing the string representation

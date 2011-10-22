@@ -11,14 +11,14 @@ public class TypeTest extends AbstractRunner {
 
     @Test
     public void returnFloat() {
-        String s = given().expect().statusCode(200).get("/getfloat").andReturn().asString();
+        String s = given().expect().statusCode(200).get("/types/getfloat").andReturn().asString();
 
         Assert.assertEquals( "3.9", s);
     }
 
     @Test
     public void acceptFloat() {
-        given().body("3.5").expect().statusCode(200).post("/postfloat");
+        given().body("3.5").expect().statusCode(200).post("/types/postfloat");
 
         Float result = (Float) StateHolder.get();
         Assert.assertEquals( result, new Float(3.5f));
@@ -26,7 +26,7 @@ public class TypeTest extends AbstractRunner {
 
     @Test
     public void acceptFloatForm() {
-        given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(200).post("/postfloat?argument1=3.875");
+        given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(200).post("/types/postfloat?argument1=3.875");
 
         Float result = (Float) StateHolder.get();
         Assert.assertEquals( result, new Float(3.875));

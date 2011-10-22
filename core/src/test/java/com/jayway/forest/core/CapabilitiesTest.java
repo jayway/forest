@@ -39,8 +39,15 @@ public class CapabilitiesTest extends AbstractRunner {
     @Test
     public void discoverHtml() {
         String s = given().spec(acceptTextHtml()).get("/").asString();
-        Assert.assertTrue("Must have element 'addwithtemplates'", s.contains("addwithtemplates"));
-        Assert.assertTrue("Must have element 'addwithwrongtemplates'", s.contains("addwithwrongtemplates"));
+        Assert.assertTrue("Must have element 'command'", s.contains("command"));
+        Assert.assertTrue("Must have element 'commandenum'", s.contains("commandenum"));
+    }
+
+    @Test
+    public void discoverWithLinkablesHtml() {
+        String s = given().spec(acceptTextHtml()).get("/listresponse/").asString();
+        Assert.assertTrue("Must have element 'immutableiterable'", s.contains("immutableiterable"));
+        Assert.assertTrue("Must have element 'listhowlong'", s.contains("listhowlong"));
     }
 
     private void assertElement( JSONObject obj ) {

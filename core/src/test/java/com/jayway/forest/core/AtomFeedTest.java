@@ -17,7 +17,7 @@ public class AtomFeedTest extends AbstractRunner {
 
     @Test
     public void testTemplate() {
-        String s = given().expect().statusCode(200).when().get("/listhowlong?argument1=7&pageSize=5&format=atom").asString();
+        String s = given().expect().statusCode(200).when().get("/listresponse/listhowlong?argument1=7&pageSize=5&format=atom").asString();
 
         System.out.println(s);
     }
@@ -25,7 +25,7 @@ public class AtomFeedTest extends AbstractRunner {
 
     @Test
     public void testTemplateLinkable() {
-        String s = given().expect().statusCode(200).when().get("/linkables?format=atom&pageSize=5").asString();
+        String s = given().expect().statusCode(200).when().get("/listresponse/linkables?format=atom&pageSize=5").asString();
 
         System.out.printf(s);
     }

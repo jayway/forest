@@ -1,23 +1,14 @@
 package com.jayway.forest.service;
 
-import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.constraint.RolesInContext;
-import com.jayway.forest.constraint.RolesNotInContext;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.dto.Value;
 import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.Template;
 
-import javax.naming.OperationNotSupportedException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static com.jayway.forest.core.RoleManager.addRole;
 import static com.jayway.forest.core.RoleManager.role;
 
 /**
@@ -53,29 +44,11 @@ public class RootResource implements Resource {
         return first + second.getInteger();
     }
 
-    private Integer defaultInt() {
-        return 17;
-    }
-    private IntegerDTO defaultIntDTO() {
-        return new IntegerDTO(63);
-    }
-    private IntegerDTO evil() {
-        throw new IllegalArgumentException();
-    }
-
-    public Integer addwithtemplates( @Template("defaultInt") Integer first, @Template("defaultIntDTO") IntegerDTO second ) {
-        return first + second.getInteger();
-    }
-
-    public Integer addwithwrongtemplates( @Template("badwrongname") Integer first, @Template("evil") IntegerDTO second ) {
-        return first + second.getInteger();
-    }
-
     public void addcommand( Integer first, IntegerDTO second ) {
         StateHolder.set( first + second.getInteger() );
     }
 
-    public String echo( @Template("content") String input ) {
+    public String echo( String input ) {
         return input;
     }
     
@@ -93,71 +66,8 @@ public class RootResource implements Resource {
         StateHolder.set(list);
     }
 
-    private String content() {
-        return "Template Content";
-    }
-
-    public void updatewithtemplate( @Template("content") String content ) {
-    }
-
     public String throwingnotfound() {
         throw new NotFoundException("Bad stuff");
-    }
-
-
-    public String withwrongtemplatetype( @Template("wrongType") String name ) {
-        return null;
-    }
-    private Double wrongType() {
-        return 5.0;
-    }
-
-    public String withnonexistingtemplate( @Template("nonexistent") String name ) {
-        return null;
-    }
-
-    private String withargument( String argument ) {
-        return "cannot be invoked by framework";
-    }
-    public String templatemethodwithargument( @Template("withargument") String arg) {
-        return null;
-    }
-
-    public List<String> list() {
-        List<String> list = new ArrayList<String>();
-        list.add("world");
-        list.add( "hello");
-        return list;
-    }
-
-    public List<StringDTO> liststringdto() {
-        List<StringDTO> list = new ArrayList<StringDTO>();
-        list.add( new StringDTO("world"));
-        list.add( new StringDTO("hello"));
-        return list;
-    }
-
-    public List<StringDTO> listhowlong( Integer size ) {
-        List<StringDTO> list = new ArrayList<StringDTO>(size);
-        for ( int i=0; i<size; i++ ) {
-            list.add( new StringDTO(""+i) );
-        }
-        return list;
-    }
-
-    public Iterable<StringDTO> immutableiterable( ) {
-        List<StringDTO> list = new ArrayList<StringDTO>();
-        list.add( new StringDTO("world"));
-        list.add( new StringDTO("hello"));
-        return Collections.unmodifiableList(list);
-    }
-
-    public Iterable<Linkable> linkables() {
-        List<Linkable> list = new ArrayList<Linkable>(15);
-        for (int i=0; i<15; i++) {
-            list.add( new Linkable(""+i+"/", "number"+i, "linkable", "This is element number "+i + " in the long line of elements in this list"));
-        }
-        return list;
     }
 
     public StringDTO getstring() {
@@ -165,47 +75,20 @@ public class RootResource implements Resource {
         return (StringDTO) string;
     }
 
-    public String mappedchecked() throws OperationNotSupportedException {
-        throw new OperationNotSupportedException();
+    public Resource listresponse() {
+        return new ListResponseResource();
     }
 
-    public String mappedunchecket() {
-        throw new NullPointerException();
+    public Resource templates() {
+        return new TemplateResource();
     }
 
-    public String unmappedchecket() throws IOException {
-        throw new IOException();
+    public Resource types() {
+        return new TypesResource();
     }
 
-    @Doc("Just to try using the constraint")
-    @RolesNotInContext( IntegerDTO.class )
-    public String unmappedunchecket() {
-        throw new RuntimeException();
+    public Resource exceptions() {
+        return new ExceptionsResource();
     }
-
-    public void mappedcheckedcommand() throws OperationNotSupportedException {
-        throw new OperationNotSupportedException();
-    }
-
-    public void mappedunchecketcommand() {
-        throw new NullPointerException();
-    }
-
-    public void unmappedchecketcommand() throws IOException {
-        throw new IOException();
-    }
-
-    public void unmappedunchecketcommand() {
-        addRole(Integer.class, "will throw IllegalArgument Exception");
-    }
-
-    public Float getfloat() {
-        return 3.9f;
-    }
-
-    public void postfloat( Float f ) {
-        StateHolder.set( f );
-    }
-
 }
 
