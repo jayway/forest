@@ -8,8 +8,8 @@ package com.jayway.forest.roles;
  * will be routed to this method
  *
  */
-public interface CreatableResource extends Resource {
+public interface CreatableResource<T> extends Resource {
 
-    Linkable create( Object... arguments);
+    Linkable create( T argument);
 
 }

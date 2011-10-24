@@ -1,11 +1,12 @@
 package com.jayway.forest.service;
 
+import com.jayway.forest.dto.StringAndIntegerDTO;
 import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.roles.*;
 
 /**
  */
-public class OtherResource implements Resource, IdResource, DescribedResource, DeletableResource, CreatableResource {
+public class OtherResource implements Resource, IdResource, DescribedResource, DeletableResource, CreatableResource<StringAndIntegerDTO> {
 
     @Override
     public Resource id(String id) {
@@ -28,12 +29,8 @@ public class OtherResource implements Resource, IdResource, DescribedResource, D
     }
 
     @Override
-    public Linkable create( Object... arguments ) {
-        StringBuilder sb = new StringBuilder();
-        for (Object argument : arguments) {
-            sb.append( argument );
-        }
-        StateHolder.set( sb.toString() );
-        return new Linkable( "1234", "jayway", "appendabletest" );
+    public Linkable create( StringAndIntegerDTO argument ) {
+        return new Linkable( argument.getString() + "/" + argument.getInteger().toString() + "/", argument.getString(), "appendabletest" );
     }
+
 }

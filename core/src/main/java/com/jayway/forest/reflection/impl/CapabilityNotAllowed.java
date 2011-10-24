@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.NotFoundException;
@@ -21,7 +22,7 @@ public class CapabilityNotAllowed extends Capability {
 		throw new UnauthorizedException();
 	}
 	@Override
-	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
 		throw new UnauthorizedException();
 	}
 	@Override

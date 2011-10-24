@@ -9,6 +9,7 @@ import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,7 +59,7 @@ public class QueryCapability extends BaseReflectionCapability {
     }
 
     @Override
-    public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+    public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
         throw new NotFoundException();
     }
 

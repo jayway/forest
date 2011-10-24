@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.reflection.impl.SubResource;
@@ -50,7 +51,7 @@ public abstract class Capability implements CapabilityReference {
 
     public abstract Object get(HttpServletRequest request);
 
-	public abstract void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler);
+	public abstract void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response );
 
 	public abstract void delete();
 

@@ -4,10 +4,13 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.reflection.impl.*;
 import com.jayway.forest.roles.CreatableResource;
@@ -31,11 +34,11 @@ import com.jayway.forest.roles.Resource;
 public class ResourceUtil {
 
     static Logger log = LoggerFactory.getLogger(ResourceUtil.class);
-	private final DependencyInjectionSPI dependencyInjectionSPI;
+    private final DependencyInjectionSPI dependencyInjectionSPI;
 
     public ResourceUtil(DependencyInjectionSPI dependencyInjectionSPI) {
-		this.dependencyInjectionSPI = dependencyInjectionSPI;
-	}
+        this.dependencyInjectionSPI = dependencyInjectionSPI;
+    }
 
     private String getDocumentation( Method method ) {
         for ( Annotation a : method.getAnnotations() ) {
@@ -72,8 +75,8 @@ public class ResourceUtil {
         return true;
     }
 
-    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
-        findMethod( resource, method ).post(formParams, stream, mediaTypeHandler);
+    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
+        findMethod( resource, method ).post(formParams, stream, mediaTypeHandler, response );
     }
 
     public Resource invokePathMethod( Resource resource, String path ) {
@@ -82,8 +85,19 @@ public class ResourceUtil {
 
     Capability findMethod( Resource resource, String name ) {
         Class<? extends Resource> clazz = resource.getClass();
-        if ( name == null && resource instanceof CreatableResource ) {
-
+        if ( "create".equals( name ) && resource instanceof CreatableResource ) {
+            try {
+                for (Type type : clazz.getGenericInterfaces()) {
+                    if ( type instanceof ParameterizedType && ((ParameterizedType) type).getRawType() == CreatableResource.class ) {
+                        Type genericType = ((ParameterizedType) type).getActualTypeArguments()[0];
+                        // no generic types supported in the Parameterized type of CreatableResource
+                        Method method = clazz.getDeclaredMethod("create", (Class)genericType);
+                        return makeResourceMethod(resource, method );
+                    }
+                }
+            } catch (NoSuchMethodException e) {
+                log.error( "Error finding Create method", e);
+            }
         }
         for ( Method method : clazz.getDeclaredMethods() ) {
             if ( method.isSynthetic() ) continue;
@@ -92,20 +106,22 @@ public class ResourceUtil {
             }
         }
         if (resource instanceof IdResource) {
-        	return new IdCapability((IdResource) resource, name, null);
+            return new IdCapability((IdResource) resource, name, null);
         }
         return CapabilityNotFound.INSTANCE;
     }
-    
+
     public Capability makeResourceMethod(Resource resource, Method method) {
         if (!Modifier.isAbstract(method.getModifiers()) && Modifier.isPublic(method.getModifiers())) {
             String name = method.getName();
-			if (!checkConstraint(resource, method)) {
+            if (!checkConstraint(resource, method)) {
                 return new CapabilityNotAllowed(name);
             } else {
                 String documentation = getDocumentation(method);
                 if (method.getReturnType().equals(Void.TYPE)) {
                     return new CommandCapability(method, resource, documentation, method.getName() );
+                } else if (resource instanceof CreatableResource && method.getName().equals( "create" )) {
+                    return new CreateCommandCapability( method, resource, documentation, method.getName() );
                 } else if (Resource.class.isAssignableFrom(method.getReturnType())) {
                     if (method.getParameterTypes().length == 0) return new SubResource(resource, method, documentation);
                     else if (resource instanceof IdResource) return new IdCapability((IdResource) resource, name, documentation);
@@ -120,7 +136,7 @@ public class ResourceUtil {
     }
 
     public void invokeDelete( Resource resource ) {
-    	findMethod( resource, "delete").delete();
+        findMethod( resource, "delete").delete();
     }
 
     public Object get( HttpServletRequest request, Resource resource, String get ) {

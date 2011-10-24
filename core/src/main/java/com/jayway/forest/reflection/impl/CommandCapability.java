@@ -8,14 +8,15 @@ import com.jayway.forest.roles.DeletableResource;
 import com.jayway.forest.roles.Resource;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 public class CommandCapability extends BaseReflectionCapability {
-	private final Method method;
-	private final Resource resource;
+	protected final Method method;
+	protected final Resource resource;
 
 	public CommandCapability(Method method, Resource resource, String documentation, String rel) {
 		super(method.getName(), documentation, rel);
@@ -29,12 +30,12 @@ public class CommandCapability extends BaseReflectionCapability {
 	}
 
 	@Override
-	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
         Object[] arguments = stream == null ? arguments(method, formParams ) : arguments( method, stream, mediaTypeHandler );
-        invokeCommand(arguments );
+        invokeCommand( response, arguments );
 	}
 
-	public <T extends Resource> void invokeCommand(Object... arguments) {
+	public <T extends Resource> void invokeCommand(HttpServletResponse response, Object... arguments) {
         try {
             method.invoke( resource, arguments );
         } catch (InvocationTargetException e) {

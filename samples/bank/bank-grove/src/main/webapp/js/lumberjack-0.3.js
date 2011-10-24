@@ -1,10 +1,11 @@
 
 jQuery(document).ready(function()
 {
-    var cache;
+    var cache = {};
 
     function initializeStepCache( url ) {
         $.ajax({
+            async: false,
             url: url,
             success: function( data ) {
                 $.each( data, function( idx, elm) {
@@ -25,19 +26,6 @@ jQuery(document).ready(function()
         
     }
 
-    cache = {};
     initializeStepCache( "/bank/" );
-    $('#master').load('html/root.html', function() {
-        $.ajax({
-                url: "/bank/",
-                success: function(data) {
-                    $.each( data, function(idx, elm) {
-                        $('#code').append( "<a href='" + elm.href + "'>"+elm.name+"</a></br>");
-                    });
-                },
-                error: function() {
-                    alert("Error");
-                }
-        });
-    });
+    $('#master').load('html/root.html' );
 })

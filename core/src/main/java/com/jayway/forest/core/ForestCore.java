@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.MethodNotAllowedException;
@@ -52,20 +53,16 @@ public class ForestCore {
         return resourceUtil.get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
     }
 
-    public void evaluatePostPut( HttpServletRequest request, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
+    public void evaluatePostPut( HttpServletRequest request, HttpServletResponse response, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
     	PathAndMethod pathAndMethod = setup(request);
         if ( pathAndMethod.method() == null ) {
             throw new MethodNotAllowedException();
         }
-        resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
+        resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler, response);
     }
 
     public void evaluateDelete( HttpServletRequest request ) {
     	PathAndMethod pathAndMethod = setup(request);
-        if ( pathAndMethod.method() != null ) {
-            // TODO allow delete if DeletableResource
-            throw new MethodNotAllowedException();
-        }
         resourceUtil.invokeDelete(evaluatePath(pathAndMethod.pathSegments()));
     }
 

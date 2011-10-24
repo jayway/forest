@@ -46,9 +46,9 @@ public class RestfulServlet extends HttpServlet {
             @SuppressWarnings("unchecked")
             public Object run(HttpServletRequest req, HttpServletResponse resp, MediaTypeHandler mediaType) throws Exception {
                 if (mediaType.contentTypeFormUrlEncoded()) {
-                    forest.evaluatePostPut(req, null, req.getParameterMap(), mediaType);
+                    forest.evaluatePostPut(req, resp, null, req.getParameterMap(), mediaType );
                 } else {
-                    forest.evaluatePostPut(req, req.getInputStream(), null, mediaType);
+                    forest.evaluatePostPut(req, resp, req.getInputStream(), null, mediaType);
                 }
                 return ResponseHandler.SUCCESS_RESPONSE;
             }
