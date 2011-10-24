@@ -1,21 +1,20 @@
 package com.jayway.forest.samples.bank.spring;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
+import com.jayway.forest.core.Application;
+import com.jayway.forest.di.DependencyInjectionSPI;
+import com.jayway.forest.roles.Resource;
+import com.jayway.forest.samples.bank.exceptions.CannotDepositException;
+import com.jayway.forest.samples.bank.exceptions.OverdrawException;
+import com.jayway.forest.samples.bank.spring.resources.RootResource;
+import com.jayway.forest.servlet.ExceptionMapper;
+import com.jayway.forest.servlet.Response;
+import com.jayway.forest.servlet.RestfulServlet;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.jayway.forest.core.Application;
-import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.servlet.ExceptionMapper;
-import com.jayway.forest.servlet.Response;
-import com.jayway.forest.servlet.RestfulServlet;
-import com.jayway.forest.samples.bank.exceptions.CannotDepositException;
-import com.jayway.forest.samples.bank.exceptions.OverdrawException;
-import com.jayway.forest.samples.bank.spring.resources.RootResource;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 public class RestService extends RestfulServlet implements ApplicationContextAware {
 
@@ -23,8 +22,7 @@ public class RestService extends RestfulServlet implements ApplicationContextAwa
 
     @Override
     public void init() throws ServletException {
-        super.init();
-        Application application = new Application() {
+        initForest(new Application() {
             @Override
             public void setupRequestContext() {
             }
@@ -33,9 +31,7 @@ public class RestService extends RestfulServlet implements ApplicationContextAwa
             public Resource root() {
                 return new RootResource();
             }
-
-        };
-        initForest(application, getDI());
+        }, getDI());
     }
 
     private DependencyInjectionSPI getDI() {

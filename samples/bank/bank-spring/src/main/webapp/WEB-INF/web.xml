@@ -4,9 +4,24 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
+
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>servletonly</servlet-name>
-        <servlet-class>com.jayway.forest.samples.bank.spring.RestService</servlet-class>
+        <servlet-class>com.jayway.forest.di.spring.DelegatingServletProxy</servlet-class>
+        <init-param>
+            <param-name>targetBean</param-name>
+            <param-value>forestServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>
