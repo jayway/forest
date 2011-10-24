@@ -6,7 +6,7 @@
 <web-app>
     <servlet>
         <servlet-name>servletonly</servlet-name>
-        <servlet-class>com.jayway.restfuljersey.samples.bank.grove.RestService</servlet-class>
+        <servlet-class>com.jayway.forest.samples.bank.grove.RestService</servlet-class>
     </servlet>
 
     <servlet-mapping>
