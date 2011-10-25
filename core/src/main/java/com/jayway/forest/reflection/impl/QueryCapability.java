@@ -59,7 +59,7 @@ public class QueryCapability extends BaseReflectionCapability {
     }
 
     @Override
-    public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
+    public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
         throw new NotFoundException();
     }
 

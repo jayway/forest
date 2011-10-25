@@ -47,7 +47,7 @@ public class AbstractRunner {
     }
 
     protected RequestSpecification contentTypeFormUrlEncoded() {
-        return new RequestSpecBuilder().addHeader( "Content-type", "application/x-www-form-urlencoded").build();
+        return new RequestSpecBuilder().addHeader( "Content-type", "application/x-www-form-urlencoded").addHeader("Accept", "text/html").build();
     }
 
     protected RequestSpecification acceptTextHtml() {

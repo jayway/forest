@@ -1,6 +1,7 @@
 package com.jayway.forest.reflection;
 
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
+import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.Response;
 
@@ -14,4 +15,5 @@ public interface RestReflection {
     Object renderListResponse(PagedSortedListResponse<?> responseObject);
     Object renderQueryResponse(Object responseObject);
     Object renderError( Response response );
+    Object renderCreatedResponse(Linkable linkable);
 }

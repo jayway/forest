@@ -106,6 +106,13 @@ public final class JsonRestReflection implements RestReflection {
         return response.message();
     }
 
+    @Override
+    public Object renderCreatedResponse(Linkable linkable) {
+        StringBuilder sb = new StringBuilder();
+        appendMethod(sb, new LinkCapabilityReference( linkable ) );
+        return sb.toString();
+    }
+
     private void appendLink( StringBuilder sb, String name, String link ) {
         if ( link!= null) {
             sb.append("\"").append(name).append("\":\"").append(link).append("\",");

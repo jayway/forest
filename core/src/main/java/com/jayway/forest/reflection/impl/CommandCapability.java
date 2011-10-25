@@ -30,12 +30,12 @@ public class CommandCapability extends BaseReflectionCapability {
 	}
 
 	@Override
-	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
+	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
         Object[] arguments = stream == null ? arguments(method, formParams ) : arguments( method, stream, mediaTypeHandler );
-        invokeCommand( response, arguments );
+        invokeCommand( arguments );
 	}
 
-	public <T extends Resource> void invokeCommand(HttpServletResponse response, Object... arguments) {
+	public <T extends Resource> void invokeCommand(Object... arguments) {
         try {
             method.invoke( resource, arguments );
         } catch (InvocationTargetException e) {

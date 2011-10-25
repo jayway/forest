@@ -3,6 +3,7 @@ package com.jayway.forest.reflection.impl;
 import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.UriInfo;
 import com.jayway.forest.servlet.Response;
@@ -59,6 +60,11 @@ public class AtomRestReflection implements RestReflection {
     @Override
     public Object renderError(Response response) {
         return response.message();
+    }
+
+    @Override
+    public Object renderCreatedResponse(Linkable linkable) {
+        throw new UnsupportedMediaTypeException();
     }
 
     @Override

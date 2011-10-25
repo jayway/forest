@@ -14,9 +14,11 @@ public class CreatableTest extends AbstractRunner {
 
     @Test
     public void testCreate() {
-        given().body("{\"string\":\"Hello\", \"integer\": 25}").
+        String result = given().body("{\"string\":\"Hello\", \"integer\": 25}").
         expect().statusCode( 201 ).header("Location", RestAssured.baseURI + RestAssured.basePath + "/other/Hello/" + 25 + "/")
-                .when().post("/other/");
+                .when().post("/other/").andReturn().asString();
+
+        //Assert.assertEquals( "", result );
     }
 
     @Test
@@ -26,4 +28,13 @@ public class CreatableTest extends AbstractRunner {
         Assert.assertEquals( "Delete invoked", StateHolder.get() );
     }
 
+    @Test
+    public void testCreateHtml() {
+        String result = given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(201)
+                .header("Location", RestAssured.baseURI + RestAssured.basePath + "/other/hello/" + 25 + "/")
+                .post("/other/?argument1.StringAndIntegerDTO.string=hello&argument1.StringAndIntegerDTO.integer=25").andReturn().asString();
+
+        String expect = String.format("<code>Location:</code> <a href='%s/bank/other/hello/25/' rel='appendabletest'>hello</a>", RestAssured.baseURI);
+        Assert.assertEquals( expect, result );
+    }
 }

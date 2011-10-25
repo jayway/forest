@@ -3,6 +3,7 @@ package com.jayway.forest.servlet;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.AbstractHtmlException;
+import com.jayway.forest.exceptions.CreatedException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.reflection.Capabilities;
@@ -81,6 +82,10 @@ public class ResponseHandler {
                     Response error = (Response) responseObject;
                     responseString = restReflection().renderError(error).toString();
                     response.setStatus( error.status() );
+                } else if ( responseObject instanceof CreatedException ) {
+                    responseString = restReflection().renderCreatedResponse( ((CreatedException) responseObject).getLinkable() ).toString();
+                    response.setStatus( ((CreatedException) responseObject).getCode() );
+                    response.addHeader( "Location", ((CreatedException) responseObject).getLinkable().getHref() );
                 } else {
                     responseString = restReflection().renderQueryResponse( responseObject ).toString();
                 }
@@ -98,7 +103,11 @@ public class ResponseHandler {
         try {
             responseObject = runner.run(req, resp, mediaTypeHandler);
         } catch ( Exception e ) {
-            responseObject = mapInternalException(e);
+            if ( e instanceof CreatedException ) {
+                responseObject = e;
+            } else {
+                responseObject = mapInternalException(e);
+            }
         }
         handleResponse(responseObject);
     }

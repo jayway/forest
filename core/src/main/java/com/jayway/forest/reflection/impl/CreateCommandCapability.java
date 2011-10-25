@@ -1,5 +1,6 @@
 package com.jayway.forest.reflection.impl;
 
+import com.jayway.forest.exceptions.CreatedException;
 import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
@@ -17,11 +18,9 @@ public class CreateCommandCapability extends CommandCapability {
 	}
 
     @Override
-	public <T extends Resource> void invokeCommand(HttpServletResponse response, Object... arguments) {
+	public <T extends Resource> void invokeCommand(Object... arguments) {
         try {
-            Linkable link = (Linkable) method.invoke(resource, arguments);
-            response.addHeader( "Location", link.getHref() );
-            response.setStatus(HttpServletResponse.SC_CREATED );
+            throw new CreatedException((Linkable) method.invoke(resource, arguments));
         } catch (InvocationTargetException e) {
             if ( e.getCause() instanceof RuntimeException ) {
                 throw (RuntimeException) e.getCause();

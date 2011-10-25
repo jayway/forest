@@ -51,7 +51,7 @@ public abstract class Capability implements CapabilityReference {
 
     public abstract Object get(HttpServletRequest request);
 
-	public abstract void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response );
+	public abstract void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler );
 
 	public abstract void delete();
 

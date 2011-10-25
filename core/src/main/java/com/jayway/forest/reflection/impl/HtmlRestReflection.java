@@ -152,6 +152,11 @@ public final class HtmlRestReflection implements RestReflection {
         return sb.toString();
     }
 
+    @Override
+    public Object renderCreatedResponse(Linkable linkable) {
+        return "<code>Location:</code> <a href='" + linkable.getHref() + "' rel='"+linkable.getRel()+"'>"+linkable.getName() +"</a>";
+    }
+
     private void renderTable(StringBuilder sb, List<?> list, PagedSortedListResponse response ) {
         sb.append("<table><tr>");
         Object element = list.get(0);

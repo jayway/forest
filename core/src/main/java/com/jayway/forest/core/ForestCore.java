@@ -53,12 +53,12 @@ public class ForestCore {
         return resourceUtil.get(request, evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
     }
 
-    public void evaluatePostPut( HttpServletRequest request, HttpServletResponse response, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
+    public void evaluatePostPut( HttpServletRequest request, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler ) {
     	PathAndMethod pathAndMethod = setup(request);
         if ( pathAndMethod.method() == null ) {
             throw new MethodNotAllowedException();
         }
-        resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler, response);
+        resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
     }
 
     public void evaluateDelete( HttpServletRequest request ) {

@@ -75,8 +75,8 @@ public class ResourceUtil {
         return true;
     }
 
-    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler, HttpServletResponse response ) {
-        findMethod( resource, method ).post(formParams, stream, mediaTypeHandler, response );
+    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
+        findMethod( resource, method ).post(formParams, stream, mediaTypeHandler );
     }
 
     public Resource invokePathMethod( Resource resource, String path ) {
