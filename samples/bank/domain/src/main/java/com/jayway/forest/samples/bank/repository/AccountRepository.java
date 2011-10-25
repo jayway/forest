@@ -38,6 +38,12 @@ public class AccountRepository {
         return accounts.values();
     }
 
+    public Account createAccount( String accountName ) {
+        CheckingAccount account = new CheckingAccount(UUID.randomUUID().toString(), accountName, false);
+        accounts.put( account.getAccountNumber(), account );
+        return account;
+    }
+
     public static Map<String, Account> accounts;
 
     public void initializeDummyAccounts(AccountManager manager) {
