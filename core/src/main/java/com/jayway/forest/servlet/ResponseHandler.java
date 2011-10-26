@@ -98,10 +98,10 @@ public class ResponseHandler {
         }
     }
 
-    public void invoke( HttpServletRequest req, HttpServletResponse resp, RestfulServlet.Runner runner ) {
+    public void invoke( RestfulServlet.Runner runner ) {
         Object responseObject;
         try {
-            responseObject = runner.run(req, resp, mediaTypeHandler);
+            responseObject = runner.run(mediaTypeHandler);
         } catch ( Exception e ) {
             if ( e instanceof CreatedException ) {
                 responseObject = e;
