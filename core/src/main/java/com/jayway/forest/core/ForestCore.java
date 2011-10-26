@@ -63,6 +63,9 @@ public class ForestCore {
 
     public void evaluateDelete( HttpServletRequest request ) {
     	PathAndMethod pathAndMethod = setup(request);
+        if ( !pathAndMethod.method().equals("delete") ) {
+            throw new MethodNotAllowedException();
+        }
         resourceUtil.invokeDelete(evaluatePath(pathAndMethod.pathSegments()));
     }
 

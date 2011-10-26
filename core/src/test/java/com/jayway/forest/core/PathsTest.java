@@ -33,43 +33,26 @@ public class PathsTest extends AbstractRunner {
         expect().statusCode(404).when().get( "/other");
     }
 
-/*
     @Test
     public void invokeIdResourceAsCommand() {
-        mustThrow( webResource.path("test/other/id").type(MediaType.APPLICATION_JSON), "POST", null, 404);
-        mustThrow( webResource.path("test/other/id").type(MediaType.APPLICATION_JSON), "PUT", null, 404);
-        mustThrow( webResource.path("test/other/id").type(MediaType.APPLICATION_JSON), "DELETE", null, 405);
+        expect().statusCode( 404).when().post("/other/id");
+        expect().statusCode( 404).when().put("/other/id");
+        expect().statusCode( 405).when().delete("/other/id");
     }
 
     @Test
     public void invokeResourceAsCommand() {
-        mustThrow( webResource.path("test/other").type(MediaType.APPLICATION_JSON), "POST", null, 404);
-        mustThrow( webResource.path("test/other").type(MediaType.APPLICATION_JSON), "PUT", null, 404);
-        mustThrow( webResource.path("test/other").type(MediaType.APPLICATION_JSON), "DELETE", null, 405);
+        expect().statusCode( 404).when().post("/other");
+        expect().statusCode( 404).when().put("/other");
+        expect().statusCode( 405).when().delete("/other");
     }
 
 
     @Test
-    public void putOnPath() {
-        mustThrow( webResource.path("test/other/id/").type(MediaType.APPLICATION_JSON), "PUT", null, 405);
+    public void onPath() {
+        expect().statusCode( 405 ).when().put("/other/id/");
+        expect().statusCode( 404 ).when().post("/other/id/");
+        expect().statusCode( 405 ).when().delete("/other/id/");
     }
 
-    @Test
-    public void postOnPath() {
-        mustThrow( webResource.path("test/other/id/").type(MediaType.APPLICATION_JSON), "POST", null, 405);
-    }
-
-    @Test
-    public void deleteOnPath() {
-        mustThrow( webResource.path("test/").type(MediaType.APPLICATION_JSON), "DELETE", null, 405);
-        webResource.path("test/other/").type(MediaType.APPLICATION_JSON).delete();
-        Assert.assertEquals( "Delete invoked", StateHolder.get() );
-    }
-
-    @Test
-    public void deleteAsCommand() {
-        webResource.path("test/other/delete").type(MediaType.APPLICATION_JSON).post();
-        Assert.assertEquals( "Delete invoked", StateHolder.get() );
-    }
-*/
 }

@@ -36,18 +36,9 @@ public class ConstraintsTest extends AbstractRunner {
     }
 
 
-/*
     @Test
     public void testIllegalDelete() {
-        //mustThrow(webResource.path("test/other/constraint/").accept(MediaType.APPLICATION_JSON), "DELETE", null, 404);
-        try {
-            delete( "/bank/other/constraint/", String.class);
-            Assert.fail();
-        } catch (IOException e) {
-            Assert.assertTrue(  e instanceof FileNotFoundException );
-        }
-
+        given().expect().statusCode( 405 ).when().delete("/other/contraint/");
     }
-*/
 
 }
