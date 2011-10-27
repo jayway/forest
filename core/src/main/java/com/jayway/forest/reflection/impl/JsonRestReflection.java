@@ -27,7 +27,6 @@ public final class JsonRestReflection implements RestReflection {
         all.addAll( capabilities.getQueries() );
         all.addAll( capabilities.getCommands() );
         all.addAll( capabilities.getResources() );
-        // todo append the whole paging result
         for (Linkable link : capabilities.getDiscoveredLinks()) {
             all.add(new CapabilityLinkable(link));
         }
@@ -36,18 +35,6 @@ public final class JsonRestReflection implements RestReflection {
         }
         results.append("]");
         return results.toString();
-    }
-
-    private void appendMethod( StringBuilder sb, CapabilityReference method ) {
-        sb.append("{\"name\":").append("\"").append(method.name() ).append("\",");
-        sb.append("\"href\": \"").append(method.href()).append("\",");
-        sb.append("\"method\":\"").append(method.httpMethod()).append("\"");
-        if ( method.rel() != null ) {
-            sb.append(", \"rel\":\"").append( method.rel() ).append("\"");
-        }
-        sb.append("}");
-        // todo JSONTemplate
-        // sb.append(",\"jsonTemplate\": generateTemplate( method ) );
     }
 
     private void toMapEntries(List<CapabilityReference> list, StringBuilder results) {
@@ -61,34 +48,40 @@ public final class JsonRestReflection implements RestReflection {
 
     @Override
     public Object renderQueryForm(BaseReflection baseReflection ) {
-        return createMethodDescription( baseReflection );
+        return appendMethod( new StringBuilder(), baseReflection ).toString();
     }
 
     @Override
     public Object renderCommandCreateForm(BaseReflection baseReflection) {
-        return createMethodDescription( baseReflection );
+        return appendMethod(new StringBuilder(), baseReflection).toString();
     }
 
     @Override
     public Object renderCommandDeleteForm(BaseReflection baseReflection) {
-        return createMethodDescription( baseReflection );
+        return appendMethod( new StringBuilder(), baseReflection ).toString();
     }
 
     @Override
     public Object renderCommandForm( BaseReflection baseReflection ) {
-        return createMethodDescription( baseReflection );
+        return appendMethod(new StringBuilder(), baseReflection ).toString();
     }
 
-    private Object createMethodDescription( BaseReflection baseReflection ) {
-        StringBuilder sb = new StringBuilder();
-        sb.append( "{ \"method\":\"").append(baseReflection.httpMethod()).append("\", ");
-        sb.append("\"href\":\"").append(baseReflection.href()).append("\"");
-        String template = createTemplate(baseReflection.method, baseReflection.resource);
-        if ( template != null ) {
-            sb.append(",").append("\"jsonTemplate\":").append(template).append(", ");
+    private StringBuilder appendMethod( StringBuilder sb, CapabilityReference reference ) {
+        sb.append( "{ \"method\":\"").append(reference.httpMethod()).append("\",");
+        sb.append("\"name\":").append("\"").append(reference.name() ).append("\",");
+        sb.append("\"href\":\"").append(reference.href()).append("\"");
+        if ( reference instanceof BaseReflection ) {
+            BaseReflection base = (BaseReflection) reference;
+            String template = createTemplate( base.method, base.resource);
+            if ( template != null ) {
+                sb.append(",\"jsonTemplate\":").append(template);
+            }
+        }
+        if ( reference.rel() != null ) {
+            sb.append(",\"rel\":\"").append( reference.rel() ).append("\"");
         }
         sb.append("}");
-        return sb.toString();
+        return sb;
     }
 
     @Override
@@ -243,7 +236,7 @@ public final class JsonRestReflection implements RestReflection {
             sb.append( templateValue );
         } else if ( clazz == Long.class || clazz == Integer.class ) {
             sb.append( 0 );
-        } else if ( clazz == Double.class ) {
+        } else if ( clazz == Double.class || clazz == Float.class ) {
             sb.append( 0.0 );
         } else if ( clazz == Boolean.class ) {
             sb.append( false );

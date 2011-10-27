@@ -84,18 +84,18 @@ public class ForestCore {
         CapabilityQueryForList discoverMethod = null;
         for ( Method m : clazz.getDeclaredMethods() ) {
             if ( m.isSynthetic() ) continue;
-            Capability method = resourceUtil.createCapability(resource, m);
-            if (method instanceof CapabilityCommand) {
-                capabilities.addCommand(method);
-            } else if (method instanceof CapabilityQueryForList) {
-                capabilities.addQuery(method);
-                if ( method.name().equals( "discover") ) {
-                    discoverMethod = (CapabilityQueryForList) method;
+            Capability capability = resourceUtil.createCapability(resource, m);
+            if (capability instanceof CapabilityCommand) {
+                capabilities.addCommand(capability);
+            } else if (capability instanceof CapabilityQueryForList) {
+                capabilities.addQuery(capability);
+                if ( capability.name().equals( "discover") ) {
+                    discoverMethod = (CapabilityQueryForList) capability;
                 }
-            } else if (method instanceof CapabilityQuery) {
-                capabilities.addQuery(method);
-            } else if (method instanceof CapabilitySubResource) {
-                capabilities.addResource(method);
+            } else if (capability instanceof CapabilityQuery) {
+                capabilities.addQuery(capability);
+            } else if (capability instanceof CapabilitySubResource) {
+                capabilities.addResource(capability);
             }
         }
         if ( resource instanceof IdDiscoverableResource) {

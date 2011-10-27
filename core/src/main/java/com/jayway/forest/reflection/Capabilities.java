@@ -1,5 +1,7 @@
 package com.jayway.forest.reflection;
 
+import com.jayway.forest.reflection.impl.CapabilityCommand;
+import com.jayway.forest.reflection.impl.CapabilityQuery;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
 
@@ -21,11 +23,11 @@ public class Capabilities {
 	public Capabilities(String name) {
 		this.name = name;
 	}
-	public void addQuery(Capability method) {
-		queries.add(method);
+	public void addQuery(Capability query) {
+		queries.add(query);
 	}
-	public void addCommand(Capability method) {
-		commands.add(method);
+	public void addCommand(Capability command) {
+		commands.add(command);
 	}
 	public void addResource(Capability method) {
 		resources.add(method);
