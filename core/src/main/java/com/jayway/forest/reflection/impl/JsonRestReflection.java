@@ -30,6 +30,9 @@ public final class JsonRestReflection implements RestReflection {
         for (Linkable link : capabilities.getDiscoveredLinks()) {
             all.add(new CapabilityLinkable(link));
         }
+        if ( capabilities.getIdResource() != null ) {
+            all.add( capabilities.getIdResource());
+        }
         if ( !all.isEmpty() ) {
             toMapEntries(all, results);
         }

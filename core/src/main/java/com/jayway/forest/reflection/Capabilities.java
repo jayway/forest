@@ -16,6 +16,7 @@ public class Capabilities {
 	private final List<Capability> resources = new LinkedList<Capability>();
 	private Object description;
     private PagedSortedListResponse discovered;
+    private Capability idResource;
 
     public void setDescriptionResult(Object description) {
 		this.description = description;
@@ -56,5 +57,12 @@ public class Capabilities {
     }
     public PagedSortedListResponse<?> getPagedSortedListResponse() {
         return discovered;
+    }
+
+    public void addIdResource(Capability capability) {
+        this.idResource = capability;
+    }
+    public Capability getIdResource() {
+        return idResource;
     }
 }

@@ -18,7 +18,7 @@ public class CapabilityIdResource extends Capability {
 	private final IdResource idResource;
 
 	public CapabilityIdResource(IdResource idResource, String name, String documentation) {
-		super(name, documentation, null);
+		super(name, documentation, idResource.getClass().getSimpleName()+":id");
 		this.idResource = idResource;
 	}
 

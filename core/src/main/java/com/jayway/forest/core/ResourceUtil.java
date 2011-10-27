@@ -124,11 +124,11 @@ public class ResourceUtil {
             } else {
                 String documentation = getDocumentation(method);
                 if ( resource instanceof DeletableResource && method.getName().equals("delete") ) {
-                    return new CapabilityDeleteCommand((DeletableResource) resource, documentation,method.getName() );
+                    return new CapabilityDeleteCommand((DeletableResource) resource, documentation );
                 } else if (method.getReturnType().equals(Void.TYPE)) {
                     return new CapabilityCommand(method, resource, documentation, method.getName() );
                 } else if (resource instanceof CreatableResource && method.getName().equals( "create" )) {
-                    return new CapabilityCreateCommand(method, (CreatableResource) resource, documentation, method.getName() );
+                    return new CapabilityCreateCommand(method, (CreatableResource) resource, documentation );
                 } else if (Resource.class.isAssignableFrom(method.getReturnType())) {
                     if (method.getParameterTypes().length == 0) return new CapabilitySubResource(resource, method, documentation);
                     else if (resource instanceof IdResource) return new CapabilityIdResource((IdResource) resource, name, documentation);

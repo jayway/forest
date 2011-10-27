@@ -12,10 +12,7 @@ import com.jayway.forest.exceptions.MethodNotAllowedException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.*;
-import com.jayway.forest.reflection.impl.CapabilityCommand;
-import com.jayway.forest.reflection.impl.CapabilityQuery;
-import com.jayway.forest.reflection.impl.CapabilitySubResource;
-import com.jayway.forest.reflection.impl.CapabilityQueryForList;
+import com.jayway.forest.reflection.impl.*;
 import com.jayway.forest.roles.DescribedResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Resource;
@@ -96,6 +93,8 @@ public class ForestCore {
                 capabilities.addQuery(capability);
             } else if (capability instanceof CapabilitySubResource) {
                 capabilities.addResource(capability);
+            } else if ( capability instanceof CapabilityIdResource ) {
+                capabilities.addIdResource( capability );
             }
         }
         if ( resource instanceof IdDiscoverableResource) {

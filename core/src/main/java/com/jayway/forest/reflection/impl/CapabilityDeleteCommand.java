@@ -12,8 +12,8 @@ public class CapabilityDeleteCommand extends CapabilityCommand {
 
     private DeletableResource deletable;
 
-    public CapabilityDeleteCommand(DeletableResource resource, String documentation, String rel) {
-		super(DeletableResource.class.getDeclaredMethods()[0], resource, documentation, rel);
+    public CapabilityDeleteCommand(DeletableResource resource, String documentation ) {
+		super(DeletableResource.class.getDeclaredMethods()[0], resource, documentation, resource.getClass().getSimpleName()+"Delete");
         this.deletable = resource;
 	}
 

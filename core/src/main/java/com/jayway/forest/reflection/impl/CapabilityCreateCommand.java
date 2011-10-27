@@ -15,8 +15,8 @@ public class CapabilityCreateCommand extends CapabilityCommand {
 
     private CreatableResource creatable;
 
-    public CapabilityCreateCommand( Method method, CreatableResource resource, String documentation, String rel) {
-		super( method, resource, documentation, rel);
+    public CapabilityCreateCommand( Method method, CreatableResource resource, String documentation ) {
+		super( method, resource, documentation, resource.getClass().getSimpleName()+"Create");
         this.creatable = resource;
 	}
 

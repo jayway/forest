@@ -19,7 +19,7 @@ public class CapabilitiesTest extends AbstractRunner {
     
     @Test
     public void testRoot() throws IOException {
-        System.out.println( get("/").asString() );
+        System.out.println( get("/other/").asString() );
     }
 
 
