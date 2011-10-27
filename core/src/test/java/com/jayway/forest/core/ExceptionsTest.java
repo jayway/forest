@@ -31,22 +31,22 @@ public class ExceptionsTest extends AbstractRunner {
 
     @Test
     public void mappedCheckedExceptionCommand() {
-        given().expect().statusCode(409).post("/exceptions/mappedcheckedcommand");
+        given().expect().statusCode(409).put("/exceptions/mappedcheckedcommand");
     }
 
     @Test
     public void unmappedCheckedExceptionCommand() {
-        given().expect().statusCode(409).post("/exceptions/mappedunchecketcommand");
+        given().expect().statusCode(409).put("/exceptions/mappedunchecketcommand");
     }
 
     @Test
     public void mappedUncheckedExceptionCommand() {
-        given().expect().statusCode(500).post("/exceptions/unmappedchecketcommand");
+        given().expect().statusCode(500).put("/exceptions/unmappedchecketcommand");
     }
 
     @Test
     public void unMappedUncheckedExceptionCommand() {
-        given().expect().statusCode(500).post("/exceptions/unmappedunchecketcommand");
+        given().expect().statusCode(500).put("/exceptions/unmappedunchecketcommand");
     }
 
 

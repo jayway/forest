@@ -13,11 +13,11 @@ import java.util.*;
 
 import static com.jayway.forest.core.RoleManager.role;
 
-public class QueryForListCapability extends QueryCapability {
+public class CapabilityQueryForList extends CapabilityQuery {
 
     private DependencyInjectionSPI dependencyInjectionSPI;
 
-    public QueryForListCapability(DependencyInjectionSPI dependencyInjectionSPI, Resource resource, Method method, String documentation) {
+    public CapabilityQueryForList(DependencyInjectionSPI dependencyInjectionSPI, Resource resource, Method method, String documentation) {
         super( resource, method, documentation, method.getName() );
         this.dependencyInjectionSPI = dependencyInjectionSPI;
     }

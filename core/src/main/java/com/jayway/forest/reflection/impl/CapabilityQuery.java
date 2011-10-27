@@ -9,20 +9,15 @@ import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class QueryCapability extends BaseReflectionCapability {
-    protected final Resource resource;
-    protected final Method method;
+public class CapabilityQuery extends BaseReflection {
 
-    public QueryCapability(Resource resource, Method method, String documentation, String rel) {
-        super(method.getName(), documentation, rel);
-        this.resource = resource;
-        this.method = method;
+    public CapabilityQuery(Resource resource, Method method, String documentation, String rel) {
+        super(method, resource, method.getName(), documentation, rel);
     }
 
     @Override
@@ -59,13 +54,18 @@ public class QueryCapability extends BaseReflectionCapability {
     }
 
     @Override
+    public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+        throw new MethodNotAllowedRenderTemplateException( this );
+    }
+
+    @Override
     public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
-        throw new NotFoundException();
+        throw new MethodNotAllowedRenderTemplateException( this );
     }
 
     @Override
     public void delete() {
-        throw new NotFoundException();
+        throw new MethodNotAllowedRenderTemplateException( this );
     }
 
     @Override
@@ -79,6 +79,6 @@ public class QueryCapability extends BaseReflectionCapability {
 
     @Override
     public Object renderForm(RestReflection restReflection) {
-        return restReflection.renderQueryForm(method, resource);
+        return restReflection.renderQueryForm( this );
     }
 }

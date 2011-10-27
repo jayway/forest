@@ -17,14 +17,14 @@ public class JSONParsingTest extends AbstractRunner {
     @Test
     public void testCommandSimple() {
         String body = "Hello";
-        given().body( body ).expect().statusCode(400).when().post("/command");
+        given().body( body ).expect().statusCode(400).when().put("/command");
     }
 
 
     @Test
     public void testCommandAcceptsEnum() {
         String body = "\"One\"";
-        given().body( body ).expect().statusCode(200).when().post("/commandenum");
+        given().body( body ).expect().statusCode(200).when().put("/commandenum");
 
         Value value = (Value) StateHolder.get();
         Assert.assertEquals( value, Value.One );

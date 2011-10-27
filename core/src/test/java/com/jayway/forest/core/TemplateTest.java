@@ -8,37 +8,46 @@ import java.io.IOException;
 
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 
 public class TemplateTest extends AbstractRunner {
 
     @Test
     public void testTemplate() throws IOException {
-        String json = given().expect().statusCode(405).when().get("/templates/updatewithtemplate").andReturn().as(String.class);
-
-        assertEquals("Template Content", json);
+        given().expect().statusCode(405).
+                body("jsonTemplate", equalTo("Template Content")).when().get("/templates/updatewithtemplate");
     }
 
     @Test
     public void testCommandSimple() throws IOException {
-        String json = given().expect().statusCode(405).when().get("/templates/command").andReturn().as(String.class);
-        assertEquals("", json);
+        given().expect().statusCode(405).
+                body("jsonTemplate", equalTo("")).when().get("/templates/command");
     }
 
 
     @Test
     public void testQueryWithNoArgument() throws IOException {
-        given().expect().statusCode(405).body( is("[0,{\"integer\":0}]") ).when().get("/templates/add");
+        given().expect().statusCode(405).
+                body( "jsonTemplate[0]", equalTo(0) ).
+                body( "jsonTemplate[1].integer", equalTo(0) ).
+                when().get("/templates/add");
     }
 
     @Test
     public void testQueryWithNoArgumentTemplate() throws IOException {
-        given().expect().statusCode(405).body( is("[17,{\"integer\":63}]") ).when().get("/templates/addwithtemplates");
+        given().expect().statusCode(405).
+                body( "jsonTemplate[0]", equalTo(17) ).
+                body( "jsonTemplate[1].integer", equalTo(63) ).
+                when().get("/templates/addwithtemplates");
     }
 
     @Test
     public void testQueryWithNoArgumentWrongTemplate() throws IOException {
-        given().expect().statusCode(405).body( is("[0,{\"integer\":0}]") ).when().get("/templates/addwithwrongtemplates");
+        given().expect().statusCode(405).
+                body( "jsonTemplate[0]", equalTo(0) ).
+                body( "jsonTemplate[1].integer", equalTo(0) ).
+                when().get("/templates/addwithwrongtemplates");
     }
 
     @Test
@@ -60,23 +69,23 @@ public class TemplateTest extends AbstractRunner {
 
     @Test
     public void testTemplateWrongType() throws IOException {
-        String jsonTemplate = given().expect().statusCode(405).when().get("/templates/withwrongtemplatetype").andReturn().asString();
-
-        Assert.assertTrue("Must be empty json string", jsonTemplate.equals("\"\""));
+        given().expect().statusCode(405).
+                body( "jsonTemplate", equalTo("")).
+                when().get("/templates/withwrongtemplatetype");
     }
 
     @Test
     public void testNonexistentTemplate() throws IOException {
-        String jsonTemplate = given().expect().statusCode(405).when().get("/templates/withnonexistingtemplate").andReturn().asString();
-
-        Assert.assertTrue("Must be empty json string", jsonTemplate.equals("\"\""));
+        given().expect().statusCode(405).
+                body( "jsonTemplate", equalTo("")).
+                when().get("/templates/withnonexistingtemplate");
     }
 
     @Test
     public void testTemplateWithArgument() throws IOException {
-        String jsonTemplate = given().expect().statusCode(405).when().get("/templates/templatemethodwithargument").andReturn().asString();
-
-        Assert.assertTrue("Must be empty json string", jsonTemplate.equals("\"\""));
+        given().expect().statusCode(405).
+                body( "jsonTemplate", equalTo("")).
+                when().get("/templates/templatemethodwithargument");
     }
 
 }

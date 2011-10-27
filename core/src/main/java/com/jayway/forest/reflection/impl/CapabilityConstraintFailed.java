@@ -13,15 +13,21 @@ import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
-public class CapabilityNotAllowed extends Capability {
-	public CapabilityNotAllowed(String name) {
+public class CapabilityConstraintFailed extends Capability {
+	public CapabilityConstraintFailed(String name) {
 		super(name, null, null);
 	}
 	@Override
 	public Object get(HttpServletRequest request) {
 		throw new UnauthorizedException();
 	}
-	@Override
+
+    @Override
+    public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+        throw new UnauthorizedException();
+    }
+
+    @Override
 	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
 		throw new UnauthorizedException();
 	}
@@ -35,7 +41,7 @@ public class CapabilityNotAllowed extends Capability {
 	}
 	@Override
 	public String httpMethod() {
-		return "GET";
+		return "N/A";
 	}
 	@Override
 	public Object renderForm(RestReflection restReflection) {

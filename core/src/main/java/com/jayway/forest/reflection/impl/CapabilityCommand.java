@@ -2,26 +2,23 @@ package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.*;
+import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
+import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.DeletableResource;
 import com.jayway.forest.roles.Resource;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class CommandCapability extends BaseReflectionCapability {
-	protected final Method method;
-	protected final Resource resource;
+public class CapabilityCommand extends BaseReflection {
 
-	public CommandCapability(Method method, Resource resource, String documentation, String rel) {
-		super(method.getName(), documentation, rel);
-		this.method = method;
-		this.resource = resource;
+	public CapabilityCommand(Method method, Resource resource, String documentation, String rel) {
+		super(method, resource, method.getName(), documentation, rel);
 	}
 
 	@Override
@@ -29,13 +26,27 @@ public class CommandCapability extends BaseReflectionCapability {
 		throw new MethodNotAllowedRenderTemplateException( this );
 	}
 
-	@Override
-	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
+    @Override
+    public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
         Object[] arguments = stream == null ? arguments(method, formParams ) : arguments( method, stream, mediaTypeHandler );
         invokeCommand( arguments );
+    }
+
+    @Override
+	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
+        if ( mediaTypeHandler.acceptHtml() ) {
+            put(formParams, stream, mediaTypeHandler);
+        } else {
+            throw new MethodNotAllowedRenderTemplateException( this );
+        }
 	}
 
-	public <T extends Resource> void invokeCommand(Object... arguments) {
+    @Override
+    public void delete() {
+        throw new MethodNotAllowedRenderTemplateException( this );
+    }
+
+    protected <T extends Resource> void invokeCommand(Object... arguments) {
         try {
             method.invoke( resource, arguments );
         } catch (InvocationTargetException e) {
@@ -70,11 +81,6 @@ public class CommandCapability extends BaseReflectionCapability {
     }
 
 	@Override
-	public void delete() {
-        ((DeletableResource) resource).delete();
-	}
-
-	@Override
 	public Resource subResource(String path) {
 		throw new NotFoundException();
 	}
@@ -86,6 +92,6 @@ public class CommandCapability extends BaseReflectionCapability {
 
 	@Override
 	public Object renderForm(RestReflection restReflection) {
-		return restReflection.renderCommandForm(method, resource);
+		return restReflection.renderCommandForm(this);
 	}
 }

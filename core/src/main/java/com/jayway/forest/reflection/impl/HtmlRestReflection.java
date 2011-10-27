@@ -83,13 +83,23 @@ public final class HtmlRestReflection implements RestReflection {
     }
 
     @Override
-    public Object renderCommandForm(Method method, Resource resource) {
-        return createForm(method, "POST", resource);
+    public Object renderQueryForm( BaseReflection  baseReflection ) {
+        return createForm(baseReflection.method, "GET", baseReflection.resource);
     }
 
     @Override
-    public Object renderQueryForm(Method method, Resource resource) {
-        return createForm(method, "GET", resource);
+    public Object renderCommandDeleteForm(BaseReflection  baseReflection) {
+        return createForm(baseReflection.method, "POST", baseReflection.resource);
+    }
+
+    @Override
+    public Object renderCommandCreateForm(BaseReflection  baseReflection) {
+        return createForm(baseReflection.method, "POST", baseReflection.resource);
+    }
+
+    @Override
+    public Object renderCommandForm(BaseReflection  baseReflection) {
+        return createForm(baseReflection.method, "POST", baseReflection.resource);
     }
 
     private void appendPagingInfo( StringBuilder sb, PagedSortedListResponse response, boolean stripName ) {

@@ -13,14 +13,14 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public final class JsonRestReflection implements RestReflection {
-	
-	public static final RestReflection INSTANCE = new JsonRestReflection();
-	
-	private JsonRestReflection() {
-	}
 
-	@Override
-	public Object renderCapabilities(Capabilities capabilities) {
+    public static final RestReflection INSTANCE = new JsonRestReflection();
+
+    private JsonRestReflection() {
+    }
+
+    @Override
+    public Object renderCapabilities(Capabilities capabilities) {
         StringBuilder results = new StringBuilder( );
         results.append("[");
         List<CapabilityReference> all = new LinkedList<CapabilityReference>();
@@ -29,14 +29,14 @@ public final class JsonRestReflection implements RestReflection {
         all.addAll( capabilities.getResources() );
         // todo append the whole paging result
         for (Linkable link : capabilities.getDiscoveredLinks()) {
-            all.add(new LinkCapabilityReference(link));
+            all.add(new CapabilityLinkable(link));
         }
         if ( !all.isEmpty() ) {
             toMapEntries(all, results);
         }
         results.append("]");
-		return results.toString();
-	}
+        return results.toString();
+    }
 
     private void appendMethod( StringBuilder sb, CapabilityReference method ) {
         sb.append("{\"name\":").append("\"").append(method.name() ).append("\",");
@@ -59,16 +59,37 @@ public final class JsonRestReflection implements RestReflection {
         }
     }
 
-    // TODO pass in Resource
-	@Override
-	public Object renderCommandForm(Method method, Resource resource) {
-		return createForm(method, "POST", resource);
-	}
+    @Override
+    public Object renderQueryForm(BaseReflection baseReflection ) {
+        return createMethodDescription( baseReflection );
+    }
 
-	@Override
-	public Object renderQueryForm(Method method, Resource resource ) {
-		return createForm(method, "GET", resource );
-	}
+    @Override
+    public Object renderCommandCreateForm(BaseReflection baseReflection) {
+        return createMethodDescription( baseReflection );
+    }
+
+    @Override
+    public Object renderCommandDeleteForm(BaseReflection baseReflection) {
+        return createMethodDescription( baseReflection );
+    }
+
+    @Override
+    public Object renderCommandForm( BaseReflection baseReflection ) {
+        return createMethodDescription( baseReflection );
+    }
+
+    private Object createMethodDescription( BaseReflection baseReflection ) {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "{ \"method\":\"").append(baseReflection.httpMethod()).append("\", ");
+        sb.append("\"href\":\"").append(baseReflection.href()).append("\"");
+        String template = createTemplate(baseReflection.method, baseReflection.resource);
+        if ( template != null ) {
+            sb.append(",").append("\"jsonTemplate\":").append(template).append(", ");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
 
     @Override
     public Object renderListResponse(PagedSortedListResponse response) {
@@ -109,7 +130,7 @@ public final class JsonRestReflection implements RestReflection {
     @Override
     public Object renderCreatedResponse(Linkable linkable) {
         StringBuilder sb = new StringBuilder();
-        appendMethod(sb, new LinkCapabilityReference( linkable ) );
+        appendMethod(sb, new CapabilityLinkable( linkable ) );
         return sb.toString();
     }
 
@@ -128,8 +149,8 @@ public final class JsonRestReflection implements RestReflection {
         }
     }
 
-    protected String createForm( Method method, String httpMethod, Resource resource ) {
-        if ( method.getParameterTypes().length == 0 ) return "";
+    private String createTemplate(Method method, Resource resource) {
+        if ( method.getParameterTypes().length == 0 ) return null;
         List<Parameter> parameters = ReflectionUtil.parameterList(method, resource);
         final StringBuilder sb = new StringBuilder();
         if ( parameters.size() > 1 ) {
@@ -156,7 +177,7 @@ public final class JsonRestReflection implements RestReflection {
         }
     }
 
-    private void defaultInstanceComposed(StringBuilder sb, Class<?> clazz, Type genericType, Object templateValue ) {
+    private void defaultInstanceComposed(final StringBuilder sb, Class<?> clazz, Type genericType, Object templateValue ) {
         if ( genericType instanceof ParameterizedType ) {
             Type rawType = ((ParameterizedType) genericType).getRawType();
             if (  List.class.isAssignableFrom( (Class) rawType ) ) {
@@ -188,22 +209,24 @@ public final class JsonRestReflection implements RestReflection {
             sb.append("{}");
             return;
         }
+        final Object finalTemplateValue = templateValue;
+        IterableCallback.element( sb, Arrays.asList( clazz.getDeclaredFields()), new Callback<Field>(){
+            public void callback(Field field) {
+                if ( Modifier.isStatic( field.getModifiers() )) return;
+                if ( Modifier.isFinal(field.getModifiers())) return;
+                sb.append("\"").append(field.getName()).append("\":");
+                if ( finalTemplateValue != null ) {
+                    try {
+                        field.setAccessible(true);
+                        jsonTemplateForParameter(sb, field.getType(), field.getGenericType(), field.get(finalTemplateValue));
+                    } catch (IllegalAccessException e) {
 
-        for (Field field : clazz.getDeclaredFields()) {
-            if ( Modifier.isStatic( field.getModifiers() )) continue;
-            if ( Modifier.isFinal(field.getModifiers())) continue;
-            sb.append("\"").append(field.getName()).append("\":");
-            if ( templateValue != null ) {
-                try {
-                    field.setAccessible(true);
-                    jsonTemplateForParameter(sb, field.getType(), field.getGenericType(), field.get(templateValue));
-                } catch (IllegalAccessException e) {
-
-                }  // what about no such field exception???
-            } else {
-                jsonTemplateForParameter(sb, field.getType(), field.getGenericType(), null);
+                    }
+                } else {
+                    jsonTemplateForParameter(sb, field.getType(), field.getGenericType(), null);
+                }
             }
-        }
+        });
         if ( clazz.getSuperclass() != null && clazz.getSuperclass() != Object.class ) {
             defaultInstanceComposed(sb, clazz.getSuperclass(), clazz.getSuperclass(), templateValue);
         }

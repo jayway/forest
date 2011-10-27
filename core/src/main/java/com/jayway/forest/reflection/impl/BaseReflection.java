@@ -1,6 +1,7 @@
 package com.jayway.forest.reflection.impl;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
@@ -8,11 +9,17 @@ import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.ReflectionUtil;
+import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.UriInfo;
 
-public abstract class BaseReflectionCapability extends Capability {
-	public BaseReflectionCapability(String name, String documentation, String rel) {
+public abstract class BaseReflection extends Capability {
+    protected final Resource resource;
+    protected final Method method;
+
+    public BaseReflection(Method method, Resource resource, String name, String documentation, String rel) {
 		super(name, documentation, rel);
+        this.method = method;
+        this.resource = resource;
 	}
 
     protected Object mapArguments( Class<?> dto, Map<String,String[]> formParams, String prefix ) {

@@ -34,8 +34,8 @@ public class RestfulServlet extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI ).invoke( new Runner() {
-            public Object run(MediaTypeHandler mediaType) throws IOException {
-                return forest.evaluateGet(req);
+            public Object run(MediaTypeHandler mediaType) {
+                return forest.get(req);
             }
         });
     }
@@ -44,11 +44,11 @@ public class RestfulServlet extends HttpServlet {
     protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI  ).invoke(new Runner() {
             @SuppressWarnings("unchecked")
-            public Object run(MediaTypeHandler mediaType) throws Exception {
+            public Object run(MediaTypeHandler mediaType) throws IOException {
                 if (mediaType.contentTypeFormUrlEncoded()) {
-                    forest.evaluatePostPut(req, null, req.getParameterMap(), mediaType );
+                    forest.post(req, null, req.getParameterMap(), mediaType);
                 } else {
-                    forest.evaluatePostPut(req, req.getInputStream(), null, mediaType);
+                    forest.post(req, req.getInputStream(), null, mediaType);
                 }
                 return ResponseHandler.SUCCESS_RESPONSE;
             }
@@ -56,21 +56,31 @@ public class RestfulServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doPost( req, resp );
+    protected void doPut(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI  ).invoke(new Runner() {
+            @SuppressWarnings("unchecked")
+            public Object run(MediaTypeHandler mediaType) throws IOException {
+                if (mediaType.contentTypeFormUrlEncoded()) {
+                    forest.put(req, null, req.getParameterMap(), mediaType);
+                } else {
+                    forest.put(req, req.getInputStream(), null, mediaType);
+                }
+                return ResponseHandler.SUCCESS_RESPONSE;
+            }
+        });
     }
 
     @Override
     protected void doDelete(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI ).invoke(new Runner() {
-            public String run( MediaTypeHandler mediaType) throws Exception {
-                forest.evaluateDelete(req);
+            public String run( MediaTypeHandler mediaType) {
+                forest.delete(req);
                 return ResponseHandler.SUCCESS_RESPONSE;
             }
         });
     }
 
     public interface Runner {
-        Object run( MediaTypeHandler mediaTypeHandler ) throws Exception;
+        Object run( MediaTypeHandler mediaTypeHandler ) throws IOException;
     }
 }

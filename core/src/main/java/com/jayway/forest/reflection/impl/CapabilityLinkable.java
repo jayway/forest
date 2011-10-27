@@ -3,11 +3,11 @@ package com.jayway.forest.reflection.impl;
 import com.jayway.forest.reflection.CapabilityReference;
 import com.jayway.forest.roles.Linkable;
 
-public class LinkCapabilityReference implements CapabilityReference {
+public class CapabilityLinkable implements CapabilityReference {
 	
 	private final Linkable linkable;
 
-	public LinkCapabilityReference(Linkable linkable) {
+	public CapabilityLinkable(Linkable linkable) {
 		this.linkable = linkable;
 	}
 

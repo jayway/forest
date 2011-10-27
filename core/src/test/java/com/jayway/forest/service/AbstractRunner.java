@@ -14,7 +14,7 @@ import static com.jayway.restassured.parsing.Parser.JSON;
  */
 public class AbstractRunner {
 
-    private static ServletTester tester;
+    protected static ServletTester tester;
 
     @Before
     public void setup() {

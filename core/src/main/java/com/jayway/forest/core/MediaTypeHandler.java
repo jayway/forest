@@ -64,6 +64,10 @@ public class MediaTypeHandler {
         return accept;
     }
 
+    public boolean acceptHtml() {
+        return accept.equals( TEXT_HTML );
+    }
+
     public boolean contentTypeJSON() {
         return contentTypeApplicationJSON;
     }

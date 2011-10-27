@@ -73,13 +73,22 @@ public class AtomRestReflection implements RestReflection {
     }
 
     @Override
-    public Object renderCommandForm(Method method, Resource resource ) {
+    public Object renderCommandForm( BaseReflection baseReflection ) {
         throw new UnsupportedMediaTypeException();
     }
 
     @Override
-    public Object renderQueryForm(Method method, Resource resource ) {
+    public Object renderQueryForm(BaseReflection baseReflection) {
         throw new UnsupportedMediaTypeException();
     }
 
+    @Override
+    public Object renderCommandCreateForm(BaseReflection baseReflection) {
+        throw new UnsupportedMediaTypeException();
+    }
+
+    @Override
+    public Object renderCommandDeleteForm(BaseReflection baseReflection) {
+        throw new UnsupportedMediaTypeException();
+    }
 }

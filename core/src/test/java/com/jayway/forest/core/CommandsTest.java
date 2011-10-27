@@ -26,7 +26,7 @@ public class CommandsTest extends AbstractRunner {
                 statusCode(200).
                 body(containsString("Operation completed successfully")).
         when().
-                post("/command");
+                put("/command");
 
         assertThat(StateHolder.get().toString(), equalTo("second"));
     }
@@ -38,13 +38,13 @@ public class CommandsTest extends AbstractRunner {
 
     @Test
     public void testAddCommand() {
-        given().body("[10, \n{ \"integer\": 32}]").when().post("/addcommand");
+        given().body("[10, \n{ \"integer\": 32}]").when().put("/addcommand");
         assertEquals(42, StateHolder.get());
     }
 
     @Test
     public void testCommandList() throws IOException {
-        given().body("[\"Hello\"]").when().post("/commandlist");
+        given().body("[\"Hello\"]").when().put("/commandlist");
 
         assertEquals("SuccessHello", StateHolder.get());
     }
@@ -56,12 +56,12 @@ public class CommandsTest extends AbstractRunner {
             expect().
                     statusCode(400).
             when().
-                    post( "/commandlist");
+                    put( "/commandlist");
     }
 
     @Test @SuppressWarnings("unchecked")
     public void testCommandAddToList() {
-        given().body("[[\"Hello\"], \"World\"]").when().post("/addtolist");
+        given().body("[[\"Hello\"], \"World\"]").expect().statusCode(200).when().put("/addtolist");
 
 		List<String> list = (List<String>) StateHolder.get();
         assertEquals("HelloWorld", list.get(0) + list.get(1));
@@ -69,7 +69,7 @@ public class CommandsTest extends AbstractRunner {
 
     @Test @SuppressWarnings("unchecked")
     public void testComplex() {
-        given().body("[[[\"Hello\", \"World\"]]]").when().post("/complex");
+        given().body("[[[\"Hello\", \"World\"]]]").expect().statusCode(200).when().put("/complex");
 
 		List<List<List<String>>> list = (List<List<List<String>>>) StateHolder.get();
         String result = "";

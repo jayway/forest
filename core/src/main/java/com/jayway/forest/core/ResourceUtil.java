@@ -1,33 +1,26 @@
 package com.jayway.forest.core;
 
+import com.jayway.forest.constraint.Constraint;
+import com.jayway.forest.constraint.ConstraintEvaluator;
+import com.jayway.forest.constraint.Doc;
+import com.jayway.forest.di.DependencyInjectionSPI;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.impl.*;
+import com.jayway.forest.roles.CreatableResource;
+import com.jayway.forest.roles.DeletableResource;
+import com.jayway.forest.roles.IdResource;
+import com.jayway.forest.roles.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.jayway.forest.reflection.impl.*;
-import com.jayway.forest.roles.CreatableResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.jayway.forest.constraint.Constraint;
-import com.jayway.forest.constraint.ConstraintEvaluator;
-import com.jayway.forest.constraint.Doc;
-import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.reflection.impl.CommandCapability;
-import com.jayway.forest.reflection.impl.IdCapability;
-import com.jayway.forest.reflection.impl.QueryCapability;
-import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.impl.SubResource;
-import com.jayway.forest.roles.IdResource;
-import com.jayway.forest.roles.Resource;
 
 /**
  */
@@ -38,6 +31,22 @@ public class ResourceUtil {
 
     public ResourceUtil(DependencyInjectionSPI dependencyInjectionSPI) {
         this.dependencyInjectionSPI = dependencyInjectionSPI;
+    }
+
+    public Object get( HttpServletRequest request, Resource resource, String get ) {
+        return findCapability(resource, get).get(request);
+    }
+
+    public void put( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
+        findCapability(resource, method).put(formParams, stream, mediaTypeHandler );
+    }
+
+    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
+        findCapability(resource, method).post(formParams, stream, mediaTypeHandler );
+    }
+
+    public void delete(Resource resource, String delete) {
+        findCapability(resource, delete).delete();
     }
 
     private String getDocumentation( Method method ) {
@@ -75,15 +84,11 @@ public class ResourceUtil {
         return true;
     }
 
-    public void post( Resource resource, String method, Map<String,String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
-        findMethod( resource, method ).post(formParams, stream, mediaTypeHandler );
-    }
-
     public Resource invokePathMethod( Resource resource, String path ) {
-        return findMethod( resource, path).subResource(path);
+        return findCapability(resource, path).subResource(path);
     }
 
-    Capability findMethod( Resource resource, String name ) {
+    private Capability findCapability(Resource resource, String name) {
         Class<? extends Resource> clazz = resource.getClass();
         if ( "create".equals( name ) && resource instanceof CreatableResource ) {
             try {
@@ -92,7 +97,7 @@ public class ResourceUtil {
                         Type genericType = ((ParameterizedType) type).getActualTypeArguments()[0];
                         // no generic types supported in the Parameterized type of CreatableResource
                         Method method = clazz.getDeclaredMethod("create", (Class)genericType);
-                        return makeResourceMethod(resource, method );
+                        return createCapability(resource, method);
                     }
                 }
             } catch (NoSuchMethodException e) {
@@ -102,44 +107,38 @@ public class ResourceUtil {
         for ( Method method : clazz.getDeclaredMethods() ) {
             if ( method.isSynthetic() ) continue;
             if ( method.getName().equals( name ) ) {
-                return makeResourceMethod( resource, method );
+                return createCapability(resource, method);
             }
         }
         if (resource instanceof IdResource) {
-            return new IdCapability((IdResource) resource, name, null);
+            return new CapabilityIdResource((IdResource) resource, name, null);
         }
         return CapabilityNotFound.INSTANCE;
     }
 
-    public Capability makeResourceMethod(Resource resource, Method method) {
+    public Capability createCapability(Resource resource, Method method) {
         if (!Modifier.isAbstract(method.getModifiers()) && Modifier.isPublic(method.getModifiers())) {
             String name = method.getName();
             if (!checkConstraint(resource, method)) {
-                return new CapabilityNotAllowed(name);
+                return new CapabilityConstraintFailed(name);
             } else {
                 String documentation = getDocumentation(method);
-                if (method.getReturnType().equals(Void.TYPE)) {
-                    return new CommandCapability(method, resource, documentation, method.getName() );
+                if ( resource instanceof DeletableResource && method.getName().equals("delete") ) {
+                    return new CapabilityDeleteCommand((DeletableResource) resource, documentation,method.getName() );
+                } else if (method.getReturnType().equals(Void.TYPE)) {
+                    return new CapabilityCommand(method, resource, documentation, method.getName() );
                 } else if (resource instanceof CreatableResource && method.getName().equals( "create" )) {
-                    return new CreateCommandCapability( method, resource, documentation, method.getName() );
+                    return new CapabilityCreateCommand(method, (CreatableResource) resource, documentation, method.getName() );
                 } else if (Resource.class.isAssignableFrom(method.getReturnType())) {
-                    if (method.getParameterTypes().length == 0) return new SubResource(resource, method, documentation);
-                    else if (resource instanceof IdResource) return new IdCapability((IdResource) resource, name, documentation);
+                    if (method.getParameterTypes().length == 0) return new CapabilitySubResource(resource, method, documentation);
+                    else if (resource instanceof IdResource) return new CapabilityIdResource((IdResource) resource, name, documentation);
                 } else if ( Iterable.class.isAssignableFrom( method.getReturnType() )) {
-                    return new QueryForListCapability(dependencyInjectionSPI, resource, method, documentation );
+                    return new CapabilityQueryForList(dependencyInjectionSPI, resource, method, documentation );
                 } else {
-                    return new QueryCapability(resource, method, documentation, method.getName());
+                    return new CapabilityQuery(resource, method, documentation, method.getName());
                 }
             }
         }
         return CapabilityNotFound.INSTANCE;
-    }
-
-    public void invokeDelete( Resource resource ) {
-        findMethod( resource, "delete").delete();
-    }
-
-    public Object get( HttpServletRequest request, Resource resource, String get ) {
-        return findMethod(resource, get).get(request);
     }
 }

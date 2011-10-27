@@ -2,10 +2,7 @@ package com.jayway.forest.servlet;
 
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.exceptions.AbstractHtmlException;
-import com.jayway.forest.exceptions.CreatedException;
-import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
-import com.jayway.forest.exceptions.WrappedException;
+import com.jayway.forest.exceptions.*;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
@@ -52,7 +49,7 @@ public class ResponseHandler {
     private HttpServletResponse response;
     private ExceptionMapper exceptionMapper;
 
-    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) {
+    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) throws IOException {
         mediaTypeHandler = new MediaTypeHandler(request, response );
         this.response = response;
         this.exceptionMapper = exceptionMapper;
@@ -62,6 +59,10 @@ public class ResponseHandler {
         String path = request.getPathInfo();
         dependencyInjectionSPI.clear();
 
+        if ( request.getPathInfo() == null ) {
+            response.sendError(404);
+            throw new NotFoundException();
+        }
         String base = url.substring(0, url.length() - path.length() + 1);
         dependencyInjectionSPI.addRequestContext( UriInfo.class, new UriInfo( base ) );
         dependencyInjectionSPI.addRequestContext(BaseUrl.class, new BaseUrl(base));

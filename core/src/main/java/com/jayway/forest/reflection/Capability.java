@@ -1,20 +1,16 @@
 package com.jayway.forest.reflection;
 
-import java.io.InputStream;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.core.RoleManager;
-import com.jayway.forest.reflection.impl.SubResource;
+import com.jayway.forest.exceptions.InternalServerErrorException;
+import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.InternalServerErrorException;
-import com.jayway.forest.roles.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
+import java.util.Map;
 
 
 public abstract class Capability implements CapabilityReference {
@@ -50,6 +46,8 @@ public abstract class Capability implements CapabilityReference {
     }
 
     public abstract Object get(HttpServletRequest request);
+
+    public abstract void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler);
 
 	public abstract void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler );
 
