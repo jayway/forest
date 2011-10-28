@@ -18,7 +18,8 @@
 	<modules>
 	  <module>core</module>
 	  <module>samples</module>
-	</modules>
+    <module>frontend</module>
+  </modules>
 
 	<scm>
 		<connection>scm:git:git://github.com/jayway/forest.git</connection>

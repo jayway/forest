@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>forest-frontend</artifactId>
+		<groupId>com.jayway.forest</groupId>
+		<version>0.3.0-SNAPSHOT</version>
+	</parent>
+	<groupId>com.jayway.forest</groupId>
+	<artifactId>forest-frontend-jersey</artifactId>
+	<name>forest-frontend-jersey</name>
+	<properties>
+		<com.sun.jersey.version>1.8</com.sun.jersey.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.jayway.forest</groupId>
+			<artifactId>forest-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${com.sun.jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-json</artifactId>
+			<version>${com.sun.jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${com.sun.jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey.test.framework</groupId>
+			<artifactId>jersey-test-framework</artifactId>
+			<version>1.0.3</version>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
+</project>
