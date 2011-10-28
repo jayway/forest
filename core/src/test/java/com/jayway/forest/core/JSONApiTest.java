@@ -5,7 +5,9 @@ import com.jayway.restassured.RestAssured;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
 /**
  */
@@ -33,7 +35,7 @@ public class JSONApiTest extends AbstractRunner {
 
     @Test
     public void commandDelete() {
-        expect().statusCode( 405 ).
+        expect().statusCode(405).
                 body("method", equalTo("PUT")).
                 body("href", equalTo( baseUrl() + "/command")).
                 body("jsonTemplate", equalTo("")).when().delete("/command");
@@ -67,7 +69,7 @@ public class JSONApiTest extends AbstractRunner {
 
     @Test
     public void commandCreateGet() {
-        expect().statusCode( 405 ).
+        expect().statusCode(405).
                 body("method", equalTo("POST")).
                 body("href", equalTo( baseUrl() + "/other/create")).
                 body("jsonTemplate.string", equalTo("")).
@@ -77,7 +79,7 @@ public class JSONApiTest extends AbstractRunner {
 
     @Test
     public void commandCreatePut() {
-        expect().statusCode( 405 ).
+        expect().statusCode(405).
                 when().put("/other/");
     }
 
@@ -104,7 +106,7 @@ public class JSONApiTest extends AbstractRunner {
 
     @Test
     public void commandDeleteGet() {
-        expect().statusCode( 405 ).
+        expect().statusCode(405).
                 body("method", equalTo("DELETE")).
                 body("href", equalTo( baseUrl() + "/other/delete")).
                 when().get("/other/delete");
@@ -126,4 +128,10 @@ public class JSONApiTest extends AbstractRunner {
                 when().post("/other/delete");
     }
 
+
+    @Test
+    public void encodingTest() {
+        String value = "Übercoolness æøåôõ";
+        given().param("argument1", value ).expect().statusCode(200).body(is("\""+value+"\"")).when().get("/echo");
+    }
 }
