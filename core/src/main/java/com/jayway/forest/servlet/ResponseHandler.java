@@ -128,10 +128,9 @@ public class ResponseHandler {
             }
         }
 
-        if ( e instanceof MethodNotAllowedRenderTemplateException ) {
-            Capability method = ((MethodNotAllowedRenderTemplateException) e).method();
-            Object form = method.renderForm(restReflection());
-            return new Response(((MethodNotAllowedRenderTemplateException) e).getCode(), form.toString() );
+        if ( e instanceof RenderTemplateException ) {
+            RenderTemplateException render = (RenderTemplateException) e;
+            return new Response( render.getCode(), render.getCapability().renderForm( restReflection() ).toString() );
         } else if ( e instanceof AbstractHtmlException ) {
             return new Response( ((AbstractHtmlException) e).getCode(), e.getMessage() );
         } else {

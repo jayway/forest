@@ -72,7 +72,11 @@ public final class JsonRestReflection implements RestReflection {
     private StringBuilder appendMethod( StringBuilder sb, CapabilityReference reference ) {
         sb.append( "{ \"method\":\"").append(reference.httpMethod()).append("\",");
         sb.append("\"name\":").append("\"").append(reference.name() ).append("\",");
-        sb.append("\"href\":\"").append(reference.href()).append("\"");
+        if ( reference instanceof CapabilityCreateCommand || reference instanceof CapabilityDeleteCommand ) {
+            sb.append("\"href\":\"").append(reference.href().substring(0, reference.href().length() - 6 )).append("\"");
+        } else {
+            sb.append("\"href\":\"").append(reference.href()).append("\"");
+        }
         if ( reference instanceof BaseReflection ) {
             BaseReflection base = (BaseReflection) reference;
             String template = createTemplate( base.method, base.resource);

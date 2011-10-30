@@ -2,6 +2,7 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.restassured.RestAssured;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.expect;
@@ -41,6 +42,15 @@ public class JSONApiTest extends AbstractRunner {
                 body("jsonTemplate", equalTo("")).when().delete("/command");
     }
 
+    @Test
+    public void queryGet() {
+        // wrong parameters
+        expect().statusCode(400).
+        body("method", equalTo("GET")).
+        body("href", equalTo( baseUrl() + "/echo")).
+        body("jsonTemplate", equalTo("")).when().get("/echo");
+
+    }
 
     @Test
     public void queryPut() {
@@ -71,7 +81,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandCreateGet() {
         expect().statusCode(405).
                 body("method", equalTo("POST")).
-                body("href", equalTo( baseUrl() + "/other/create")).
+                body("href", equalTo( baseUrl() + "/other/")).
                 body("jsonTemplate.string", equalTo("")).
                 body("jsonTemplate.integer", equalTo(0)).
                 when().get("/other/create");
@@ -87,7 +97,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandCreatePutDirect() {
         expect().statusCode( 405 ).
                 body("method", equalTo("POST")).
-                body("href", equalTo( baseUrl() + "/other/create")).
+                body("href", equalTo( baseUrl() + "/other/")).
                 body("jsonTemplate.string", equalTo("")).
                 body("jsonTemplate.integer", equalTo(0)).
                 when().put("/other/create");
@@ -97,7 +107,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandCreateDelete() {
         expect().statusCode( 405 ).
                 body("method", equalTo("POST")).
-                body("href", equalTo( baseUrl() + "/other/create")).
+                body("href", equalTo( baseUrl() + "/other/")).
                 body("jsonTemplate.string", equalTo("")).
                 body("jsonTemplate.integer", equalTo(0)).
                 when().delete("/other/create");
@@ -108,7 +118,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandDeleteGet() {
         expect().statusCode(405).
                 body("method", equalTo("DELETE")).
-                body("href", equalTo( baseUrl() + "/other/delete")).
+                body("href", equalTo( baseUrl() + "/other/")).
                 when().get("/other/delete");
     }
 
@@ -116,7 +126,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandDeletePut() {
         expect().statusCode( 405 ).
                 body("method", equalTo("DELETE")).
-                body("href", equalTo( baseUrl() + "/other/delete")).
+                body("href", equalTo( baseUrl() + "/other/")).
                 when().put("/other/delete");
     }
 
@@ -124,7 +134,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandDeletePost() {
         expect().statusCode( 405 ).
                 body("method", equalTo("DELETE")).
-                body("href", equalTo( baseUrl() + "/other/delete")).
+                body("href", equalTo( baseUrl() + "/other/")).
                 when().post("/other/delete");
     }
 
@@ -134,4 +144,29 @@ public class JSONApiTest extends AbstractRunner {
         String value = "Übercoolness æøåôõ";
         given().param("argument1", value ).expect().statusCode(200).body(is("\""+value+"\"")).when().get("/echo");
     }
+
+    @Test
+    public void createCommandTest() {
+        expect().statusCode(200).
+                body("method[2]", equalTo("POST")).
+                body("rel[2]", equalTo("OtherResourceCreate")).
+                body("href[2]", equalTo(baseUrl() + "/other/")).when().get("/other/");
+    }
+
+    @Test
+    public void createCommandTest2() {
+        String result = given().spec(acceptTextHtml()).get("/other/").asString();
+
+        Assert.assertTrue("Must have the create link", result.contains( baseUrl() + "/other/create" ));
+        Assert.assertTrue("Must have the delete link", result.contains( baseUrl() + "/other/delete" ));
+    }
+
+    @Test
+    public void deleteCommandTest() {
+        expect().statusCode(200).
+                body("method[1]", equalTo("DELETE")).
+                body("rel[1]", equalTo("OtherResourceDelete")).
+                body("href[1]", equalTo( baseUrl() + "/other/")).when().get("/other/");
+    }
+
 }
