@@ -6,18 +6,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  */
-public class MethodNotAllowedRenderTemplateException extends AbstractHtmlException {
+public class MethodNotAllowedRenderTemplateException extends RenderTemplateException {
 	private static final long serialVersionUID = 1;
 
-    private Capability method;
-
     public MethodNotAllowedRenderTemplateException(Capability method) {
-        super(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "" );
-        this.method = method;
+        super(method, HttpServletResponse.SC_METHOD_NOT_ALLOWED );
     }
-
-    public Capability method() {
-        return method;
-    }
-
 }

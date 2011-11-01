@@ -36,7 +36,7 @@ public class QueriesTest  extends AbstractRunner {
         given().
                 queryParam( "argument1", "x6f?0").
         expect().
-                statusCode(405).
+                statusCode(400).
         when().
                 get("/addten").statusLine();
     }
@@ -45,7 +45,7 @@ public class QueriesTest  extends AbstractRunner {
         given().
                 queryParam( "arent1", "2").
         expect().
-                statusCode(405).
+                statusCode(400).
         when().
                 get("/addten").statusLine();
     }

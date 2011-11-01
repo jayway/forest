@@ -1,10 +1,7 @@
 package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.BadRequestException;
-import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.exceptions.WrappedException;
+import com.jayway.forest.exceptions.*;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
@@ -25,7 +22,7 @@ public class CapabilityQuery extends BaseReflection {
         @SuppressWarnings("unchecked")
         Map<String, String[]> queryParams = request.getParameterMap();
         if ( queryParams.size() == 0 && method.getParameterTypes().length > 0) {
-            throw new MethodNotAllowedRenderTemplateException( this );
+            throw new BadRequestRenderTemplateException( this );
         } else {
             try {
                 if ( method.getParameterTypes().length == 0 ) {
@@ -40,7 +37,7 @@ public class CapabilityQuery extends BaseReflection {
                     return method.invoke( resource, args);
                 } catch (BadRequestException e ) {
                     // some arguments was passed but some was missing
-                    throw new MethodNotAllowedRenderTemplateException( this );
+                    throw new BadRequestRenderTemplateException( this );
                 }
             } catch ( IllegalAccessException e) {
                 throw internalServerError( e );
