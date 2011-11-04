@@ -1,29 +1,21 @@
 package com.jayway.forest.frontend.jersey;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
 import com.jayway.forest.core.Application;
 import com.jayway.forest.core.ForestCore;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.roles.BaseUrl;
 import com.jayway.forest.roles.UriInfo;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // Is it possible to put @Consumes / @Produces on the Resource objects?
 
@@ -111,11 +103,7 @@ public class ForestJerseyService {
 	}
 
     private void prepare(HttpServletRequest request) {
-        String url = request.getRequestURL().toString();
-        String path = request.getPathInfo();
-        String base = url.substring(0, url.length() - path.length() + 1);
-        dependencyInjectionSPI.addRequestContext( UriInfo.class, new UriInfo( base ) );
-        dependencyInjectionSPI.addRequestContext(BaseUrl.class, new BaseUrl(base));
+        dependencyInjectionSPI.addRequestContext( UriInfo.class, new UriInfo( request ) );
         dependencyInjectionSPI.addRequestContext(HttpServletRequest.class, request);
 //        dependencyInjectionSPI.addRequestContext(HttpServletResponse.class, response);
 	}
