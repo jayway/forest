@@ -34,6 +34,9 @@ public class CapabilityQueryForList extends CapabilityQuery {
 
         PagedSortedListResponse response = new PagedSortedListResponse();
         if (pagingSortingParameter.isTouched()) {
+        	if (pagingSortingParameter.getTotalElements() == null) {
+        		throw new IllegalArgumentException("You must set totalElements!");
+        	}
             // the resource has handled the paging
             // so just copy the values to the pagedSortedListResponse
             urlParameter.setPageSize(pagingSortingParameter.getPageSize());
@@ -41,7 +44,7 @@ public class CapabilityQueryForList extends CapabilityQuery {
             response.setList(returnedList);
             response.setPageSize(pagingSortingParameter.getPageSize());
             response.setTotalElements(pagingSortingParameter.getTotalElements());
-            if ( pagingSortingParameter.getPage()*pagingSortingParameter.getPageSize() < pagingSortingParameter.getTotalElements() ) {
+            if ( pagingSortingParameter.offset() < pagingSortingParameter.getTotalElements() ) {
                 response.setNext( name() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
             }
             if ( pagingSortingParameter.getPage() > 1 ) {
