@@ -154,6 +154,13 @@ public class JSONApiTest extends AbstractRunner {
     }
 
     @Test
+    public void discoverIdResource() {
+        expect().statusCode(200).
+                body("rel[4]", equalTo("OtherResourceId")).
+                when().get("/other/");
+    }
+
+    @Test
     public void createCommandTest2() {
         String result = given().spec(acceptTextHtml()).get("/other/").asString();
 
@@ -168,5 +175,6 @@ public class JSONApiTest extends AbstractRunner {
                 body("rel[1]", equalTo("OtherResourceDelete")).
                 body("href[1]", equalTo( baseUrl() + "/other/")).when().get("/other/");
     }
+
 
 }

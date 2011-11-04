@@ -5,7 +5,9 @@ import com.jayway.forest.service.StateHolder;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class TypeTest extends AbstractRunner {
 
@@ -30,6 +32,16 @@ public class TypeTest extends AbstractRunner {
 
         Float result = (Float) StateHolder.get();
         Assert.assertEquals( result, new Float(3.875));
+    }
+
+    @Test
+    public void testIterable() {
+
+        expect().body("strings.size()", equalTo(1)).
+                 body("strings[0].string", equalTo("STRING")).
+                 body("integers.size()", equalTo(1)).
+                 body("integers[0].integer", equalTo(42)).
+        when().get("/types/iterable");
     }
 
 }

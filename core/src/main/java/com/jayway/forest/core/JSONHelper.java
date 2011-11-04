@@ -31,9 +31,9 @@ public class JSONHelper {
         }
 
         // JSONArray
-        if ( dto instanceof List ) {
+        if ( dto instanceof Iterable ) {
             JSONArray arrayResult = new JSONArray();
-            for ( Object o : (List<?>)dto ) {
+            for ( Object o : (Iterable<?>)dto ) {
                 arrayResult.add( toJSON(o) );
             }
             return arrayResult;
