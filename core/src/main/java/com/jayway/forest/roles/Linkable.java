@@ -30,6 +30,9 @@ public class Linkable {
         this.name = name;
     }
 
+    public Linkable( String name ) {
+    	this(name + "/", name);
+    }
 
     public String getHref() {
         return href;
