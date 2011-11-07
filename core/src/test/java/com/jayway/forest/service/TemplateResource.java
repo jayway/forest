@@ -14,12 +14,18 @@ public class TemplateResource implements Resource {
     public Integer addwithwrongtemplates( @Template("badwrongname") Integer first, @Template("evil") IntegerDTO second ) {
         return first + second.getInteger();
     }
+    public Integer witheviltemplates( @Template("evil") IntegerDTO i ) {
+        return i.getInteger();
+    }
     public String echo( @Template("content") String input ) {
         return input;
     }
     public void updatewithtemplate( @Template("content") String content ) {
     }
     public String withwrongtemplatetype( @Template("wrongType") String name ) {
+        return null;
+    }
+    public String withpublictemplate( @Template("publicTemplate") String name ) {
         return null;
     }
     public String withnonexistingtemplate( @Template("nonexistent") String name ) {
@@ -34,6 +40,9 @@ public class TemplateResource implements Resource {
         return first + second.getInteger();
     }
 
+    public String publicTemplate() {
+        return "PUBLIC";
+    }
 
     private Double wrongType() {
         return 5.0;

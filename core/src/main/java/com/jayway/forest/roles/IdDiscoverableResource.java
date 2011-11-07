@@ -5,5 +5,5 @@ import java.util.List;
 /**
  */
 public interface IdDiscoverableResource extends IdResource {
-    List<Linkable> discover();
+    List<? extends Linkable> discover();
 }
