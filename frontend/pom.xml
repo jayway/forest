@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>forest</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>forest</artifactId>
+        <groupId>com.jayway.forest</groupId>
+        <version>0.3.0-SNAPSHOT</version>
+    </parent>
     <groupId>com.jayway.forest</groupId>
-    <version>0.3.0-SNAPSHOT</version>
-  </parent>
-  <groupId>com.jayway.forest</groupId>
-  <artifactId>forest-frontend</artifactId>
-  <packaging>pom</packaging>
-  <name>forest-frontend</name>
-  <modules>
-    <module>jersey</module>
-  </modules>
+    <artifactId>forest-frontend</artifactId>
+    <packaging>pom</packaging>
+    <name>forest-frontend</name>
+    <modules>
+        <module>jersey</module>
+    </modules>
 </project>

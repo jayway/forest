@@ -10,7 +10,6 @@ import com.jayway.forest.reflection.impl.AtomRestReflection;
 import com.jayway.forest.reflection.impl.HtmlRestReflection;
 import com.jayway.forest.reflection.impl.JsonRestReflection;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
-import com.jayway.forest.roles.BaseUrl;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.UriInfo;
 import org.slf4j.Logger;
@@ -54,18 +53,14 @@ public class ResponseHandler {
         this.response = response;
         this.exceptionMapper = exceptionMapper;
 
-        // add request specifics to the current context
-        String url = request.getRequestURL().toString();
-        String path = request.getPathInfo();
-        dependencyInjectionSPI.clear();
-
         if ( request.getPathInfo() == null ) {
-            response.sendError(404);
-            throw new NotFoundException();
-        }
-        String base = url.substring(0, url.length() - path.length() + 1);
-        dependencyInjectionSPI.addRequestContext( UriInfo.class, new UriInfo( base ) );
-        dependencyInjectionSPI.addRequestContext(BaseUrl.class, new BaseUrl(base));
+             response.sendError(404);
+             throw new NotFoundException();
+         }
+         
+        // add request specifics to the current context
+        dependencyInjectionSPI.clear();
+        dependencyInjectionSPI.addRequestContext(UriInfo.class, new UriInfo(request));
         dependencyInjectionSPI.addRequestContext(HttpServletRequest.class, request);
         dependencyInjectionSPI.addRequestContext(HttpServletResponse.class, response);
     }

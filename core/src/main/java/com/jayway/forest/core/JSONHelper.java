@@ -3,13 +3,11 @@ package com.jayway.forest.core;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.exceptions.InternalServerErrorException;
 import com.jayway.forest.reflection.ReflectionUtil;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import sun.misc.IOUtils;
 
-import java.io.*;
+import java.io.InputStream;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -31,9 +29,9 @@ public class JSONHelper {
         }
 
         // JSONArray
-        if ( dto instanceof List ) {
+        if ( dto instanceof Iterable ) {
             JSONArray arrayResult = new JSONArray();
-            for ( Object o : (List<?>)dto ) {
+            for ( Object o : (Iterable<?>)dto ) {
                 arrayResult.add( toJSON(o) );
             }
             return arrayResult;
@@ -84,9 +82,9 @@ public class JSONHelper {
         }
 
         // several arguments must passed in a JSON array
-        if ( !(parse instanceof JSONArray) ) throw new BadRequestException();
+        if ( !(parse instanceof JSONArray) ) throw new BadRequestException("More than one argument needs to be passed in a JSON array");
         JSONArray argumentArray = (JSONArray) parse;
-        if ( argumentArray.size() != argumentCount ) throw new BadRequestException();
+        if ( argumentArray.size() != argumentCount ) throw new BadRequestException(String.format("Mismatch between number of arguments (%d) and array size (%d)", argumentCount, argumentArray.size()));
 
         // more than one argument
         Object[] arguments = new Object[ argumentCount ];
@@ -117,7 +115,7 @@ public class JSONHelper {
             if ( argumentClass.isAssignableFrom( value.getClass() )) {
                 return value;
             } else {
-                throw new BadRequestException();
+                throw new BadRequestException(String.format("Couldn't assign value of class %s to argument of class %s", jsonValue.getClass(), argumentClass));
             }
         }
 
@@ -142,7 +140,7 @@ public class JSONHelper {
                     list.add( handleArgument( typeClass, typeArgument, elm ) );
                 }
             } else {
-                throw new BadRequestException();
+                throw new BadRequestException(String.format("Couldn't assign value of class %s to argument of class %s", jsonValue.getClass(), argumentClass));
             }
             return list;
         }
@@ -171,7 +169,7 @@ public class JSONHelper {
                             handleArgument( valueClass, valueType, entry.getValue()));
                 }
             } else {
-                throw new BadRequestException();
+                throw new BadRequestException(String.format("Couldn't assign value of class %s to argument of class %s", jsonValue.getClass(), argumentClass));
             }
             return map;
         }
@@ -190,12 +188,12 @@ public class JSONHelper {
                 }
                 return composite;
             } catch (InstantiationException e) {
-                throw new InternalServerErrorException();
+                throw new InternalServerErrorException(e.getMessage());
             } catch (IllegalAccessException e) {
-                throw new InternalServerErrorException();
+                throw new InternalServerErrorException(e.getMessage());
             }
         } else {
-            throw new BadRequestException();
+            throw new BadRequestException(String.format("Couldn't find any matching clause for value of class %s and argument of class %s", jsonValue.getClass(), argumentClass));
         }
     }
 
