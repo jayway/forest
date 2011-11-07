@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.jayway.forest</groupId>
-	<artifactId>forest-samples-bank</artifactId>
-	<packaging>pom</packaging>
-	<parent>
-		<groupId>com.jayway.forest</groupId>
-		<artifactId>forest-samples</artifactId>
-  		<version>0.3.0-SNAPSHOT</version>
-	</parent>
-  <modules>
-    <module>domain</module>
-    <module>bank-grove</module>
-    <module>bank-spring</module>
-    <module>bank-jersey</module>
-  </modules>
+    <groupId>com.jayway.forest</groupId>
+    <artifactId>forest-samples-bank</artifactId>
+    <packaging>pom</packaging>
+    <parent>
+        <groupId>com.jayway.forest</groupId>
+        <artifactId>forest-samples</artifactId>
+        <version>0.3.0-SNAPSHOT</version>
+    </parent>
+    <modules>
+        <module>domain</module>
+        <module>bank-grove</module>
+        <module>bank-spring</module>
+        <module>bank-jersey</module>
+    </modules>
 </project>
