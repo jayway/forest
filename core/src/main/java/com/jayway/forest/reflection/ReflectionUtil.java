@@ -1,15 +1,20 @@
 package com.jayway.forest.reflection;
 
-import com.jayway.forest.reflection.impl.Parameter;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.Template;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import com.jayway.forest.reflection.impl.Parameter;
+import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.Template;
 
 public abstract class ReflectionUtil {
 	protected static Logger log = LoggerFactory.getLogger(ReflectionUtil.class);
@@ -42,12 +47,16 @@ public abstract class ReflectionUtil {
                     String methodName = ((Template) annotation).value();
                     try {
                         Method template = resource.getClass().getDeclaredMethod(methodName);
-                        if ( aClass.isAssignableFrom( template.getReturnType() ) && Modifier.isPrivate(template.getModifiers()) ) {
+                        if ( aClass.isAssignableFrom( template.getReturnType() ) ) {
                             template.setAccessible( true );
                             parameter.setTemplate( template.invoke(resource) );
                         }
+                    } catch (NoSuchMethodException e) {
+                    	throw new IllegalArgumentException(String.format("Template method [%s] does not exist for resource [%s]!", methodName, resource.getClass().getName()));
+                    } catch (InvocationTargetException e) {
+                    	throw new RuntimeException("Could not evaluate template method. Template methods must have zero arguments and return type must match argument type", e.getTargetException());
                     } catch (Throwable e) {
-                        log.debug("Could not evaluate template method. Template methods must be private have zero arguments and return type must match argument type", e);
+                    	throw new RuntimeException("Could not evaluate template method. Template methods must have zero arguments and return type must match argument type", e);
                     }
                 }
             }

@@ -1,15 +1,14 @@
 package com.jayway.forest.core;
 
-import com.jayway.forest.service.AbstractRunner;
-import org.junit.Assert;
-import org.junit.Test;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.io.IOException;
 
-import static com.jayway.restassured.RestAssured.given;
-import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.jayway.forest.service.AbstractRunner;
 
 public class TemplateTest extends AbstractRunner {
 
@@ -17,6 +16,12 @@ public class TemplateTest extends AbstractRunner {
     public void testTemplate() throws IOException {
         given().expect().statusCode(405).
                 body("jsonTemplate", equalTo("Template Content")).when().get("/templates/updatewithtemplate");
+    }
+
+    @Test
+    public void testPublicTemplate() throws IOException {
+        given().expect().statusCode(400).
+                body("jsonTemplate", equalTo("PUBLIC")).when().get("/templates/withpublictemplate");
     }
 
     @Test
@@ -44,9 +49,7 @@ public class TemplateTest extends AbstractRunner {
 
     @Test
     public void testQueryWithNoArgumentWrongTemplate() throws IOException {
-        given().expect().statusCode(400).
-                body( "jsonTemplate[0]", equalTo(0) ).
-                body( "jsonTemplate[1].integer", equalTo(0) ).
+        given().expect().statusCode(500).
                 when().get("/templates/addwithwrongtemplates");
     }
 
@@ -76,16 +79,25 @@ public class TemplateTest extends AbstractRunner {
 
     @Test
     public void testNonexistentTemplate() throws IOException {
-        given().expect().statusCode(400).
-                body( "jsonTemplate", equalTo("")).
-                when().get("/templates/withnonexistingtemplate");
+        given().expect().statusCode(500)
+        	.when().get("/templates/withnonexistingtemplate");
     }
 
     @Test
     public void testTemplateWithArgument() throws IOException {
-        given().expect().statusCode(400).
-                body( "jsonTemplate", equalTo("")).
-                when().get("/templates/templatemethodwithargument");
+        given().expect().statusCode(500)
+        	.when().get("/templates/templatemethodwithargument");
+    }
+
+    @Test
+    public void testTemplateThrowingException() throws IOException {
+        given().expect().statusCode(500)
+        	.when().get("/templates/witheviltemplates");
+    }
+
+    @Test
+    public void testCallingTemplateThrowingException() throws IOException {
+        given().body("[{ \"integer\": 32}]").expect().statusCode(500).when().put("/templates/witheviltemplates");
     }
 
 }
