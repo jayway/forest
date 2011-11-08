@@ -1,5 +1,7 @@
 package com.jayway.forest.roles;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -16,7 +18,12 @@ public class UriInfo {
     public UriInfo(HttpServletRequest request) {
         String url = request.getRequestURL().toString();
         String path = request.getPathInfo();
-        this.baseUrl = url.substring(0, url.length() - path.length() + 1);
+        int urlLength = url.length();
+        if (StringUtils.isNotEmpty(path)) {
+            this.baseUrl = url.substring(0, urlLength - path.length() + 1);
+        } else {
+            this.baseUrl = url.substring(0, urlLength);
+        }
         this.relativeUrl = "";
     }
 
