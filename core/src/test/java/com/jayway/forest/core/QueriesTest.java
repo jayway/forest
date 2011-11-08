@@ -32,6 +32,13 @@ public class QueriesTest  extends AbstractRunner {
     }
 
     @Test
+    public void testQueryWithNamedParam() throws IOException {
+        final IntegerDTO integer = given().param("paramWithName", "60").when().get("/namedaddten").andReturn().as(IntegerDTO.class);
+
+        assertEquals(70, integer.getInteger().intValue());
+    }
+
+    @Test
     public void testQueryWithIntegerWrongInput() throws IOException {
         given().
                 queryParam( "argument1", "x6f?0").

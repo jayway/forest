@@ -1,16 +1,18 @@
 package com.jayway.forest.reflection.impl;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import com.jayway.forest.core.RoleManager;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.QueryParam;
+
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.ReflectionUtil;
 import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.UriInfo;
 
 public abstract class BaseReflection extends Capability {
     protected final Resource resource;
@@ -22,7 +24,17 @@ public abstract class BaseReflection extends Capability {
         this.resource = resource;
 	}
 
-    protected Object mapArguments( Class<?> dto, Map<String,String[]> formParams, String prefix ) {
+    protected Object[] arguments( Method m, Map<String, String[]> params ) {
+        Object[] args = new Object[m.getParameterTypes().length];
+        for ( int i=0; i<args.length; i++ ) {
+            args[i] = mapArguments( m, i, params );
+        }
+        return args;
+    }
+
+    private Object mapArguments( Method m, int parameter, Map<String,String[]> formParams) {
+        Class<?> dto = method.getParameterTypes()[parameter];
+        String prefix = getParameterName(m, parameter);
         try {
             if ( ReflectionUtil.basicTypes.contains( dto ) ) {
                 return mapBasic( dto, getFirst(formParams, prefix) );
@@ -35,6 +47,18 @@ public abstract class BaseReflection extends Capability {
             throw new BadRequestException();
         }
     }
+
+    private String getParameterName(Method method, int parameter) {
+		for (Annotation a : method.getParameterAnnotations()[parameter]) {
+			if (a instanceof FormParam) {
+				return ((FormParam)a).value();
+			}
+			if (a instanceof QueryParam) {
+				return ((QueryParam)a).value();
+			}
+		}
+		return "argument"+(parameter+1);
+	}
 
     private String getFirst( Map<String, String[]> map, String key ) {
         String[] strings = map.get(key);

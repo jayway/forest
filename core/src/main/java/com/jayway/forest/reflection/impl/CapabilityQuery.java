@@ -28,12 +28,8 @@ public class CapabilityQuery extends BaseReflection {
                 if ( method.getParameterTypes().length == 0 ) {
                     return method.invoke( resource );
                 }
-                Object[] args = new Object[method.getParameterTypes().length];
+                Object[] args = arguments(method, queryParams);
                 try {
-                    for ( int i=0; i<args.length; i++) {
-                        Class<?> type = method.getParameterTypes()[i];
-                        args[i] = mapArguments( type, queryParams, "argument"+(i+1));
-                    }
                     return method.invoke( resource, args);
                 } catch (BadRequestException e ) {
                     // some arguments was passed but some was missing

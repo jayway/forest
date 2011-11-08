@@ -10,7 +10,10 @@ import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
+
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -65,19 +68,6 @@ public class CapabilityCommand extends BaseReflection {
         }
         // TODO support other types
         throw new UnsupportedMediaTypeException();
-    }
-
-    private Object[] arguments( Method m, Map<String, String[]> formParams ) {
-        if ( m.getParameterTypes().length == 0 ) {
-            return new Object[0];
-        }
-        Object[] args = new Object[m.getParameterTypes().length];
-
-        for ( int i=0; i<args.length; i++ ) {
-            Class<?> type = m.getParameterTypes()[i];
-            args[i] = mapArguments( type, formParams, "argument"+(i+1) );
-        }
-        return args;
     }
 
 	@Override

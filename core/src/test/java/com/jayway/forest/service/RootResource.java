@@ -9,6 +9,9 @@ import com.jayway.forest.roles.Resource;
 
 import java.util.List;
 
+import javax.ws.rs.FormParam;
+import javax.ws.rs.QueryParam;
+
 import static com.jayway.forest.core.RoleManager.role;
 
 /**
@@ -20,6 +23,10 @@ public class RootResource implements Resource {
     }
 
     public void command( String input ) {
+        StateHolder.set(input);
+    }
+
+    public void commandwithnamedparam(@FormParam("theName") String input ) {
         StateHolder.set(input);
     }
 
@@ -37,6 +44,10 @@ public class RootResource implements Resource {
     }
 
     public IntegerDTO addten( Integer number ) {
+        return new IntegerDTO( number + 10);
+    }
+
+    public IntegerDTO namedaddten( @QueryParam("paramWithName") Integer number ) {
         return new IntegerDTO( number + 10);
     }
 
