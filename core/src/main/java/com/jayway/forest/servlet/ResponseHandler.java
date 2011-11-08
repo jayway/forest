@@ -3,13 +3,9 @@ package com.jayway.forest.servlet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,10 +22,7 @@ import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.reflection.impl.AtomRestReflection;
 import com.jayway.forest.reflection.impl.BaseReflection;
-import com.jayway.forest.reflection.impl.HtmlRestReflection;
-import com.jayway.forest.reflection.impl.JsonRestReflection;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.UriInfo;
@@ -38,28 +31,18 @@ import com.jayway.forest.roles.UriInfo;
  */
 public class ResponseHandler {
     private static Logger log = LoggerFactory.getLogger(ResponseHandler.class);
-    private static Map<String, RestReflection> reflectors;
-
-    static {
-        reflectors = new HashMap<String, RestReflection>();
-        reflectors.put(MediaTypeHandler.APPLICATION_JSON, JsonRestReflection.INSTANCE);
-        reflectors.put(MediaTypeHandler.TEXT_HTML, HtmlRestReflection.INSTANCE);
-        reflectors.put(MediaTypeHandler.APPLICATION_ATOM, AtomRestReflection.INSTANCE);
-    }
-
-    private RestReflection restReflection() {
-        return reflectors.get( mediaTypeHandler.accept() );
-    }
 
     public static final String SUCCESS_RESPONSE = "Operation completed successfully";
 
+    private MediaTypeHandlerContainer mediaTypeHandlerContainer;
     private MediaTypeHandler mediaTypeHandler;
     private HttpServletResponse response;
     private ExceptionMapper exceptionMapper;
 
-    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) throws IOException {
-        mediaTypeHandler = new MediaTypeHandler(request, response );
+    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, MediaTypeHandlerContainer mediaTypeHandlerContainer, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) throws IOException {
+		mediaTypeHandler = new MediaTypeHandler(request, response );
         this.response = response;
+        this.mediaTypeHandlerContainer = mediaTypeHandlerContainer;
         this.exceptionMapper = exceptionMapper;
 
         if ( request.getPathInfo() == null ) {
@@ -101,7 +84,11 @@ public class ResponseHandler {
         }
     }
 
-    public void invoke( RestfulServlet.Runner runner ) {
+    private RestReflection restReflection() {
+		return mediaTypeHandlerContainer.restReflection(mediaTypeHandler.accept());
+	}
+
+	public void invoke( RestfulServlet.Runner runner ) {
         Object responseObject;
         try {
             responseObject = runner.run(mediaTypeHandler);

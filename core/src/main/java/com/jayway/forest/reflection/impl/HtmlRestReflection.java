@@ -23,10 +23,12 @@ import com.jayway.forest.servlet.Response;
 
 public final class HtmlRestReflection extends BasicRestReflection implements RestReflection {
 
-    public static final RestReflection INSTANCE = new HtmlRestReflection(Charset.forName("UTF-8"));
+    public static final RestReflection DEFAULT = new HtmlRestReflection(Charset.forName("UTF-8"), null);
+	private final String cssUrl;
 
-    private HtmlRestReflection(Charset charset) {
+    public HtmlRestReflection(Charset charset, String cssUrl) {
     	super(charset);
+		this.cssUrl = cssUrl;
     }
 
 	@Override
@@ -43,7 +45,7 @@ public final class HtmlRestReflection extends BasicRestReflection implements Res
     @Override
     public void renderCapabilities(OutputStream out, Capabilities capabilities) throws IOException {
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.write( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
+        writeHeader(writer);
         writer.append("<h1>"+ capabilities.getName()  +"</h1>");
         if (!capabilities.getQueries().isEmpty()) {
             writer.append("<h2>Queries</h2>");
@@ -89,9 +91,21 @@ public final class HtmlRestReflection extends BasicRestReflection implements Res
             writer.append("<h2>Description</h2>");
             writer.append( new JSONHelper().toJSON( capabilities.getDescriptionResult() ).toString());
         }
-        writer.append("</body></html>");
+        writeFooter(writer);
         writer.flush();
     }
+
+	private void writeFooter(OutputStreamWriter writer) throws IOException {
+		writer.append("</body></html>");
+	}
+
+	private void writeHeader(OutputStreamWriter writer) throws IOException {
+		writer.append( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=").append(charset.name()).append("\">");
+        if (cssUrl != null) {
+        	writer.append("<link rel=\"stylesheet\" href=\"").append(cssUrl).append("\" type=\"text/css\" />");
+        }
+        writer.append("</head><body>" );
+	}
 
     private void appendMethod(Writer writer, Capability method ) throws IOException {
     	writer.append("<li><a href='").append(method.href());
@@ -121,7 +135,7 @@ public final class HtmlRestReflection extends BasicRestReflection implements Res
     @Override
     public void renderListResponse(OutputStream out, PagedSortedListResponse<?> response ) throws IOException {
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.write("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>");
+        writeHeader(writer);
         writer.append( "<h1>").append(response.getName()).append("</h1>");
         appendPagingInfo( writer, response, false );
 
@@ -143,7 +157,7 @@ public final class HtmlRestReflection extends BasicRestReflection implements Res
             }
             renderTable(writer, list, response );
         }
-        writer.append("</body></html>");
+        writeFooter(writer);
         writer.flush();
     }
 
@@ -152,21 +166,26 @@ public final class HtmlRestReflection extends BasicRestReflection implements Res
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
         if ( response.status() == 405) {
             writer.write(response.message());
+            writer.flush();
             return;
         }
-        writer.append("<html><h1>HTTP Error ").append(response.status().toString()).append("</h1>");
+        writeHeader(writer);
+        writer.append("<h1>HTTP Error ").append(response.status().toString()).append("</h1>");
         String description = AbstractHtmlException.messageMapping.get(response.status());
         if ( description != null ) {
             writer.append("<code>").append( description).append("</code>");
         }
-        writer.append("<h2>Message</h2>").append( response.message() ).append("</html>");
+        writer.append("<h2>Message</h2>").append( response.message() );
+        writeFooter(writer);
         writer.flush();
     }
 
     @Override
     public void renderCreatedResponse(OutputStream out, Linkable linkable) throws IOException {
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writeHeader(writer);
         writer.write("<code>Location:</code> <a href='" + linkable.getHref() + "' rel='"+linkable.getRel()+"'>"+linkable.getName() +"</a>");
+        writeFooter(writer);
         writer.flush();
     }
 
@@ -278,14 +297,16 @@ public final class HtmlRestReflection extends BasicRestReflection implements Res
         List<Parameter> parameters = ReflectionUtil.parameterList(method, resource);
         Class<?>[] types = method.getParameterTypes();
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.append( "<html><body><form name='generatedform' action='").append(method.getName()).
+        writeHeader(writer);
+        writer.append( "<form name='generatedform' action='").append(method.getName()).
                 append("' method='").append(httpMethod).append("' >" );
 
         for ( int i=0; i<parameters.size(); i++ ) {
             Parameter parameter = parameters.get(i);
             htmlForParameter("argument" + (i + 1), parameter.parameterCls(), writer, parameter.parameterCls().getSimpleName(), parameter.getTemplate());
         }
-        writer.append( "<input type='submit' /></form></body></html>" );
+        writer.append( "<input type='submit' /></form>" );
+        writeFooter(writer);
         writer.flush();
     }
 

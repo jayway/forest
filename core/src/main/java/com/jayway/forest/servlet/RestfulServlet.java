@@ -11,16 +11,28 @@ import com.jayway.forest.core.Application;
 import com.jayway.forest.core.ForestCore;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
+import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.reflection.impl.AtomRestReflection;
+import com.jayway.forest.reflection.impl.HtmlRestReflection;
+import com.jayway.forest.reflection.impl.JsonRestReflection;
 
 public class RestfulServlet extends HttpServlet {
 	private static final long serialVersionUID = 1;
 	
 	private ForestCore forest;
     private DependencyInjectionSPI dependencyInjectionSPI;
+    private MediaTypeHandlerContainer mediaTypeHandlerContainer = new MediaTypeHandlerContainer();
+    
+    public void setHandler(String mediaType, RestReflection restReflection) {
+    	mediaTypeHandlerContainer.setHandler(mediaType, restReflection);
+	}
 
     public void initForest( Application application, DependencyInjectionSPI dependencyInjectionSPI){
         this.forest = new ForestCore(application, dependencyInjectionSPI);
         this.dependencyInjectionSPI = dependencyInjectionSPI;
+    	mediaTypeHandlerContainer.setHandler(MediaTypeHandler.APPLICATION_JSON, JsonRestReflection.INSTANCE);
+    	mediaTypeHandlerContainer.setHandler(MediaTypeHandler.TEXT_HTML, HtmlRestReflection.DEFAULT);
+    	mediaTypeHandlerContainer.setHandler(MediaTypeHandler.APPLICATION_ATOM, AtomRestReflection.INSTANCE);
     }
 
     /**
@@ -33,7 +45,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI ).invoke( new Runner() {
+        new ResponseHandler( req, resp, mediaTypeHandlerContainer, exceptionMapper(), dependencyInjectionSPI ).invoke( new Runner() {
             public Object run(MediaTypeHandler mediaType) {
                 return forest.get(req);
             }
@@ -42,7 +54,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI  ).invoke(new Runner() {
+        new ResponseHandler( req, resp, mediaTypeHandlerContainer, exceptionMapper(), dependencyInjectionSPI  ).invoke(new Runner() {
             @SuppressWarnings("unchecked")
             public Object run(MediaTypeHandler mediaType) throws IOException {
                 if (mediaType.contentTypeFormUrlEncoded()) {
@@ -57,7 +69,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doPut(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI  ).invoke(new Runner() {
+        new ResponseHandler( req, resp, mediaTypeHandlerContainer, exceptionMapper(), dependencyInjectionSPI  ).invoke(new Runner() {
             @SuppressWarnings("unchecked")
             public Object run(MediaTypeHandler mediaType) throws IOException {
                 if (mediaType.contentTypeFormUrlEncoded()) {
@@ -72,7 +84,7 @@ public class RestfulServlet extends HttpServlet {
 
     @Override
     protected void doDelete(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        new ResponseHandler( req, resp, exceptionMapper(), dependencyInjectionSPI ).invoke(new Runner() {
+        new ResponseHandler( req, resp, mediaTypeHandlerContainer, exceptionMapper(), dependencyInjectionSPI ).invoke(new Runner() {
             public String run( MediaTypeHandler mediaType) {
                 forest.delete(req);
                 return ResponseHandler.SUCCESS_RESPONSE;

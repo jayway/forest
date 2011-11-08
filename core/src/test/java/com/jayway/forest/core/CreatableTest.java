@@ -43,6 +43,6 @@ public class CreatableTest extends AbstractRunner {
                 .post("/other/?argument1.StringAndIntegerDTO.string=hello&argument1.StringAndIntegerDTO.integer=25").andReturn().asString();
 
         String expect = String.format("<code>Location:</code> <a href='%s/bank/other/hello/25/' rel='appendabletest'>hello</a>", baseURI);
-        Assert.assertEquals( expect, result );
+        Assert.assertTrue( result.contains(expect) );
     }
 }
