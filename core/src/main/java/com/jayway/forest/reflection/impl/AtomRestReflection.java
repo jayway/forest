@@ -1,22 +1,20 @@
 package com.jayway.forest.reflection.impl;
 
-import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
-import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.UriInfo;
-import com.jayway.forest.servlet.Response;
+import static com.jayway.forest.core.RoleManager.role;
+import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
+
+import java.io.StringWriter;
+
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.jayway.forest.core.RoleManager.role;
+import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
+import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.UriInfo;
+import com.jayway.forest.servlet.Response;
 
 /**
  */
@@ -39,10 +37,10 @@ public class AtomRestReflection implements RestReflection {
             VelocityContext context = new VelocityContext();
             context.put( "base", role( UriInfo.class).getBaseUrl() );
             context.put( "title", response.getName() );
-            context.put( "next", response.getNext() );
-            context.put( "previous", response.getPrevious() );
+            context.put( "next", escapeXml(response.getNext()) );
+            context.put( "previous", escapeXml(response.getPrevious()) );
             UriInfo uriInfo = role(UriInfo.class);
-            context.put("self", uriInfo.getSelf());
+            context.put("self", escapeXml(uriInfo.getSelf()));
             context.put( "list", response.getList() );
             StringWriter writer = new StringWriter();
             template.merge( context, writer );

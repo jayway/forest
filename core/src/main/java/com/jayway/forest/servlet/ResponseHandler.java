@@ -1,22 +1,5 @@
 package com.jayway.forest.servlet;
 
-import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.exceptions.*;
-import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.reflection.impl.AtomRestReflection;
-import com.jayway.forest.reflection.impl.HtmlRestReflection;
-import com.jayway.forest.reflection.impl.JsonRestReflection;
-import com.jayway.forest.reflection.impl.PagedSortedListResponse;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.UriInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -24,6 +7,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.di.DependencyInjectionSPI;
+import com.jayway.forest.exceptions.AbstractHtmlException;
+import com.jayway.forest.exceptions.CreatedException;
+import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.exceptions.RenderTemplateException;
+import com.jayway.forest.exceptions.WrappedException;
+import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.reflection.impl.AtomRestReflection;
+import com.jayway.forest.reflection.impl.HtmlRestReflection;
+import com.jayway.forest.reflection.impl.JsonRestReflection;
+import com.jayway.forest.reflection.impl.PagedSortedListResponse;
+import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.UriInfo;
 
 /**
  */
