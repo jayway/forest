@@ -6,12 +6,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.MethodNotAllowedException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 
 public class CapabilityNotFound extends Capability {
 	public static final CapabilityNotFound INSTANCE = new CapabilityNotFound();
@@ -40,10 +37,7 @@ public class CapabilityNotFound extends Capability {
 	}
 	@Override
 	public String httpMethod() {
-		return "N/A";
-	}
-	@Override
-	public Object renderForm(RestReflection restReflection) {
 		throw new UnsupportedOperationException();
+//		return "N/A";
 	}
 }

@@ -3,30 +3,34 @@ package com.jayway.forest.reflection.impl;
 import static com.jayway.forest.core.RoleManager.role;
 import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
 
-import java.io.StringWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
-import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.UriInfo;
 import com.jayway.forest.servlet.Response;
 
 /**
  */
-public class AtomRestReflection implements RestReflection {
+public class AtomRestReflection extends BasicRestReflection implements RestReflection {
 
-    public static final AtomRestReflection INSTANCE = new AtomRestReflection();
+	public static final AtomRestReflection INSTANCE = new AtomRestReflection(Charset.forName("UTF-8"));
     private VelocityEngine engine;
 
-    private AtomRestReflection() {}
+    private AtomRestReflection(Charset charset) {
+    	super(charset);
+    }
 
     @Override
-    public Object renderListResponse(PagedSortedListResponse response) {
+    public void renderListResponse(OutputStream out, PagedSortedListResponse response) {
+
         engine = new VelocityEngine();
         engine.setProperty("resource.loader","class");
         engine.setProperty("class.resource.loader.class",
@@ -42,51 +46,24 @@ public class AtomRestReflection implements RestReflection {
             UriInfo uriInfo = role(UriInfo.class);
             context.put("self", escapeXml(uriInfo.getSelf()));
             context.put( "list", response.getList() );
-            StringWriter writer = new StringWriter();
+            OutputStreamWriter writer = new OutputStreamWriter( out, charset);
             template.merge( context, writer );
-            return writer.toString();
+            writer.flush();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Object renderQueryResponse(Object responseObject) {
+    public void renderQueryResponse(OutputStream out, Object responseObject) {
+    	// TODO: if the responseObject is ATOM it could be returned
         throw new UnsupportedMediaTypeException();
     }
 
     @Override
-    public Object renderError(Response response) {
-        return response.message();
-    }
-
-    @Override
-    public Object renderCreatedResponse(Linkable linkable) {
-        throw new UnsupportedMediaTypeException();
-    }
-
-    @Override
-    public Object renderCapabilities(Capabilities capabilities) {
-        throw new UnsupportedMediaTypeException();
-    }
-
-    @Override
-    public Object renderCommandForm( BaseReflection baseReflection ) {
-        throw new UnsupportedMediaTypeException();
-    }
-
-    @Override
-    public Object renderQueryForm(BaseReflection baseReflection) {
-        throw new UnsupportedMediaTypeException();
-    }
-
-    @Override
-    public Object renderCommandCreateForm(BaseReflection baseReflection) {
-        throw new UnsupportedMediaTypeException();
-    }
-
-    @Override
-    public Object renderCommandDeleteForm(BaseReflection baseReflection) {
-        throw new UnsupportedMediaTypeException();
+    public void renderError(OutputStream out, Response response) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.write(response.message());
+        writer.flush();
     }
 }

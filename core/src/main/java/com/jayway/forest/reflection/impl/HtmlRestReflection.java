@@ -1,240 +1,243 @@
 package com.jayway.forest.reflection.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
+
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.exceptions.AbstractHtmlException;
-import com.jayway.forest.reflection.*;
+import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.ReflectionUtil;
+import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.Response;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.Map;
+public final class HtmlRestReflection extends BasicRestReflection implements RestReflection {
 
-public final class HtmlRestReflection implements RestReflection {
+    public static final RestReflection INSTANCE = new HtmlRestReflection(Charset.forName("UTF-8"));
 
-    public static final RestReflection INSTANCE = new HtmlRestReflection();
-
-    private HtmlRestReflection() {
+    private HtmlRestReflection(Charset charset) {
+    	super(charset);
     }
 
+	@Override
+	public void renderQueryResponse(OutputStream out, Object responseObject) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        if ( responseObject instanceof String ) {
+        	writer.write(responseObject.toString());
+        } else {
+        	writer.write(new JSONHelper().toJSON(responseObject).toString());
+        }
+        writer.flush();
+	}
+
     @Override
-    public Object renderCapabilities(Capabilities capabilities) {
-        StringBuilder results = new StringBuilder( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
-        results.append("<h1>"+ capabilities.getName()  +"</h1>");
+    public void renderCapabilities(OutputStream out, Capabilities capabilities) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.write( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
+        writer.append("<h1>"+ capabilities.getName()  +"</h1>");
         if (!capabilities.getQueries().isEmpty()) {
-            results.append("<h2>Queries</h2>");
-            results.append("<ul>");
+            writer.append("<h2>Queries</h2>");
+            writer.append("<ul>");
             for (Capability method: capabilities.getQueries()) {
-                appendMethod( results, method );
+                appendMethod( writer, method );
             }
-            results.append("</ul>");
+            writer.append("</ul>");
         }
         if (!capabilities.getCommands().isEmpty()) {
-            results.append("<h2>Commands</h2>");
-            results.append("<ul>");
+            writer.append("<h2>Commands</h2>");
+            writer.append("<ul>");
             for (Capability method: capabilities.getCommands()) {
-                appendMethod( results, method );
+                appendMethod( writer, method );
             }
-            results.append("</ul>");
+            writer.append("</ul>");
         }
         if (!capabilities.getResources().isEmpty() || !capabilities.getDiscoveredLinks().isEmpty()) {
-            results.append("<h2>Sub Resources</h2>");
-            results.append("<ul>");
+            writer.append("<h2>Sub Resources</h2>");
+            writer.append("<ul>");
 
             for (Capability method: capabilities.getResources()) {
-                appendMethod(results, method );
+                appendMethod(writer, method );
             }
             for (Linkable resource: capabilities.getDiscoveredLinks()) {
                 if ( resource == null ) continue;
-                results.append("<li><a href='").append(resource.getHref()).append("'>").append(resource.getName()).append("</a></li>");
+                writer.append("<li><a href='").append(resource.getHref()).append("'>").append(resource.getName()).append("</a></li>");
             }
-            results.append("</ul>");
+            writer.append("</ul>");
         }
         if ( capabilities.getPagedSortedListResponse() != null ) {
             PagedSortedListResponse<?> response = capabilities.getPagedSortedListResponse();
-            appendPagingInfo( results, response, true);
+            appendPagingInfo( writer, response, true);
             if ( response.getOrderByAsc() != null ) {
-                appendAnchor( results, response.getOrderByAsc().get( "name"), "asc", true);
+                appendAnchor( writer, response.getOrderByAsc().get( "name"), "asc", true);
             }
             if ( response.getOrderByDesc() != null) {
-                appendAnchor( results, response.getOrderByDesc().get( "name"), "desc", true);
+                appendAnchor( writer, response.getOrderByDesc().get( "name"), "desc", true);
             }
         }
 
         if (capabilities.getDescriptionResult() != null ) {
-            results.append("<h2>Description</h2>").append( new JSONHelper().toJSON( capabilities.getDescriptionResult() ));
+            writer.append("<h2>Description</h2>");
+            writer.append( new JSONHelper().toJSON( capabilities.getDescriptionResult() ).toString());
         }
-        results.append("</body></html>");
-        return results.toString();
+        writer.append("</body></html>");
+        writer.flush();
     }
 
-    private void appendMethod( StringBuilder sb, Capability method ) {
-        sb.append("<li><a href='").append(method.href());
-        sb.append("'>").append( method.name() ).append("</a>");
+    private void appendMethod(Writer writer, Capability method ) throws IOException {
+    	writer.append("<li><a href='").append(method.href());
+    	writer.append("'>").append( method.name() ).append("</a>");
         if ( method.isDocumented() ) {
-            sb.append(" <i>(").append( method.documentation() ).append("</i>)");
+        	writer.append(" <i>(").append( method.documentation() ).append("</i>)");
         }
-        sb.append("</li>");
+        writer.append("</li>");
     }
 
     @Override
-    public Object renderQueryForm( BaseReflection  baseReflection ) {
-        return createForm(baseReflection.method, "GET", baseReflection.resource);
+    public void renderForm(OutputStream out, BaseReflection baseReflection) throws IOException {
+    	String httpMethod = "GET";
+    	if (!baseReflection.httpMethod().equals("GET")) {
+    		httpMethod = "POST";
+    	}
+        createForm(out, baseReflection.method, httpMethod, baseReflection.resource);
+    }
+
+    private void appendPagingInfo( Writer writer, PagedSortedListResponse response, boolean stripName ) throws IOException {
+        writer.append("Page ").append( response.getPage().toString() ).append( " of ").append( response.getTotalPages().toString() );
+
+        appendAnchor( writer, response.getPrevious(), "previous", stripName );
+        appendAnchor( writer, response.getNext(), "next" , stripName);
     }
 
     @Override
-    public Object renderCommandDeleteForm(BaseReflection  baseReflection) {
-        return createForm(baseReflection.method, "POST", baseReflection.resource);
-    }
-
-    @Override
-    public Object renderCommandCreateForm(BaseReflection  baseReflection) {
-        return createForm(baseReflection.method, "POST", baseReflection.resource);
-    }
-
-    @Override
-    public Object renderCommandForm(BaseReflection  baseReflection) {
-        return createForm(baseReflection.method, "POST", baseReflection.resource);
-    }
-
-    private void appendPagingInfo( StringBuilder sb, PagedSortedListResponse response, boolean stripName ) {
-        sb.append("Page ").append( response.getPage() ).append( " of ").append( response.getTotalPages() );
-
-        appendAnchor( sb, response.getPrevious(), "previous", stripName );
-        appendAnchor( sb, response.getNext(), "next" , stripName);
-    }
-
-    @Override
-    public Object renderListResponse(PagedSortedListResponse<?> response ) {
-        StringBuilder htmlListResponse = new StringBuilder( "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" );
-        htmlListResponse.append( "<h1>").append(response.getName()).append("</h1>");
-        appendPagingInfo( htmlListResponse, response, false );
+    public void renderListResponse(OutputStream out, PagedSortedListResponse<?> response ) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.write("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>");
+        writer.append( "<h1>").append(response.getName()).append("</h1>");
+        appendPagingInfo( writer, response, false );
 
         List<?> list = response.getList();
         if ( !list.isEmpty() ) {
             if ( list.get( 0 ) instanceof Linkable ) {
                 if ( response.getOrderByAsc() != null && response.getOrderByDesc() != null ) {
-                    appendAnchor( htmlListResponse, response.getOrderByAsc().get( "name"), "asc", false);
-                    appendAnchor( htmlListResponse, response.getOrderByDesc().get( "name"), "desc", false);
+                    appendAnchor( writer, response.getOrderByAsc().get( "name"), "asc", false);
+                    appendAnchor( writer, response.getOrderByDesc().get( "name"), "desc", false);
                 }
 
                 if (list.get(0).getClass() == Linkable.class) {
-                    htmlListResponse.append( "<ul>" );
+                    writer.append( "<ul>" );
                     for (Object elm : list) {
-                        renderLinkable(htmlListResponse, (Linkable) elm);
+                        renderLinkable(writer, (Linkable) elm);
                     }
-                    htmlListResponse.append( "</ul>" );
-                    return htmlListResponse;
+                    writer.append( "</ul>" );
                 }
             }
-            renderTable(htmlListResponse, list, response );
+            renderTable(writer, list, response );
         }
-        return htmlListResponse.append("</body></html>");
+        writer.append("</body></html>");
+        writer.flush();
     }
 
     @Override
-    public Object renderQueryResponse(Object responseObject) {
-        if ( responseObject instanceof String ) {
-            return responseObject.toString();
-        } else {
-            // complex object are JSON serialized for html output
-            return new JSONHelper().toJSON(responseObject).toString();
-        }
-    }
-
-    @Override
-    public Object renderError( Response response ) {
+    public void renderError(OutputStream out, Response response ) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
         if ( response.status() == 405) {
-            return response.message();
+            writer.write(response.message());
+            return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><h1>HTTP Error ").append(response.status()).append("</h1>");
+        writer.append("<html><h1>HTTP Error ").append(response.status().toString()).append("</h1>");
         String description = AbstractHtmlException.messageMapping.get(response.status());
         if ( description != null ) {
-            sb.append("<code>").append( description).append("</code>");
+            writer.append("<code>").append( description).append("</code>");
         }
-        sb.append("<h2>Message</h2>").append( response.message() ).append("</html>");
-        return sb.toString();
+        writer.append("<h2>Message</h2>").append( response.message() ).append("</html>");
+        writer.flush();
     }
 
     @Override
-    public Object renderCreatedResponse(Linkable linkable) {
-        return "<code>Location:</code> <a href='" + linkable.getHref() + "' rel='"+linkable.getRel()+"'>"+linkable.getName() +"</a>";
+    public void renderCreatedResponse(OutputStream out, Linkable linkable) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.write("<code>Location:</code> <a href='" + linkable.getHref() + "' rel='"+linkable.getRel()+"'>"+linkable.getName() +"</a>");
+        writer.flush();
     }
 
-    private void renderTable(StringBuilder sb, List<?> list, PagedSortedListResponse response ) {
-        sb.append("<table><tr>");
+    private void renderTable(Writer writer, List<?> list, PagedSortedListResponse response ) throws IOException {
+        writer.append("<table><tr>");
         Object element = list.get(0);
         if ( element instanceof Linkable ) {
-            sb.append("<th>href");
-            generateSortOption( sb, "href", response );
-            sb.append("</th>");
+            writer.append("<th>href");
+            generateSortOption( writer, "href", response );
+            writer.append("</th>");
         }
-        renderTableHeader( sb, element, element.getClass(), response );
-        sb.append("</tr>");
+        renderTableHeader( writer, element, element.getClass(), response );
+        writer.append("</tr>");
         for ( Object elm: list ) {
-            sb.append("<tr>");
+            writer.append("<tr>");
             if ( elm instanceof Linkable ) {
-                sb.append("<td>");
-                appendAnchor( sb, ((Linkable) elm).getHref(), ((Linkable) elm).getName(), false);
-                sb.append("</td>");
-                renderTableRow(sb, elm.getClass(), elm );
+                writer.append("<td>");
+                appendAnchor( writer, ((Linkable) elm).getHref(), ((Linkable) elm).getName(), false);
+                writer.append("</td>");
+                renderTableRow(writer, elm.getClass(), elm );
             } else {
-                renderTableRow(sb, elm.getClass(), elm );
+                renderTableRow(writer, elm.getClass(), elm );
             }
-            sb.append("</tr>");
+            writer.append("</tr>");
         }
-        sb.append("</table>");
+        writer.append("</table>");
     }
 
-    private void appendAnchor( StringBuilder sb, String id, String name, boolean stripMethodName ) {
+    private void appendAnchor(Writer writer, String id, String name, boolean stripMethodName ) throws IOException {
         if ( id == null ) return;
         if ( stripMethodName ) {
             id = id.substring( id.indexOf( "?" ) );
         }
-        sb.append( "  <a href=\"" ).append( id ).append("\">").append(name).append("</a>");
+        writer.append( "  <a href=\"" ).append( id ).append("\">").append(name).append("</a>");
     }
 
-    private void renderTableHeader( final StringBuilder sb, Object instance, Class clazz, final PagedSortedListResponse response ) {
+    private void renderTableHeader( final Writer writer, Object instance, Class clazz, final PagedSortedListResponse response ) throws IOException {
         if ( clazz == Object.class ) return;
         iterateFields(clazz, instance, new FieldIterator() {
-            public void field(Field field) {
-                sb.append("<th>").append(field.getName());
-                generateSortOption(sb, field.getName(), response);
-                sb.append("</th>");
+            public void field(Field field) throws IOException {
+                writer.append("<th>").append(field.getName());
+                generateSortOption(writer, field.getName(), response);
+                writer.append("</th>");
             }
         });
-        renderTableHeader( sb, instance, clazz.getSuperclass(), response );
+        renderTableHeader( writer, instance, clazz.getSuperclass(), response );
     }
 
-    private void generateSortOption(StringBuilder sb, String name, PagedSortedListResponse<?> response) {
+    private void generateSortOption(Writer writer, String name, PagedSortedListResponse<?> response) throws IOException {
         String asc = response.getOrderByAsc().get(name);
         String desc = response.getOrderByDesc().get(name);
         if ( asc != null ) {
-            sb.append( " <a href=\"" ).append( asc ).append( "\">^</a>");
+            writer.append( " <a href=\"" ).append( asc ).append( "\">^</a>");
         }
         if ( desc != null ) {
-            sb.append( " <a href=\"").append(desc).append("\">v</a>");
+            writer.append( " <a href=\"").append(desc).append("\">v</a>");
         }
 
     }
 
-    private void renderTableRow( final StringBuilder sb, Class clazz, final Object element ) {
+    private void renderTableRow( final Writer writer, Class clazz, final Object element ) throws IOException {
         if ( clazz == Object.class ) return;
         iterateFields( clazz, element, new FieldIterator() {
-            public void field(Field field) throws IllegalAccessException {
-                sb.append("<td>").append(field.get(element)).append("</td>");
+            public void field(Field field) throws IllegalAccessException, IOException {
+                writer.append("<td>").append(emptyOrString(field.get(element))).append("</td>");
             }
         });
-        renderTableRow(sb, clazz.getSuperclass(), element );
+        renderTableRow(writer, clazz.getSuperclass(), element );
     }
 
-    private void iterateFields( Class clazz, Object instance, FieldIterator callback ) {
+    private void iterateFields( Class clazz, Object instance, FieldIterator callback ) throws IOException {
         for (Field field : clazz.getDeclaredFields()) {
             if ( Modifier.isFinal(field.getModifiers())) continue;
             if ( Modifier.isStatic( field.getModifiers() )) continue;
@@ -250,13 +253,13 @@ public final class HtmlRestReflection implements RestReflection {
     }
 
     public interface FieldIterator {
-        void field( Field field ) throws IllegalAccessException;
+        void field( Field field ) throws IllegalAccessException, IOException;
     }
 
-    private void renderLinkable(StringBuilder sb, Linkable link) {
-        sb.append("<li>");
-        appendAnchor( sb, link.getHref(), link.getName(), false );
-        sb.append( "</li>" );
+    private void renderLinkable(Writer writer, Linkable link) throws IOException {
+        writer.append("<li>");
+        appendAnchor( writer, link.getHref(), link.getName(), false );
+        writer.append( "</li>" );
     }
 
 
@@ -265,39 +268,42 @@ public final class HtmlRestReflection implements RestReflection {
      * It will reflectively look at the argument for the method,
      * which has to be a single argument of DTO type, and
      * construct the form based on that
+     * @param out 
      *
      * @param method
      * @return html form getting the parameters needed for the method
+     * @throws IOException 
      */
-    protected String createForm( Method method, String httpMethod, Resource resource ) {
+    protected void createForm( OutputStream out, Method method, String httpMethod, Resource resource ) throws IOException {
         List<Parameter> parameters = ReflectionUtil.parameterList(method, resource);
         Class<?>[] types = method.getParameterTypes();
-        StringBuilder sb = new StringBuilder();
-        sb.append( "<html><body><form name='generatedform' action='").append(method.getName()).
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.append( "<html><body><form name='generatedform' action='").append(method.getName()).
                 append("' method='").append(httpMethod).append("' >" );
 
         for ( int i=0; i<parameters.size(); i++ ) {
             Parameter parameter = parameters.get(i);
-            htmlForParameter("argument" + (i + 1), parameter.parameterCls(), sb, parameter.parameterCls().getSimpleName(), parameter.getTemplate());
+            htmlForParameter("argument" + (i + 1), parameter.parameterCls(), writer, parameter.parameterCls().getSimpleName(), parameter.getTemplate());
         }
-        return sb.append( "<input type='submit' /></form></body></html>" ).toString();
+        writer.append( "<input type='submit' /></form></body></html>" );
+        writer.flush();
     }
 
-    private void htmlForParameter(String legend, Class<?> dto, StringBuilder sb, String typeName, Object templateValue) {
-        sb.append("<fieldset><legend>").append(legend).append("</legend>");
+    private void htmlForParameter(String legend, Class<?> dto, Writer writer, String typeName, Object templateValue) throws IOException {
+        writer.append("<fieldset><legend>").append(legend).append("</legend>");
         if ( ReflectionUtil.basicTypes.contains( dto ) ) {
             // special case for text area
             if ( templateValue != null && templateValue instanceof String && ( ((String) templateValue).length()> 20)) {
                 String value = (String) templateValue;
                 int rows = lines( value ) + 2;
-                sb.append(typeName).append(": <textarea rows='").append( rows ).append("' cols='80' name='");
-                sb.append(legend).append("'>").append(value).append("</textarea></br>");
+                writer.append(typeName).append(": <textarea rows='").append( "" + rows ).append("' cols='80' name='");
+                writer.append(legend).append("'>").append(value).append("</textarea></br>");
             } else {
-                sb.append(typeName).append(": <input type='text' ");
+                writer.append(typeName).append(": <input type='text' ");
                 if ( templateValue != null && ReflectionUtil.basicTypes.contains( templateValue.getClass() )) {
-                    sb.append(" value='").append(templateValue).append("' ");
+                    writer.append(" value='").append(templateValue.toString()).append("' ");
                 }
-                sb.append("name='").append( legend ).append("'/></br>");
+                writer.append("name='").append( legend ).append("'/></br>");
             }
         } else if ( List.class.isAssignableFrom( dto ) ) {
             // TODO create textarea and accept a comma separated list of values
@@ -305,14 +311,14 @@ public final class HtmlRestReflection implements RestReflection {
             // TODO
         } else {
             // dto type
-            htmlForComposite(dto.getSimpleName(), dto, sb, legend + "." + dto.getSimpleName(), templateValue);
+            htmlForComposite(dto.getSimpleName(), dto, writer, legend + "." + dto.getSimpleName(), templateValue);
         }
 
-        sb.append("</fieldset>");
+        writer.append("</fieldset>");
     }
 
-    private void htmlForComposite(String legend, Class<?> dto, StringBuilder sb, String fieldPath, Object templateValue ) {
-        sb.append("<fieldset><legend>").append(legend).append("</legend>");
+    private void htmlForComposite(String legend, Class<?> dto, Writer writer, String fieldPath, Object templateValue ) throws IOException {
+        writer.append("<fieldset><legend>").append(legend).append("</legend>");
         for ( Field f : dto.getDeclaredFields() ) {
             if ( Modifier.isFinal(f.getModifiers())) continue;
             if ( Modifier.isStatic(f.getModifiers())) continue;
@@ -329,26 +335,26 @@ public final class HtmlRestReflection implements RestReflection {
             Class<?> type = f.getType();
             // this must be one of the getters
             if ( ReflectionUtil.basicTypes.contains(  type ) ) {
-                sb.append(name).append(": <input type='");
-                sb.append( name.equals("password")? "password": "text" );
+                writer.append(name).append(": <input type='");
+                writer.append( name.equals("password")? "password": "text" );
                 if ( fieldValue != null ) {
-                    sb.append("' value='").append(fieldValue);
+                    writer.append("' value='").append(fieldValue.toString());
                 }
-                sb.append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
+                writer.append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
             } else if ( type.isEnum() ) {
                 // TODO handle enums
-                sb.append(name).append( ": <select name='").append( fieldPath ).append( "." ).append(name).append("'>");
+                writer.append(name).append( ": <select name='").append( fieldPath ).append( "." ).append(name).append("'>");
                 for ( Object o : type.getEnumConstants() ) {
-                    sb.append( "<option value='").append(o).append("'>").append(o).append("</option>");
+                    writer.append( "<option value='").append(o.toString()).append("'>").append(o.toString()).append("</option>");
                 }
-                sb.append("</select></br>");
+                writer.append("</select></br>");
             } else {
                 // for now assume DTO subtype
                 // TODO List & Map, (any other???)
-                htmlForComposite(name, type, sb, fieldPath + "." + name, fieldValue);
+                htmlForComposite(name, type, writer, fieldPath + "." + name, fieldValue);
             }
         }
-        sb.append("</fieldset>");
+        writer.append("</fieldset>");
     }
 
     private int lines(String contents ) {

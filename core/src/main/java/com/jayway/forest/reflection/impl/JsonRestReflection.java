@@ -9,20 +9,26 @@ import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.servlet.Response;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
-public final class JsonRestReflection implements RestReflection {
+public final class JsonRestReflection extends BasicRestReflection implements RestReflection {
 
-    public static final RestReflection INSTANCE = new JsonRestReflection();
+    public static final RestReflection INSTANCE = new JsonRestReflection(Charset.forName("UTF-8"));
 
-    private JsonRestReflection() {
+    private JsonRestReflection(Charset charset) {
+    	super(charset);
     }
 
     @Override
-    public Object renderCapabilities(Capabilities capabilities) {
-        StringBuilder results = new StringBuilder( );
-        results.append("[");
+    public void renderCapabilities(OutputStream out, Capabilities capabilities) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.append("[");
         List<CapabilityReference> all = new LinkedList<CapabilityReference>();
         all.addAll( capabilities.getQueries() );
         all.addAll( capabilities.getCommands() );
@@ -34,13 +40,13 @@ public final class JsonRestReflection implements RestReflection {
             all.add( capabilities.getIdResource());
         }
         if ( !all.isEmpty() ) {
-            toMapEntries(all, results);
+            toMapEntries(all, writer);
         }
-        results.append("]");
-        return results.toString();
+        writer.append("]");
+        writer.flush();
     }
 
-    private void toMapEntries(List<CapabilityReference> list, StringBuilder results) {
+    private void toMapEntries(List<CapabilityReference> list, Writer results) throws IOException {
         boolean first = true;
         for (CapabilityReference method : list) {
             if ( !first ) results.append( ",\n");
@@ -50,102 +56,95 @@ public final class JsonRestReflection implements RestReflection {
     }
 
     @Override
-    public Object renderQueryForm(BaseReflection baseReflection ) {
-        return appendMethod( new StringBuilder(), baseReflection ).toString();
+    public void renderForm(OutputStream out, BaseReflection baseReflection ) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        appendMethod(writer, baseReflection );
+        writer.flush();
     }
 
-    @Override
-    public Object renderCommandCreateForm(BaseReflection baseReflection) {
-        return appendMethod(new StringBuilder(), baseReflection).toString();
-    }
-
-    @Override
-    public Object renderCommandDeleteForm(BaseReflection baseReflection) {
-        return appendMethod( new StringBuilder(), baseReflection ).toString();
-    }
-
-    @Override
-    public Object renderCommandForm( BaseReflection baseReflection ) {
-        return appendMethod(new StringBuilder(), baseReflection ).toString();
-    }
-
-    private StringBuilder appendMethod( StringBuilder sb, CapabilityReference reference ) {
-        sb.append( "{ \"method\":\"").append(reference.httpMethod()).append("\",");
-        sb.append("\"name\":").append("\"").append(reference.name() ).append("\",");
+    private void appendMethod( Writer writer, CapabilityReference reference ) throws IOException {
+        writer.append( "{ \"method\":\"").append(reference.httpMethod()).append("\",");
+        writer.append("\"name\":").append("\"").append(reference.name() ).append("\",");
         if ( reference instanceof CapabilityCreateCommand || reference instanceof CapabilityDeleteCommand ) {
-            sb.append("\"href\":\"").append(reference.href().substring(0, reference.href().length() - 6 )).append("\"");
+            writer.append("\"href\":\"").append(reference.href().substring(0, reference.href().length() - 6 )).append("\"");
         } else {
-            sb.append("\"href\":\"").append(reference.href()).append("\"");
+            writer.append("\"href\":\"").append(reference.href()).append("\"");
         }
         if ( reference instanceof BaseReflection ) {
             BaseReflection base = (BaseReflection) reference;
             String template = createTemplate( base.method, base.resource);
             if ( template != null ) {
-                sb.append(",\"jsonTemplate\":").append(template);
+                writer.append(",\"jsonTemplate\":").append(template);
             }
         }
         if ( reference.rel() != null ) {
-            sb.append(",\"rel\":\"").append( reference.rel() ).append("\"");
+            writer.append(",\"rel\":\"").append( reference.rel() ).append("\"");
         }
-        sb.append("}");
-        return sb;
+        writer.append("}");
+        writer.flush();
     }
 
     @Override
-    public Object renderListResponse(PagedSortedListResponse response) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        appendLink( sb, "next", response.getNext() );
-        appendLink(sb, "previous", response.getPrevious());
+    public void renderListResponse(OutputStream out, PagedSortedListResponse response) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.append("{");
+        appendLink( writer, "next", response.getNext() );
+        appendLink(writer, "previous", response.getPrevious());
         if ( response.getOrderByAsc() != null ) {
             // TODO
         }
         if ( response.getOrderByDesc() != null ) {
             // TODO
         }
-        sb.append("\"page\":").append( response.getPage() ).append(",");
-        sb.append("\"pageSize\":").append( response.getPageSize() ).append(",");
-        sb.append("\"totalPages\":").append( response.getTotalPages() ).append(",");
-        sb.append("\"totalElements\":").append( response.getTotalElements() ).append(",");
-        sb.append("\"list\":");
-        appendRawList( sb, response.getList() );
-        sb.append("}");
-        return sb.toString();
+        writer.append("\"page\":").append( emptyOrString(response.getPage()) ).append(",");
+        writer.append("\"pageSize\":").append( emptyOrString(response.getPageSize()) ).append(",");
+        writer.append("\"totalPages\":").append( emptyOrString(response.getTotalPages()) ).append(",");
+        writer.append("\"totalElements\":").append( emptyOrString(response.getTotalElements()) ).append(",");
+        writer.append("\"list\":");
+        appendRawList( writer, response.getList() );
+        writer.append("}");
+        writer.flush();
     }
 
     @Override
-    public Object renderQueryResponse(Object responseObject) {
-        if (responseObject instanceof String) {
-            return "\"" + responseObject + "\"";
+    public void renderQueryResponse(OutputStream out, Object responseObject) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        if ( responseObject instanceof String ) {
+        	writer.write("\"");
+        	writer.write(responseObject.toString());
+        	writer.write("\"");
         } else {
-            return new JSONHelper().toJSON(responseObject);
+        	writer.write(new JSONHelper().toJSON(responseObject).toString());
         }
+        writer.flush();
     }
 
     @Override
-    public Object renderError(Response response) {
-        return response.message();
+    public void renderError(OutputStream out, Response response) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        writer.write(response.message());
+        writer.flush();
     }
 
     @Override
-    public Object renderCreatedResponse(Linkable linkable) {
-        StringBuilder sb = new StringBuilder();
-        appendMethod(sb, new CapabilityLinkable( linkable ) );
-        return sb.toString();
+    public void renderCreatedResponse(OutputStream out, Linkable linkable) throws IOException {
+        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
+        appendMethod(writer, new CapabilityLinkable( linkable ) );
+        writer.flush();
     }
 
-    private void appendLink( StringBuilder sb, String name, String link ) {
+    private void appendLink( Writer writer, String name, String link ) throws IOException {
         if ( link!= null) {
-            sb.append("\"").append(name).append("\":\"").append(link).append("\",");
+            writer.append("\"").append(name).append("\":\"").append(link).append("\",");
         }
     }
 
-    private void appendRawList( StringBuilder sb, List<?> list ) {
+    private void appendRawList( Writer writer, List<?> list ) throws IOException {
         if ( list == null || list.size() == 0 ) {
-            sb.append("[]");
+            writer.append("[]");
         } else {
             JSONHelper helper = new JSONHelper();
-            sb.append( helper.toJSON( list ).toString() );
+            writer.append( helper.toJSON( list ).toString() );
         }
     }
 

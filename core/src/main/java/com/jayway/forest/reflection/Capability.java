@@ -61,6 +61,4 @@ public abstract class Capability implements CapabilityReference {
     }
 
 	public abstract String httpMethod();
-
-	public abstract Object renderForm(RestReflection restReflection);
 }

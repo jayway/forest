@@ -1,15 +1,19 @@
 package com.jayway.forest.reflection.impl;
 
-import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.*;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.Resource;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.exceptions.BadRequestException;
+import com.jayway.forest.exceptions.BadRequestRenderTemplateException;
+import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.exceptions.WrappedException;
+import com.jayway.forest.roles.Resource;
 
 public class CapabilityQuery extends BaseReflection {
 
@@ -68,10 +72,5 @@ public class CapabilityQuery extends BaseReflection {
     @Override
     public String httpMethod() {
         return "GET";
-    }
-
-    @Override
-    public Object renderForm(RestReflection restReflection) {
-        return restReflection.renderQueryForm( this );
     }
 }

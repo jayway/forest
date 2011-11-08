@@ -1,13 +1,15 @@
 package com.jayway.forest.servlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,8 +24,10 @@ import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.exceptions.RenderTemplateException;
 import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.reflection.impl.AtomRestReflection;
+import com.jayway.forest.reflection.impl.BaseReflection;
 import com.jayway.forest.reflection.impl.HtmlRestReflection;
 import com.jayway.forest.reflection.impl.JsonRestReflection;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
@@ -73,25 +77,23 @@ public class ResponseHandler {
     public void handleResponse( Object responseObject ) {
         if (responseObject != null) {
             try {
-                OutputStreamWriter writer = new OutputStreamWriter( response.getOutputStream(), Charset.forName("UTF-8"));
-                String responseString;
+            	OutputStream out = response.getOutputStream();
                 if ( responseObject instanceof Capabilities ) {
-                    responseString = restReflection().renderCapabilities((Capabilities) responseObject ).toString();
+                    restReflection().renderCapabilities(out, (Capabilities) responseObject );
                 } else if ( responseObject instanceof PagedSortedListResponse) {
-                    responseString = restReflection().renderListResponse((PagedSortedListResponse) responseObject).toString();
+                    restReflection().renderListResponse(out, (PagedSortedListResponse) responseObject);
                 } else if ( responseObject instanceof Response ) {
                     Response error = (Response) responseObject;
-                    responseString = restReflection().renderError(error).toString();
                     response.setStatus( error.status() );
+                    restReflection().renderError(out, error);
                 } else if ( responseObject instanceof CreatedException ) {
-                    responseString = restReflection().renderCreatedResponse( ((CreatedException) responseObject).getLinkable() ).toString();
                     response.setStatus( ((CreatedException) responseObject).getCode() );
                     response.addHeader( "Location", ((CreatedException) responseObject).getLinkable().getHref() );
+                    restReflection().renderCreatedResponse( out, ((CreatedException) responseObject).getLinkable() );
                 } else {
-                    responseString = restReflection().renderQueryResponse( responseObject ).toString();
+                    restReflection().renderQueryResponse( out, responseObject );
                 }
-                writer.write( responseString, 0, responseString.length() );
-                writer.flush();
+				out.flush();
             } catch (IOException e) {
                 response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
                 log.error("Error sending response", e);
@@ -130,7 +132,16 @@ public class ResponseHandler {
 
         if ( e instanceof RenderTemplateException ) {
             RenderTemplateException render = (RenderTemplateException) e;
-            return new Response( render.getCode(), render.getCapability().renderForm( restReflection() ).toString() );
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Capability capability = render.getCapability();
+            if (capability instanceof BaseReflection) {
+            	try {
+					restReflection().renderForm(out, (BaseReflection)capability);
+				} catch (IOException e1) {
+					throw new RuntimeException(e1);
+				}
+            }
+            return new Response( render.getCode(), new String(out.toByteArray()) );
         } else if ( e instanceof AbstractHtmlException ) {
             return new Response( ((AbstractHtmlException) e).getCode(), e.getMessage() );
         } else {

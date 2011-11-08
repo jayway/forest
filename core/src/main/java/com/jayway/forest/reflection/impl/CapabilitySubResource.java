@@ -6,12 +6,10 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.RestReflection;
 import com.jayway.forest.roles.Resource;
 
 public class CapabilitySubResource extends Capability {
@@ -56,11 +54,6 @@ public class CapabilitySubResource extends Capability {
 	@Override
 	public String httpMethod() {
 		return "GET";
-	}
-
-	@Override
-	public Object renderForm(RestReflection restReflection) {
-		throw new UnsupportedOperationException();
 	}
 
     @Override

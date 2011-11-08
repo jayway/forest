@@ -39,9 +39,4 @@ public class CapabilityCreateCommand extends CapabilityCommand {
     public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
         throw new MethodNotAllowedRenderTemplateException( this );
     }
-
-    @Override
-    public Object renderForm(RestReflection restReflection) {
-        return restReflection.renderCommandCreateForm( this );
-    }
 }

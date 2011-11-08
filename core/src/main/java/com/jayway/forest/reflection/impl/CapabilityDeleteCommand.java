@@ -1,12 +1,11 @@
 package com.jayway.forest.reflection.impl;
 
-import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.DeletableResource;
-
 import java.io.InputStream;
 import java.util.Map;
+
+import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.forest.roles.DeletableResource;
 
 public class CapabilityDeleteCommand extends CapabilityCommand {
 
@@ -25,11 +24,6 @@ public class CapabilityDeleteCommand extends CapabilityCommand {
     @Override
     public void delete() {
         deletable.delete();
-    }
-
-    @Override
-    public Object renderForm(RestReflection restReflection) {
-        return restReflection.renderCommandDeleteForm( this );
     }
 
     @Override

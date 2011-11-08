@@ -79,9 +79,4 @@ public class CapabilityCommand extends BaseReflection {
 	public String httpMethod() {
 		return "PUT";
 	}
-
-	@Override
-	public Object renderForm(RestReflection restReflection) {
-		return restReflection.renderCommandForm(this);
-	}
 }
