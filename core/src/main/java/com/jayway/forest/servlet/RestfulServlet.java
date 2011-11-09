@@ -1,20 +1,31 @@
 package com.jayway.forest.servlet;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 
 import com.jayway.forest.core.Application;
 import com.jayway.forest.core.ForestCore;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.reflection.impl.AtomRestReflection;
-import com.jayway.forest.reflection.impl.HtmlRestReflection;
-import com.jayway.forest.reflection.impl.JsonRestReflection;
+import com.jayway.forest.mediatype.SimpleErrorMessageBodyWriter;
+import com.jayway.forest.mediatype.atom.PagedSortedListResponseAtomMessageBodyWriter;
+import com.jayway.forest.mediatype.html.CapabilitiesHtmlMessageBodyWriter;
+import com.jayway.forest.mediatype.html.ErrorHtmlMessageBodyWriter;
+import com.jayway.forest.mediatype.html.FormHtmlMessageBodyWriter;
+import com.jayway.forest.mediatype.html.LinkableHtmlMessageBodyWriter;
+import com.jayway.forest.mediatype.html.PagedSortedListResponseHtmlMessageBodyWriter;
+import com.jayway.forest.mediatype.html.QueryHtmlMessageBodyWriter;
+import com.jayway.forest.mediatype.json.CapabilitiesJsonMessageBodyWriter;
+import com.jayway.forest.mediatype.json.FormJsonMessageBodyWriter;
+import com.jayway.forest.mediatype.json.LinkableJsonMessageBodyWriter;
+import com.jayway.forest.mediatype.json.PagedSortedListResponseJsonMessageBodyWriter;
+import com.jayway.forest.mediatype.json.QueryJsonMessageBodyWriter;
 
 public class RestfulServlet extends HttpServlet {
 	private static final long serialVersionUID = 1;
@@ -23,16 +34,28 @@ public class RestfulServlet extends HttpServlet {
     private DependencyInjectionSPI dependencyInjectionSPI;
     private MediaTypeHandlerContainer mediaTypeHandlerContainer = new MediaTypeHandlerContainer();
     
-    public void setHandler(String mediaType, RestReflection restReflection) {
-    	mediaTypeHandlerContainer.setHandler(mediaType, restReflection);
-	}
-
     public void initForest( Application application, DependencyInjectionSPI dependencyInjectionSPI){
         this.forest = new ForestCore(application, dependencyInjectionSPI);
         this.dependencyInjectionSPI = dependencyInjectionSPI;
-    	mediaTypeHandlerContainer.setHandler(MediaTypeHandler.APPLICATION_JSON, JsonRestReflection.INSTANCE);
-    	mediaTypeHandlerContainer.setHandler(MediaTypeHandler.TEXT_HTML, HtmlRestReflection.DEFAULT);
-    	mediaTypeHandlerContainer.setHandler(MediaTypeHandler.APPLICATION_ATOM, AtomRestReflection.INSTANCE);
+        Charset charset = Charset.forName("UTF-8");
+        String cssUrl = null;
+        mediaTypeHandlerContainer.addHandler(new CapabilitiesHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new ErrorHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new FormHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new LinkableHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new PagedSortedListResponseHtmlMessageBodyWriter(charset, cssUrl));
+        
+        mediaTypeHandlerContainer.addHandler(new CapabilitiesJsonMessageBodyWriter(charset));
+        mediaTypeHandlerContainer.addHandler(new FormJsonMessageBodyWriter(charset));
+        mediaTypeHandlerContainer.addHandler(new LinkableJsonMessageBodyWriter(charset));
+        mediaTypeHandlerContainer.addHandler(new PagedSortedListResponseJsonMessageBodyWriter(charset));
+
+        mediaTypeHandlerContainer.addHandler(new PagedSortedListResponseAtomMessageBodyWriter(charset));
+        
+        mediaTypeHandlerContainer.addHandler(new SimpleErrorMessageBodyWriter(MediaType.WILDCARD_TYPE, charset));
+
+        mediaTypeHandlerContainer.addHandler(new QueryHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new QueryJsonMessageBodyWriter(charset));
     }
 
     /**

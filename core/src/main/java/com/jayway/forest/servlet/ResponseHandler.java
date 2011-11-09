@@ -19,10 +19,9 @@ import com.jayway.forest.exceptions.CreatedException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.exceptions.RenderTemplateException;
 import com.jayway.forest.exceptions.WrappedException;
+import com.jayway.forest.reflection.FormCapability;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.reflection.impl.BaseReflection;
 import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.UriInfo;
@@ -59,22 +58,22 @@ public class ResponseHandler {
 
     public void handleResponse( Object responseObject ) {
         if (responseObject != null) {
-            try {
+        	try {
             	OutputStream out = response.getOutputStream();
                 if ( responseObject instanceof Capabilities ) {
-                    restReflection().renderCapabilities(out, (Capabilities) responseObject );
+                	mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Capabilities.class, (Capabilities)responseObject);
                 } else if ( responseObject instanceof PagedSortedListResponse) {
-                    restReflection().renderListResponse(out, (PagedSortedListResponse) responseObject);
+                	mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), PagedSortedListResponse.class, (PagedSortedListResponse)responseObject);
                 } else if ( responseObject instanceof Response ) {
                     Response error = (Response) responseObject;
                     response.setStatus( error.status() );
-                    restReflection().renderError(out, error);
+                    mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Response.class, (Response)responseObject);
                 } else if ( responseObject instanceof CreatedException ) {
                     response.setStatus( ((CreatedException) responseObject).getCode() );
                     response.addHeader( "Location", ((CreatedException) responseObject).getLinkable().getHref() );
-                    restReflection().renderCreatedResponse( out, ((CreatedException) responseObject).getLinkable() );
+                    mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Linkable.class, ((CreatedException) responseObject).getLinkable());
                 } else {
-                    restReflection().renderQueryResponse( out, responseObject );
+                    mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Object.class, responseObject);
                 }
 				out.flush();
             } catch (IOException e) {
@@ -83,10 +82,6 @@ public class ResponseHandler {
             }
         }
     }
-
-    private RestReflection restReflection() {
-		return mediaTypeHandlerContainer.restReflection(mediaTypeHandler.accept());
-	}
 
 	public void invoke( RestfulServlet.Runner runner ) {
         Object responseObject;
@@ -121,9 +116,9 @@ public class ResponseHandler {
             RenderTemplateException render = (RenderTemplateException) e;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             Capability capability = render.getCapability();
-            if (capability instanceof BaseReflection) {
+            if (capability instanceof FormCapability) {
             	try {
-					restReflection().renderForm(out, (BaseReflection)capability);
+                    mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), FormCapability.class, (FormCapability)capability);
 				} catch (IOException e1) {
 					throw new RuntimeException(e1);
 				}

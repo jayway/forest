@@ -1,15 +1,14 @@
 package com.jayway.forest.reflection.impl;
 
-import com.jayway.forest.core.MediaTypeHandler;
-import com.jayway.forest.exceptions.CreatedException;
-import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.CreatableResource;
-import com.jayway.forest.roles.Resource;
-
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.exceptions.CreatedException;
+import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.forest.roles.CreatableResource;
+import com.jayway.forest.roles.Resource;
 
 public class CapabilityCreateCommand extends CapabilityCommand {
 
