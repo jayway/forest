@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection.impl;
+package com.jayway.forest.mediatype.atom;
 
 import static com.jayway.forest.core.RoleManager.role;
 import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
@@ -6,32 +6,35 @@ import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
-import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.mediatype.AbstractMessageBodyWriter;
+import com.jayway.forest.reflection.impl.PagedSortedListResponse;
 import com.jayway.forest.roles.UriInfo;
-import com.jayway.forest.servlet.Response;
 
-/**
- */
-public class AtomRestReflection extends BasicRestReflection implements RestReflection {
+public class PagedSortedListResponseAtomMessageBodyWriter extends AbstractMessageBodyWriter<PagedSortedListResponse>{
+	
+	private final Charset charset;
 
-	public static final AtomRestReflection INSTANCE = new AtomRestReflection(Charset.forName("UTF-8"));
-    private VelocityEngine engine;
-
-    private AtomRestReflection(Charset charset) {
-    	super(charset);
-    }
-
-    @Override
-    public void renderListResponse(OutputStream out, PagedSortedListResponse response) {
-
-        engine = new VelocityEngine();
+	public PagedSortedListResponseAtomMessageBodyWriter(Charset charset) {
+		super(PagedSortedListResponse.class, MediaType.APPLICATION_ATOM_XML_TYPE);
+		this.charset = charset;
+	}
+	
+	@Override
+	public void writeTo(PagedSortedListResponse response, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+			MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException, WebApplicationException {
+		VelocityEngine engine = new VelocityEngine();
         engine.setProperty("resource.loader","class");
         engine.setProperty("class.resource.loader.class",
                 "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
@@ -52,18 +55,5 @@ public class AtomRestReflection extends BasicRestReflection implements RestRefle
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void renderQueryResponse(OutputStream out, Object responseObject) {
-    	// TODO: if the responseObject is ATOM it could be returned
-        throw new UnsupportedMediaTypeException();
-    }
-
-    @Override
-    public void renderError(OutputStream out, Response response) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.write(response.message());
-        writer.flush();
-    }
+	}
 }

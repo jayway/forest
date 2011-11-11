@@ -13,9 +13,10 @@ import com.jayway.forest.exceptions.BadRequestRenderTemplateException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.exceptions.WrappedException;
+import com.jayway.forest.reflection.FormCapability;
 import com.jayway.forest.roles.Resource;
 
-public class CapabilityQuery extends BaseReflection {
+public class CapabilityQuery extends FormCapability {
 
     public CapabilityQuery(Resource resource, Method method, String documentation, String rel) {
         super(method, resource, method.getName(), documentation, rel);

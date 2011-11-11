@@ -1,4 +1,4 @@
-package com.jayway.forest.reflection.impl;
+package com.jayway.forest.reflection;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -10,15 +10,13 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.QueryParam;
 
 import com.jayway.forest.exceptions.BadRequestException;
-import com.jayway.forest.reflection.Capability;
-import com.jayway.forest.reflection.ReflectionUtil;
 import com.jayway.forest.roles.Resource;
 
-public abstract class BaseReflection extends Capability {
-    protected final Resource resource;
-    protected final Method method;
+public abstract class FormCapability extends Capability {
+    public final Resource resource;
+    public final Method method;
 
-    public BaseReflection(Method method, Resource resource, String name, String documentation, String rel) {
+    public FormCapability(Method method, Resource resource, String name, String documentation, String rel) {
 		super(name, documentation, rel);
         this.method = method;
         this.resource = resource;

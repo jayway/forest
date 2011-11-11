@@ -4,9 +4,10 @@ import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 
-/**
- */
+// FIXME: this class should be removed and we should use MediaType directly
+
 public class MediaTypeHandler {
 
     public static final String APPLICATION_JSON = "application/json";
@@ -60,8 +61,8 @@ public class MediaTypeHandler {
         }
     }
 
-    public String accept() {
-        return accept;
+    public MediaType accept() {
+        return MediaType.valueOf(accept);
     }
 
     public boolean acceptHtml() {

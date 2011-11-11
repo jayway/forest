@@ -1,68 +1,39 @@
-package com.jayway.forest.reflection.impl;
-
-import com.jayway.forest.core.JSONHelper;
-import com.jayway.forest.reflection.Capabilities;
-import com.jayway.forest.reflection.CapabilityReference;
-import com.jayway.forest.reflection.ReflectionUtil;
-import com.jayway.forest.reflection.RestReflection;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.servlet.Response;
+package com.jayway.forest.mediatype.json;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-public final class JsonRestReflection extends BasicRestReflection implements RestReflection {
+import javax.ws.rs.core.MediaType;
 
-    public static final RestReflection INSTANCE = new JsonRestReflection(Charset.forName("UTF-8"));
+import com.jayway.forest.core.JSONHelper;
+import com.jayway.forest.mediatype.AbstractMessageBodyWriter;
+import com.jayway.forest.reflection.FormCapability;
+import com.jayway.forest.reflection.CapabilityReference;
+import com.jayway.forest.reflection.ReflectionUtil;
+import com.jayway.forest.reflection.impl.CapabilityCreateCommand;
+import com.jayway.forest.reflection.impl.CapabilityDeleteCommand;
+import com.jayway.forest.reflection.impl.Parameter;
+import com.jayway.forest.roles.Resource;
 
-    private JsonRestReflection(Charset charset) {
-    	super(charset);
-    }
+public abstract class JsonMessageBodyWriter<T> extends AbstractMessageBodyWriter<T> {
+	
+	protected final Charset charset;
 
-    @Override
-    public void renderCapabilities(OutputStream out, Capabilities capabilities) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.append("[");
-        List<CapabilityReference> all = new LinkedList<CapabilityReference>();
-        all.addAll( capabilities.getQueries() );
-        all.addAll( capabilities.getCommands() );
-        all.addAll( capabilities.getResources() );
-        for (Linkable link : capabilities.getDiscoveredLinks()) {
-            all.add(new CapabilityLinkable(link));
-        }
-        if ( capabilities.getIdResource() != null ) {
-            all.add( capabilities.getIdResource());
-        }
-        if ( !all.isEmpty() ) {
-            toMapEntries(all, writer);
-        }
-        writer.append("]");
-        writer.flush();
-    }
-
-    private void toMapEntries(List<CapabilityReference> list, Writer results) throws IOException {
-        boolean first = true;
-        for (CapabilityReference method : list) {
-            if ( !first ) results.append( ",\n");
-            else first = false;
-            appendMethod(results, method);
-        }
-    }
-
-    @Override
-    public void renderForm(OutputStream out, BaseReflection baseReflection ) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        appendMethod(writer, baseReflection );
-        writer.flush();
-    }
-
-    private void appendMethod( Writer writer, CapabilityReference reference ) throws IOException {
+	public JsonMessageBodyWriter(Class<T> clazz, Charset charset) {
+		super(clazz, MediaType.APPLICATION_JSON_TYPE);
+		this.charset = charset;
+	}
+	
+    protected void appendMethod( Writer writer, CapabilityReference reference ) throws IOException {
         writer.append( "{ \"method\":\"").append(reference.httpMethod()).append("\",");
         writer.append("\"name\":").append("\"").append(reference.name() ).append("\",");
         if ( reference instanceof CapabilityCreateCommand || reference instanceof CapabilityDeleteCommand ) {
@@ -70,8 +41,8 @@ public final class JsonRestReflection extends BasicRestReflection implements Res
         } else {
             writer.append("\"href\":\"").append(reference.href()).append("\"");
         }
-        if ( reference instanceof BaseReflection ) {
-            BaseReflection base = (BaseReflection) reference;
+        if ( reference instanceof FormCapability ) {
+            FormCapability base = (FormCapability) reference;
             String template = createTemplate( base.method, base.resource);
             if ( template != null ) {
                 writer.append(",\"jsonTemplate\":").append(template);
@@ -84,62 +55,13 @@ public final class JsonRestReflection extends BasicRestReflection implements Res
         writer.flush();
     }
 
-    @Override
-    public void renderListResponse(OutputStream out, PagedSortedListResponse response) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.append("{");
-        appendLink( writer, "next", response.getNext() );
-        appendLink(writer, "previous", response.getPrevious());
-        if ( response.getOrderByAsc() != null ) {
-            // TODO
-        }
-        if ( response.getOrderByDesc() != null ) {
-            // TODO
-        }
-        writer.append("\"page\":").append( emptyOrString(response.getPage()) ).append(",");
-        writer.append("\"pageSize\":").append( emptyOrString(response.getPageSize()) ).append(",");
-        writer.append("\"totalPages\":").append( emptyOrString(response.getTotalPages()) ).append(",");
-        writer.append("\"totalElements\":").append( emptyOrString(response.getTotalElements()) ).append(",");
-        writer.append("\"list\":");
-        appendRawList( writer, response.getList() );
-        writer.append("}");
-        writer.flush();
-    }
-
-    @Override
-    public void renderQueryResponse(OutputStream out, Object responseObject) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        if ( responseObject instanceof String ) {
-        	writer.write("\"");
-        	writer.write(responseObject.toString());
-        	writer.write("\"");
-        } else {
-        	writer.write(new JSONHelper().toJSON(responseObject).toString());
-        }
-        writer.flush();
-    }
-
-    @Override
-    public void renderError(OutputStream out, Response response) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.write(response.message());
-        writer.flush();
-    }
-
-    @Override
-    public void renderCreatedResponse(OutputStream out, Linkable linkable) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        appendMethod(writer, new CapabilityLinkable( linkable ) );
-        writer.flush();
-    }
-
-    private void appendLink( Writer writer, String name, String link ) throws IOException {
+    protected void appendLink( Writer writer, String name, String link ) throws IOException {
         if ( link!= null) {
             writer.append("\"").append(name).append("\":\"").append(link).append("\",");
         }
     }
 
-    private void appendRawList( Writer writer, List<?> list ) throws IOException {
+    protected void appendRawList( Writer writer, List<?> list ) throws IOException {
         if ( list == null || list.size() == 0 ) {
             writer.append("[]");
         } else {
@@ -165,7 +87,6 @@ public final class JsonRestReflection extends BasicRestReflection implements Res
         }
         return sb.toString();
     }
-
     private void jsonTemplateForParameter(StringBuilder sb, Class<?> clazz, Type genericType, Object templateValue ) {
         if ( ReflectionUtil.basicTypes.contains( clazz ) ) {
             defaultInstanceBasic(sb, clazz, templateValue );

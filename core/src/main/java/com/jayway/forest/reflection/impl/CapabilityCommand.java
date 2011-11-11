@@ -1,24 +1,22 @@
 package com.jayway.forest.reflection.impl;
 
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.jayway.forest.core.JSONHelper;
 import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.exceptions.UnsupportedMediaTypeException;
 import com.jayway.forest.exceptions.WrappedException;
-import com.jayway.forest.reflection.RestReflection;
+import com.jayway.forest.reflection.FormCapability;
 import com.jayway.forest.roles.Resource;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
-
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-
-public class CapabilityCommand extends BaseReflection {
+public class CapabilityCommand extends FormCapability {
 
 	public CapabilityCommand(Method method, Resource resource, String documentation, String rel) {
 		super(method, resource, method.getName(), documentation, rel);
