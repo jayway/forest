@@ -16,5 +16,6 @@
         <module>bank-grove</module>
         <module>bank-spring</module>
         <module>bank-jersey</module>
+        <module>bank-plain-jersey</module>
     </modules>
 </project>
