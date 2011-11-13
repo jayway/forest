@@ -13,9 +13,6 @@
         <version>7</version>
     </parent>
     <url>http://github.com/jayway/forest</url>
-    <properties>
-        <com.sun.jersey.version>1.8</com.sun.jersey.version>
-    </properties>
     <modules>
         <module>core</module>
         <module>samples</module>
