@@ -5,8 +5,6 @@ import static com.jayway.restassured.parsing.Parser.JSON;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 
-import org.apache.velocity.runtime.parser.node.SetPropertyExecutor;
-import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -14,9 +12,6 @@ import org.junit.Test;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.testing.ServletTester;
 
-import com.jayway.forest.core.RoleManager;
-import com.jayway.forest.core.Setup;
-import com.jayway.forest.samples.bank.repository.AccountRepository;
 import com.jayway.restassured.RestAssured;
 
 public class PlainJerseyTest {
@@ -28,7 +23,8 @@ public class PlainJerseyTest {
         tester = new ServletTester();
         tester.setContextPath("/app");
         ServletHolder servlet = tester.addServlet(com.sun.jersey.spi.container.servlet.ServletContainer.class, "/*");
-        servlet.setInitParameter("com.sun.jersey.config.property.packages", "com.jayway.restfuljersey.samples.bank.jersey.resources");
+//        servlet.setInitParameter("com.sun.jersey.config.property.packages", "com.jayway.restfuljersey.samples.bank.jersey.resources");
+        servlet.setInitParameter("javax.ws.rs.Application", "com.jayway.restfuljersey.samples.bank.jersey.resources.MyApplication");
         servlet.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
         servlet.setInitParameter("com.sun.jersey.spi.container.ResourceFilters", "com.jayway.restfuljersey.samples.bank.jersey.MyResourceFilterFactory");
         RestAssured.baseURI = tester.createSocketConnector(true);
@@ -46,6 +42,15 @@ public class PlainJerseyTest {
     {
         tester.stop();
         RestAssured.reset();
+    }
+
+    @Test
+    public void doTestByteCode() {
+        given().
+        expect().
+        	body(is("qwe")).
+        when().
+        	get("/simplePrint");
     }
 
     @Test
