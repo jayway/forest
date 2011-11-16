@@ -4,7 +4,7 @@
     <parent>
         <artifactId>forest</artifactId>
         <groupId>com.jayway.forest</groupId>
-        <version>0.3.0.M1</version>
+        <version>0.3.0.M2-SNAPSHOT</version>
     </parent>
     <groupId>com.jayway.forest</groupId>
     <artifactId>forest-frontend</artifactId>
