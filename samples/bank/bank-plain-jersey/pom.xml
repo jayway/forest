@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>forest-samples-bank</artifactId>
 		<groupId>com.jayway.forest</groupId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.3.0.M2-SNAPSHOT</version>
 	</parent>
 	<groupId>com.jayway.forest</groupId>
 	<artifactId>forest-samples-bank-plain-jersey</artifactId>

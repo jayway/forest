@@ -1,6 +1,8 @@
 package com.jayway.restfuljersey.samples.bank.jersey.resources;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
@@ -24,10 +26,24 @@ public class RootResource implements Resource {
 		accountRepository.initializeDummyAccounts(accountManager);
 	}
 
+	@GET
+	public HyperMediaResponse<String> root() {
+		HyperMediaResponse<String> response = new HyperMediaResponse<String>(this.getClass().getName(), "qweqwe", String.class);
+		response.addLink(new Link("simpleEcho", "GET", "simpleEcho", "documentation"));
+		response.addLink(new Link("command", "POST", "command", "N/A"));
+		return response;
+	}
+
 	@Path("simpleEcho")
 	@GET
 	public String simpleEcho(@QueryParam("param") String value) {
 		return value;
+	}
+
+	@Path("command")
+	@POST
+	public void command(@FormParam("param") String value) {
+		System.out.println(value);
 	}
 
 	@Path("accounts/")
