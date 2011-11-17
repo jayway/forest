@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.jayway.forest.service.AbstractRunner;
@@ -43,4 +44,17 @@ public class FormParameterTest extends AbstractRunner {
 
         assertThat(StateHolder.get().toString(), equalTo("helloagain"));
     }
+
+    @Test
+    public void htmlInputFieldNames() {
+        String s = given().spec(acceptTextHtml()).get("/command").asString();
+        Assert.assertTrue("Input field must be called argument1", s.contains("<input type='text' name='argument1'/>"));
+    }
+
+    @Test
+    public void htmlInputFieldNamesWithFormParam() {
+        String s = given().spec(acceptTextHtml()).get("/commandwithnamedparam").asString();
+        Assert.assertTrue("Input field must be called theName", s.contains("<input type='text' name='theName'/>"));
+    }
+
 }
