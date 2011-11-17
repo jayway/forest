@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.FormParam;
+import javax.ws.rs.QueryParam;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +42,15 @@ public abstract class ReflectionUtil {
         List<Parameter> parameters = new ArrayList<Parameter>();
         for ( int i =0; i< method.getParameterTypes().length; i++) {
             Class<?> aClass = method.getParameterTypes()[i];
-            Parameter parameter = new Parameter( aClass );
+            Parameter parameter = new Parameter(i, aClass );
             parameters.add( parameter );
 
             for (Annotation annotation : parameterAnnotations[i]) {
-                if ( annotation instanceof Template) {
+                if ( annotation instanceof FormParam) {
+                	parameter.setName(((FormParam)annotation).value());
+                } else if ( annotation instanceof QueryParam) {
+                	parameter.setName(((QueryParam)annotation).value());
+                } else if ( annotation instanceof Template) {
                     String methodName = ((Template) annotation).value();
                     Method template;
                     try {

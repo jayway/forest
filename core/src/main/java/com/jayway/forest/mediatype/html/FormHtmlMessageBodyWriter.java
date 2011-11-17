@@ -58,7 +58,7 @@ public class FormHtmlMessageBodyWriter extends HtmlMessageBodyWriter<FormCapabil
 
         for ( int i=0; i<parameters.size(); i++ ) {
             Parameter parameter = parameters.get(i);
-            htmlForParameter("argument" + (i + 1), parameter.parameterCls(), writer, parameter.parameterCls().getSimpleName(), parameter.getTemplate());
+            htmlForParameter(parameter.getName(), parameter.parameterCls(), writer, parameter.parameterCls().getSimpleName(), parameter.getTemplate());
         }
         writer.append( "<input type='submit' /></form>" );
         writeFooter(writer);

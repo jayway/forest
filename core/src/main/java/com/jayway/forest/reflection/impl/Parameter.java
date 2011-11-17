@@ -5,16 +5,12 @@ package com.jayway.forest.reflection.impl;
 public class Parameter {
     private Class<?> clazz;
     private Object template;
+    private String name;
 
-    public Parameter( Class<?> clazz ) {
+    public Parameter(int indx, Class<?> clazz ) {
+        this.name = "argument" + (indx + 1);
         this.clazz = clazz;
     }
-
-    public Parameter( Class<?> clazz, Object template) {
-        this.clazz = clazz;
-        this.template = template;
-    }
-
 
     public Class<?> parameterCls() {
         return clazz;
@@ -26,4 +22,12 @@ public class Parameter {
     public void setTemplate( Object template ) {
         this.template = template;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }
