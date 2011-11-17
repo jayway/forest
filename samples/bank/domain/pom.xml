@@ -5,7 +5,7 @@
     <parent>
         <artifactId>forest-samples-bank</artifactId>
         <groupId>com.jayway.forest</groupId>
-        <version>0.2.2.RELEASE</version>
+        <version>0.2.3-SNAPSHOT</version>
     </parent>
     <groupId>com.jayway.forest</groupId>
     <artifactId>forest-samples-bank-domain</artifactId>
