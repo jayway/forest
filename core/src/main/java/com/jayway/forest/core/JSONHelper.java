@@ -3,13 +3,11 @@ package com.jayway.forest.core;
 import com.jayway.forest.exceptions.BadRequestException;
 import com.jayway.forest.exceptions.InternalServerErrorException;
 import com.jayway.forest.reflection.ReflectionUtil;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import sun.misc.IOUtils;
 
-import java.io.*;
+import java.io.InputStream;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
