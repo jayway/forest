@@ -96,7 +96,7 @@ public class JSONHelper {
     }
 
     private String convertWholeStreamToString(InputStream stream) {
-        return new Scanner(stream).useDelimiter("\\A").next();
+        return new Scanner(stream, "UTF-8").useDelimiter("\\A").next();
     }
 
     @SuppressWarnings("unchecked")
