@@ -1,6 +1,7 @@
 package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
+import com.jayway.forest.service.StateHolder;
 import com.jayway.restassured.RestAssured;
 import org.junit.Assert;
 import org.junit.Test;
@@ -144,6 +145,15 @@ public class JSONApiTest extends AbstractRunner {
         String value = "Übercoolness æøåôõ";
         given().param("argument1", value ).expect().statusCode(200).body(is("\""+value+"\"")).when().get("/echo");
     }
+
+    @Test
+    public void encodingTest2() {
+        String value = "Übercoolness æøåôõ";
+        given().body( "\""+value+"\"").expect().statusCode(200).when().put("/command");
+        String result = (String) StateHolder.get();
+        Assert.assertEquals( value, result );
+    }
+
 
     @Test
     public void createCommandTest() {

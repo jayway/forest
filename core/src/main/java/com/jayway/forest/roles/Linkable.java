@@ -18,7 +18,8 @@ public class Linkable {
 
     public Linkable( String href, String name, String rel ) {
         this(href, name);
-        this.rel = rel;
+        if ( rel.endsWith( ":") ) this.rel = rel + this.href;
+        else this.rel = rel;
     }
 
     public Linkable( String href, String name ) {

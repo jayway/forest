@@ -28,6 +28,10 @@ public class CapabilityDeleteCommand extends CapabilityCommand {
 
     @Override
     public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
-        throw new MethodNotAllowedRenderTemplateException( this );
+        if ( mediaTypeHandler.acceptHtml() ) {
+            super.put(formParams, stream, mediaTypeHandler);
+        } else {
+            throw new MethodNotAllowedRenderTemplateException( this );
+        }
     }
 }

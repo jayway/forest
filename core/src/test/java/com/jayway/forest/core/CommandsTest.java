@@ -79,5 +79,11 @@ public class CommandsTest extends AbstractRunner {
         assertEquals("HelloWorldNEW", result);
     }
 
+    @Test
+    public void testDeleteHTML() {
+        given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(200).when().post("/other/delete");
+        String message = (String) StateHolder.get();
+        System.out.printf(message );
+    }
 
 }

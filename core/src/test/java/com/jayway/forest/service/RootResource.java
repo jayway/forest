@@ -18,10 +18,6 @@ import static com.jayway.forest.core.RoleManager.role;
  */
 public class RootResource implements Resource {
 
-    public RootResource sub() {
-        return new RootResource();
-    }
-
     public void command( String input ) {
         StateHolder.set(input);
     }
@@ -62,10 +58,6 @@ public class RootResource implements Resource {
     public String echo( String input ) {
         return input;
     }
-    
-    public OtherResource other() {
-        return new OtherResource();
-    }
 
     @RolesInContext( String.class )
     public String constraint() {
@@ -86,6 +78,10 @@ public class RootResource implements Resource {
         return (StringDTO) string;
     }
 
+    public RootResource sub() {
+        return new RootResource();
+    }
+
     public Resource listresponse() {
         return new ListResponseResource();
     }
@@ -100,6 +96,10 @@ public class RootResource implements Resource {
 
     public Resource exceptions() {
         return new ExceptionsResource();
+    }
+
+    public OtherResource other() {
+        return new OtherResource();
     }
 }
 

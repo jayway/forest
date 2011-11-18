@@ -9,7 +9,7 @@ public class AccountLinkable extends Linkable {
     private int balance;
 
     public AccountLinkable(String id, String name, String description, int balance) {
-        super(id + "/", name, null, description);
+        super(id + "/", name, "AccountsResourceId:", description);
         this.balance = balance;
     }
 
