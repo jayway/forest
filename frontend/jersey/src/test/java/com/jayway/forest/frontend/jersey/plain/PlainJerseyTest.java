@@ -59,4 +59,14 @@ public class PlainJerseyTest {
         when().
         	get("/objectEcho");
     }
+
+    @Test
+    public void doTest3() {
+        given().
+        	queryParam("param", "hello").
+        expect().
+        	body(is("subben:hello")).
+        when().
+        	get("/sub/subben/echo");
+    }
 }

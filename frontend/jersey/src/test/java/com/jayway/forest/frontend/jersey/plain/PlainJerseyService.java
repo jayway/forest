@@ -2,15 +2,21 @@ package com.jayway.forest.frontend.jersey.plain;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.jayway.forest.frontend.jersey.test.StringDTO;
 
-@Path("")
+@Path("/")
 public class PlainJerseyService {
-	
+
+	@Path("sub/{no}/")
+	public PlainSubResource sub(@PathParam("no") String value) {
+		return new PlainSubResource(value);
+	}
+
 	@Path("simpleEcho")
 	@GET
 	public String simpleEcho(@QueryParam("param") String value) {

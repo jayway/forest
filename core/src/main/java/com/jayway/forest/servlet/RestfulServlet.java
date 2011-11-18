@@ -38,12 +38,11 @@ public class RestfulServlet extends HttpServlet {
         this.forest = new ForestCore(application, dependencyInjectionSPI);
         this.dependencyInjectionSPI = dependencyInjectionSPI;
         Charset charset = Charset.forName("UTF-8");
-        String cssUrl = null;
-        mediaTypeHandlerContainer.addHandler(new CapabilitiesHtmlMessageBodyWriter(charset, cssUrl));
-        mediaTypeHandlerContainer.addHandler(new ErrorHtmlMessageBodyWriter(charset, cssUrl));
-        mediaTypeHandlerContainer.addHandler(new FormHtmlMessageBodyWriter(charset, cssUrl));
-        mediaTypeHandlerContainer.addHandler(new LinkableHtmlMessageBodyWriter(charset, cssUrl));
-        mediaTypeHandlerContainer.addHandler(new PagedSortedListResponseHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new CapabilitiesHtmlMessageBodyWriter(charset, getCssUrl()));
+        mediaTypeHandlerContainer.addHandler(new ErrorHtmlMessageBodyWriter(charset, getCssUrl()));
+        mediaTypeHandlerContainer.addHandler(new FormHtmlMessageBodyWriter(charset, getCssUrl()));
+        mediaTypeHandlerContainer.addHandler(new LinkableHtmlMessageBodyWriter(charset, getCssUrl()));
+        mediaTypeHandlerContainer.addHandler(new PagedSortedListResponseHtmlMessageBodyWriter(charset, getCssUrl()));
         
         mediaTypeHandlerContainer.addHandler(new CapabilitiesJsonMessageBodyWriter(charset));
         mediaTypeHandlerContainer.addHandler(new FormJsonMessageBodyWriter(charset));
@@ -54,11 +53,15 @@ public class RestfulServlet extends HttpServlet {
         
         mediaTypeHandlerContainer.addHandler(new SimpleErrorMessageBodyWriter(MediaType.WILDCARD_TYPE, charset));
 
-        mediaTypeHandlerContainer.addHandler(new QueryHtmlMessageBodyWriter(charset, cssUrl));
+        mediaTypeHandlerContainer.addHandler(new QueryHtmlMessageBodyWriter(charset, getCssUrl()));
         mediaTypeHandlerContainer.addHandler(new QueryJsonMessageBodyWriter(charset));
     }
 
-    /**
+    protected String getCssUrl() {
+		return null;
+	}
+
+	/**
      * Override this to add custom exception mapping
      * @return
      */

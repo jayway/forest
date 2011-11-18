@@ -18,8 +18,8 @@ public class PagedSortedListResponse<T> {
     private String previous;
 
     //private String self;
-    private Map<String, String> orderByAsc;
-    private Map<String, String> orderByDesc;
+    private Map<String, String> orderByAsc = new HashMap<String, String>();
+    private Map<String, String> orderByDesc = new HashMap<String, String>();
 
 
     public List<?> getList() {
@@ -91,16 +91,10 @@ public class PagedSortedListResponse<T> {
     }
 
     public void addOrderByAsc( String field, String href ) {
-        if ( orderByAsc == null ) {
-            orderByAsc = new HashMap<String, String>();
-        }
         orderByAsc.put( field, href);
     }
 
     public void addOrderByDesc( String field, String href ) {
-        if ( orderByDesc == null ) {
-            orderByDesc = new HashMap<String, String>();
-        }
         orderByDesc.put( field, href );
     }
 
