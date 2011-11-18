@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources;
+package com.jayway.forest.samples.bank.jersey.resources;
 
 import java.util.Collections;
 import java.util.Set;

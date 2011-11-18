@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.constraints;
+package com.jayway.forest.samples.bank.jersey.constraints;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,19 +10,19 @@ import com.jayway.forest.constraint.ConstraintEvaluator;
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.samples.bank.model.Account;
+import com.jayway.forest.samples.bank.model.Withdrawable;
 
 /**
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(HasCredit.Evaluator.class)
-public @interface HasCredit {
+@Constraint(IsWithdrawable.Evaluator.class)
+public @interface IsWithdrawable {
 
-    class Evaluator implements ConstraintEvaluator<HasCredit, Resource> {
+    class Evaluator implements ConstraintEvaluator<IsWithdrawable, Resource> {
 
-        public boolean isValid( HasCredit role, Resource resource ) {
-            Account account = RoleManager.role(Account.class);
-            return account != null && account.getBalance() > 0;
+        public boolean isValid( IsWithdrawable role, Resource resource ) {
+            return RoleManager.role(Account.class) instanceof Withdrawable;
         }
 
     }

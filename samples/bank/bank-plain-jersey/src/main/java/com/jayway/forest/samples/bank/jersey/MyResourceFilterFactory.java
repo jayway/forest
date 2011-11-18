@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey;
+package com.jayway.forest.samples.bank.jersey;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.constraints;
+package com.jayway.forest.samples.bank.jersey.constraints;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

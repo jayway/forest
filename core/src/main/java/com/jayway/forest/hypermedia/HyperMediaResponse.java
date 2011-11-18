@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources;
+package com.jayway.forest.hypermedia;
 
 import java.util.LinkedList;
 import java.util.List;

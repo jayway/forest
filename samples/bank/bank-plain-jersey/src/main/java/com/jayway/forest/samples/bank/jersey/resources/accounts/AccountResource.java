@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources.accounts;
+package com.jayway.forest.samples.bank.jersey.resources.accounts;
 
 import static com.jayway.forest.core.RoleManager.role;
 
@@ -12,14 +12,14 @@ import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.Template;
 import com.jayway.forest.samples.bank.dto.AccountLinkable;
 import com.jayway.forest.samples.bank.dto.TransferToDTO;
+import com.jayway.forest.samples.bank.jersey.constraints.DepositAllowed;
+import com.jayway.forest.samples.bank.jersey.constraints.HasCredit;
+import com.jayway.forest.samples.bank.jersey.constraints.IsWithdrawable;
 import com.jayway.forest.samples.bank.model.Account;
 import com.jayway.forest.samples.bank.model.AccountManager;
 import com.jayway.forest.samples.bank.model.Depositable;
 import com.jayway.forest.samples.bank.model.Withdrawable;
 import com.jayway.forest.samples.bank.repository.AccountRepository;
-import com.jayway.restfuljersey.samples.bank.jersey.constraints.DepositAllowed;
-import com.jayway.restfuljersey.samples.bank.jersey.constraints.HasCredit;
-import com.jayway.restfuljersey.samples.bank.jersey.constraints.IsWithdrawable;
 
 public class AccountResource {
 

@@ -1,4 +1,6 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources;
+package com.jayway.forest.hypermedia;
+
+import javax.ws.rs.core.MediaType;
 
 
 public class Link {
@@ -22,7 +24,7 @@ public class Link {
 	public String getHttpMethod() {
 		return httpMethod;
 	}
-
+	
 	public String getName() {
 		return name;
 	}

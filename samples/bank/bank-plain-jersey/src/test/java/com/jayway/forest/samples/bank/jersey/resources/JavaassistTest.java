@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources;
+package com.jayway.forest.samples.bank.jersey.resources;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.parsing.Parser.JSON;
@@ -14,7 +14,7 @@ import org.mortbay.jetty.testing.ServletTester;
 
 import com.jayway.restassured.RestAssured;
 
-public class PlainJerseyTest {
+public class JavaassistTest {
     private static ServletTester tester;
 
 	@BeforeClass
@@ -24,9 +24,9 @@ public class PlainJerseyTest {
         tester.setContextPath("/app");
         ServletHolder servlet = tester.addServlet(com.sun.jersey.spi.container.servlet.ServletContainer.class, "/*");
 //        servlet.setInitParameter("com.sun.jersey.config.property.packages", "com.jayway.restfuljersey.samples.bank.jersey.resources");
-        servlet.setInitParameter("javax.ws.rs.Application", "com.jayway.restfuljersey.samples.bank.jersey.resources.MyApplication");
+        servlet.setInitParameter("javax.ws.rs.Application", "com.jayway.forest.samples.bank.jersey.resources.MyApplication");
         servlet.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
-        servlet.setInitParameter("com.sun.jersey.spi.container.ResourceFilters", "com.jayway.restfuljersey.samples.bank.jersey.MyResourceFilterFactory");
+        servlet.setInitParameter("com.sun.jersey.spi.container.ResourceFilters", "com.jayway.forest.samples.bank.jersey.MyResourceFilterFactory");
         RestAssured.baseURI = tester.createSocketConnector(true);
         RestAssured.defaultParser = JSON;
         RestAssured.basePath = "/app";

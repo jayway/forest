@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources;
+package com.jayway.forest.writers.html;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +18,8 @@ import javax.ws.rs.ext.Providers;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
+
+import com.jayway.forest.hypermedia.HyperMediaResponse;
 
 @Provider
 public class HtmlHyperMediaResponseWriter<T> implements MessageBodyWriter<HyperMediaResponse<T>> {
@@ -29,13 +30,8 @@ public class HtmlHyperMediaResponseWriter<T> implements MessageBodyWriter<HyperM
 	private Providers providers;
     
     public HtmlHyperMediaResponseWriter() {
-		VelocityEngine engine = new VelocityEngine();
-        engine.setProperty("resource.loader","class");
-        engine.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-        try {
-			engine.init();
-			this.template = engine.getTemplate("htmlHyperMedia.vm", "utf-8");
+    	try {
+			this.template = new VelocityEngineHolder().get().getTemplate("com/jayway/forest/hypermedia.html.vm", "utf-8");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

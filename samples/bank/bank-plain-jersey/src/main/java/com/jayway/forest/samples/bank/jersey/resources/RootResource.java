@@ -1,17 +1,20 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources;
+package com.jayway.forest.samples.bank.jersey.resources;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.core.Setup;
+import com.jayway.forest.hypermedia.HyperMediaResponse;
+import com.jayway.forest.hypermedia.Link;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.samples.bank.jersey.resources.accounts.AccountsResource;
 import com.jayway.forest.samples.bank.model.AccountManager;
 import com.jayway.forest.samples.bank.repository.AccountRepository;
-import com.jayway.restfuljersey.samples.bank.jersey.resources.accounts.AccountsResource;
 import com.sun.jersey.spi.resource.Singleton;
 
 @Path("")
@@ -37,7 +40,21 @@ public class RootResource implements Resource {
 	@Path("simpleEcho")
 	@GET
 	public String simpleEcho(@QueryParam("param") String value) {
+		if (value == null) {
+			return "QWEQWEQWE";
+		}
 		return value;
+	}
+
+	@Path("simplePost")
+	@POST
+	public void simplePost(@FormParam("param") String value) {
+	}
+
+	@Path("simplePost")
+	@GET
+	public String simplePost() {
+		return "QWE";
 	}
 
 	@Path("command")

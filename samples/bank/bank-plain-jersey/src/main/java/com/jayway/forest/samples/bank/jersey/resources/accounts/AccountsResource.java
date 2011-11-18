@@ -1,4 +1,4 @@
-package com.jayway.restfuljersey.samples.bank.jersey.resources.accounts;
+package com.jayway.forest.samples.bank.jersey.resources.accounts;
 
 import static com.jayway.forest.core.RoleManager.role;
 
