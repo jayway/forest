@@ -1,5 +1,13 @@
 package com.jayway.forest.service;
 
+import static com.jayway.forest.core.RoleManager.role;
+
+import java.util.List;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
@@ -7,15 +15,7 @@ import com.jayway.forest.dto.Value;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.Resource;
 
-import java.util.List;
-
-import javax.ws.rs.FormParam;
-import javax.ws.rs.QueryParam;
-
-import static com.jayway.forest.core.RoleManager.role;
-
-/**
- */
+@Path("")
 public class RootResource implements Resource {
 
     public RootResource sub() {

@@ -27,6 +27,10 @@ public class MyApplication extends Application {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public MyApplication() {
+		System.out.println("qwe");
+	}
 
 	@Override
 	public Set<Object> getSingletons() {
