@@ -24,8 +24,7 @@ public class PlainJerseyTest {
         tester = new ServletTester();
         tester.setContextPath("/app");
         ServletHolder servlet = tester.addServlet(com.sun.jersey.spi.container.servlet.ServletContainer.class, "/*");
-        servlet.setInitParameter("javax.ws.rs.Application", "com.jayway.forest.samples.bank.jersey.resources.MyNewApplication");
-//        servlet.setInitParameter("com.sun.jersey.config.property.packages", "com.jayway.forest");
+        servlet.setInitParameter("com.sun.jersey.config.property.packages", "com.jayway.forest.samples.bank.jersey,com.jayway.forest.writers.html");
         servlet.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
         RestAssured.baseURI = tester.createSocketConnector(true);
         RestAssured.defaultParser = JSON;
@@ -51,6 +50,17 @@ public class PlainJerseyTest {
         contentType(MediaType.TEXT_HTML).
         when().
         	get("/");
+        
+        assertTrue(response.getBody().asString().contains("<h2>Commands</h2>"));
+    }
+
+    @Test
+    public void doTestSub() {
+        Response response = given().
+        expect().
+        contentType(MediaType.TEXT_HTML).
+        when().
+        	get("/sub");
         
         assertTrue(response.getBody().asString().contains("<h2>Commands</h2>"));
     }

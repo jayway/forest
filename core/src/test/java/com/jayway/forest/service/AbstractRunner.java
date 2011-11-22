@@ -32,7 +32,7 @@ public class AbstractRunner {
         ServletHolder servlet = tester.addServlet(com.sun.jersey.spi.container.servlet.ServletContainer.class, "/bank/*");
         servlet.setInitParameter("javax.ws.rs.Application", "com.jayway.forest.core.TestApplication");
 //        servlet.setInitParameter("com.sun.jersey.config.property.packages", "com.jayway.forest");
-//        servlet.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
+        servlet.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
         RestAssured.baseURI = tester.createSocketConnector(true);
         RestAssured.defaultParser = JSON;
         RestAssured.basePath = "/bank";

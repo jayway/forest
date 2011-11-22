@@ -29,7 +29,6 @@ public class RootResource implements Resource {
 		accountRepository.initializeDummyAccounts(accountManager);
 	}
 
-	@GET
 	public HyperMediaResponse<String> root() {
 		HyperMediaResponse<String> response = new HyperMediaResponse<String>(this.getClass().getName(), "qweqwe", String.class);
 		response.addLink(new Link("simpleEcho", "GET", "simpleEcho", "documentation"));

@@ -15,7 +15,6 @@ import com.jayway.forest.dto.Value;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.Resource;
 
-@Path("")
 public class RootResource implements Resource {
 
     public RootResource sub() {
