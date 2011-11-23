@@ -4,7 +4,6 @@ import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
 import com.jayway.restassured.RestAssured;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.expect;
@@ -148,7 +147,6 @@ public class JSONApiTest extends AbstractRunner {
     }
 
     @Test
-    @Ignore("works in IDE, not in Maven")
     public void encodingTest2() {
         String value = "Übercoolness æøåôõ";
         given().body( "\""+value+"\"").expect().statusCode(200).when().put("/command");
