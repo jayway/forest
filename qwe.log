@@ -1,0 +1,22 @@
+== Info: About to connect() to localhost port 8080 (#0)
+== Info:   Trying 127.0.0.1... == Info: connected
+== Info: Connected to localhost (127.0.0.1) port 8080 (#0)
+=> Send header, 231 bytes (0xe7)
+0000: PUT /bank/simplePut HTTP/1.1
+001e: User-Agent: curl/7.19.7 (universal-apple-darwin10.0) libcurl/7.1
+005e: 9.7 OpenSSL/0.9.8r zlib/1.2.3
+007d: Host: localhost:8080
+0093: Accept: */*
+00a0: Content-Length: 16
+00b4: Content-Type: application/x-www-form-urlencoded
+00e5: 
+=> Send data, 16 bytes (0x10)
+0000: a1=qwe&a2=asdasd
+<= Recv header, 25 bytes (0x19)
+0000: HTTP/1.1 204 No Content
+<= Recv header, 23 bytes (0x17)
+0000: Server: Jetty(6.1.26)
+<= Recv header, 2 bytes (0x2)
+0000: 
+== Info: Connection #0 to host localhost left intact
+== Info: Closing connection #0

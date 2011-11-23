@@ -1,6 +1,10 @@
 package com.jayway.forest.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javassist.CannotCompileException;
@@ -21,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 
 import com.jayway.forest.roles.Resource;
@@ -82,37 +87,32 @@ public class ForestApplication extends Application {
 		return targetClass.toClass();
 	}
 
-	// TODO: implement parameter annotation support
-	private void prepareParameters(CtClass targetClass) throws Exception {
-		for (CtMethod m : targetClass.getMethods()) {
-			if (m.getParameterTypes().length > 0) {
-				prepareParameterAnnotations(m);
-			}
-		}
-	}
-
 	private void copyPublicMethods(CtClass sourceClass, CtClass targetClass) throws CannotCompileException, NotFoundException {
 		for (CtMethod sourceMethod : sourceClass.getMethods()) {
 			if (shouldCopy(sourceMethod)) {
 				CtMethod targetMethod = new CtMethod(sourceMethod, targetClass, null);
-				AnnotationsAttribute info = (AnnotationsAttribute) sourceMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
-				if (info != null) {
-					targetMethod.getMethodInfo().addAttribute(info.copy(targetClass.getClassFile().getConstPool(), null));
-				}
+				copyAttributeInfo(sourceMethod, targetMethod, AnnotationsAttribute.visibleTag);
+				copyAttributeInfo(sourceMethod, targetMethod, ParameterAnnotationsAttribute.visibleTag);
 				String returnStatement = "";
 				if (!sourceMethod.getReturnType().equals(CtClass.voidType)) {
 					returnStatement = "return ";
 				}
 				String body = "{"+ returnStatement +"super."+ sourceMethod.getName() +"($$);}";
-				System.out.println(sourceMethod.getName() + " replacing body: " + body);
 				targetMethod.setBody(body);
 				targetClass.addMethod(targetMethod);
 			}
 		}
 	}
 
+	private void copyAttributeInfo(CtMethod sourceMethod, CtMethod targetMethod, String name) {
+		AttributeInfo info = sourceMethod.getMethodInfo().getAttribute(name);
+		if (info != null) {
+			targetMethod.getMethodInfo().addAttribute(info.copy(targetMethod.getDeclaringClass().getClassFile().getConstPool(), null));
+		}
+	}
+
 	private CtClass createSubclass(ClassPool pool, CtClass sourceClass) throws CannotCompileException {
-		CtClass targetClass = pool.makeClass(sourceClass.getName() + "2");
+		CtClass targetClass = pool.makeClass(sourceClass.getName() + "_Proxy");
 		AnnotationsAttribute sourceInfo = (AnnotationsAttribute) sourceClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
 		if (sourceInfo != null) {
 			targetClass.getClassFile().addAttribute(sourceInfo.copy(targetClass.getClassFile().getConstPool(), null));
@@ -131,10 +131,14 @@ public class ForestApplication extends Application {
 
 	private void prepareCommandQuery(CtClass targetClass) throws Exception {
 		for (CtMethod m : targetClass.getMethods()) {
-			if (CtClass.voidType.equals(m.getReturnType())) {
-				handleCommand(m);
-			} else {
-				handleQuery(m);
+			if (m.getDeclaringClass().equals(targetClass)) {
+				if (CtClass.voidType.equals(m.getReturnType())) {
+					handleCommand(m);
+//					prepareParameterAnnotations(m, FormParam.class.getName());
+				} else {
+					handleQuery(m);
+					prepareParameterAnnotations(m, QueryParam.class.getName());
+				}
 			}
 		}
 	}
@@ -165,16 +169,46 @@ public class ForestApplication extends Application {
 		m.getMethodInfo().addAttribute(info);
 	}
 
-	private void prepareParameterAnnotations(CtMethod m) {
+	private void prepareParameterAnnotations(CtMethod m, String annotationClassName) throws Exception {
+		if (m.getParameterTypes().length == 0) {
+			return;
+		}
 		ConstPool constPool = m.getMethodInfo().getConstPool();
-		ParameterAnnotationsAttribute info = new ParameterAnnotationsAttribute(constPool, ParameterAnnotationsAttribute.visibleTag);
-		Annotation[][] annotations = new Annotation[1][1];
-		Annotation param = new Annotation(FormParam.class.getName(), constPool);
-		param.addMemberValue("value", new StringMemberValue("argument1", constPool));
-		annotations[0][0] = param;
+		int parameterCount = m.getParameterTypes().length;
+		ParameterAnnotationsAttribute info = (ParameterAnnotationsAttribute) m.getMethodInfo().getAttribute(ParameterAnnotationsAttribute.visibleTag);
+		Annotation[][] annotations;
+		if (info == null) {
+			info = new ParameterAnnotationsAttribute(constPool, ParameterAnnotationsAttribute.visibleTag);
+			annotations = new Annotation[parameterCount][];
+		} else {
+			annotations = info.getAnnotations();
+		}
+		for (int indx=0; indx<parameterCount; indx++) {
+			List<Annotation> paramAnnotations;
+			if (annotations[indx] == null) {
+				paramAnnotations = new LinkedList<Annotation>();
+			} else {
+				paramAnnotations = new ArrayList<Annotation>(Arrays.asList(annotations[indx]));
+			}
+			if (!contains(paramAnnotations, annotationClassName)) { 
+				Annotation param = new Annotation(annotationClassName, constPool);
+				param.addMemberValue("value", new StringMemberValue("argument" + (indx+1), constPool));
+				paramAnnotations.add(param);
+			}
+			annotations[indx] = paramAnnotations.toArray(new Annotation[paramAnnotations.size()]);
+		}
 		info.setAnnotations(annotations);
 		m.getMethodInfo().addAttribute(info);
 		
+	}
+
+	private boolean contains(List<Annotation> paramAnnotations, String annotationClassName) {
+		for (Annotation annotation : paramAnnotations) {
+			if (annotation.getTypeName().equals(annotationClassName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

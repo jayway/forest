@@ -3,6 +3,7 @@ package com.jayway.forest.samples.bank.jersey.resources;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -48,6 +49,13 @@ public class RootResource implements Resource {
 	@Path("simplePost")
 	@POST
 	public void simplePost(@FormParam("param") String value) {
+	}
+
+	@Path("simplePut")
+	@PUT
+	public void simplePut(@FormParam("a1") String value, @FormParam("a2") String another) {
+		System.out.println(value + "!!!!");
+		System.out.println(another + "!!!!");
 	}
 
 	@Path("simplePost")
