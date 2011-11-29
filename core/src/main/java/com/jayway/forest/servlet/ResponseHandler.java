@@ -4,6 +4,7 @@ import com.jayway.forest.core.MediaTypeHandler;
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.exceptions.AbstractHtmlException;
 import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
+import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.exceptions.WrappedException;
 import com.jayway.forest.reflection.Capabilities;
 import com.jayway.forest.reflection.Capability;
@@ -50,7 +51,7 @@ public class ResponseHandler {
     private HttpServletResponse response;
     private ExceptionMapper exceptionMapper;
 
-    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) {
+    public ResponseHandler( HttpServletRequest request, HttpServletResponse response, ExceptionMapper exceptionMapper, DependencyInjectionSPI dependencyInjectionSPI ) throws IOException {
         mediaTypeHandler = new MediaTypeHandler(request, response );
         this.response = response;
         this.exceptionMapper = exceptionMapper;
