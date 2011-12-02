@@ -46,12 +46,12 @@ jQuery(document).ready(function()
             initializeStepCache( methodArguments[ view.useCase ] );
         }
         $.each( view.steps, function(i, step) {
+            var rel = findStep( step );
+            var url = rel.href;
             if ( methodArguments[ step ] ) {
-                invoke( view.render, step, methodArguments[ step ] )
-            } else {
-                var rel = findStep( step );
-                invoke( view.render, step, rel.href );
+                url += '?' + $.URLDecode( methodArguments[ step ] );
             }
+            invoke( view.render, step, url );
         });
     }
 
@@ -67,7 +67,7 @@ jQuery(document).ready(function()
 
     function parseHash() {
         var hashString = location.hash.substring(1);
-        var hash = { "arguments": {} };
+        var hash = { "arguments": {}, hash: viewList[0].name };
         if ( hashString.indexOf( "?" ) != -1 ) {
             var nameSplit = hashString.split( "?" );
             hash.hash = nameSplit[0];
@@ -81,9 +81,7 @@ jQuery(document).ready(function()
                 }
             }
         } else {
-            if ( hashString == "" ) {
-                hash.hash = viewList[0].name;
-            } else {
+            if ( hashString != "" ) {
                 hash.hash = hashString;
             }
         }
@@ -96,7 +94,7 @@ jQuery(document).ready(function()
         $.each( hash.arguments, function( key, value ) {
             if ( !first ) { argumentString += "&"; }
             else first = false;
-            argumentString += key + '=' + value;
+            argumentString += key + '=' + $.URLEncode( value );
         });
         return '#' + hash.hash + argumentString;
     }
@@ -131,30 +129,40 @@ jQuery(document).ready(function()
 
     function renderAccount( rel, data ) {
         if ( rel == "transactions" ) {
-            // setup links
-            $('#header').empty().append("Page "+data.page+" of "+data.totalPages);
-            addClick( data.next, "next", "transactions", accountView.render );
-            addClick( data.previous, "previous", "transactions", accountView.render );
-
-            // render table
-            var tableString = "";
-            $.each( data.list, function( i,transaction ) {
-                tableString += listTransaction(i,transaction );
-            });
-            $('#transactions').empty().append( tableString );
+            renderAccountTransactions( data );
         } else if ( rel == "description" ) {
             $('#name').append(data.name);
         }
     }
 
-    function addClick( url, id, rel, callback ) {
+    function renderAccountTransactions( data ) {
+        // setup links
+        $('#header').empty().append("Page "+data.page+" of "+data.totalPages);
+        addClick( data.next, "next", renderAccountTransactions );
+        addClick( data.previous, "previous", renderAccountTransactions );
+
+        // render table
+        var tableString = "";
+        $.each( data.list, function( i,transaction ) {
+            tableString += listTransaction(i,transaction );
+        });
+        $('#transactions').empty().append( tableString );
+
+        // operations
+        $('#changeDescriptionAction').unbind().click( function() { executeInteraction( changeAccountNameInteraction ) } );
+    }
+
+    function addClick( url, id, callback ) {
         var anchor = $('#'+id);
         if ( url ) {
             var hash = parseHash();
-            hash.arguments.transactions = $.URLEncode( url );
+            // since rel="next" is understood we can construct
+            // the link to the next just needs the parameters
+            var param = url.substring( url.indexOf('?')+1, url.length );
+            hash.arguments.transactions = $.URLEncode( param );
             anchor.attr('href', toUrl( hash )).unbind().click(
             function() {
-                clickDataLink( callback, "transactions", url );
+                clickDataLink( callback, url );
                 history( anchor.attr('href'), true  );
                 return false;
             }).removeClass("disabled");
@@ -168,13 +176,8 @@ jQuery(document).ready(function()
         $.bbq.pushState( hash );
     }
 
-    function clickDataLink( callback, rel, url ) {
-        $.ajax({
-            url: url,
-            success: function( data ) {
-                callback( rel, data );
-            }
-        });
+    function clickDataLink( callback, url ) {
+        $.ajax({ url: url, success: callback });
     }
 
     function listTransaction( i, transaction ) {
@@ -187,39 +190,118 @@ jQuery(document).ready(function()
 
     }
 
+    function renderChangeAccountName( step, state ) {
+        if ( step == "description" ) {
+            $('#accountName').attr("value", state.description.name );
+        }
+    }
+
+    function inputChangeAccountName( step, state, continuation ) {
+        if ( step == "changename" ) {
+            $('#changeNameButton').click( function() { inputChangeAccountName(null, state, continuation); } );
+        } else {
+            state.changename = $('#accountName').attr("value");
+            continuation( state );
+        }
+    }
+
+    function executeInteraction( interaction ) {
+        var hash = parseHash();
+        $('#master').load('html/'+ interaction.name+'.html', function() {
+            var useCase = interaction.useCase;
+            if ( hash.arguments[ useCase ] ) {
+                initializeStepCache( hash.arguments[ useCase ] );
+            }
+
+            runInteraction( 0, interaction, hash.arguments);
+        });
+    }
+
+    function runInteraction( index, interaction, state ) {
+        index = invocationStep( index, interaction, state );
+
+        if ( index < interaction.steps.length ) {
+            interaction.inputHandler( interaction.steps[ index ], state, function( state ) { runInteraction(index, interaction, state)});
+        } else {
+            // refresh
+            hashChange(null);
+        }
+    }
+
+    function invocationStep( index, interaction, state ) {
+        var shouldProceed = true;
+        while ( shouldProceed ) {
+            var stepName = interaction.steps[ index ];
+            var step = findStep( stepName );
+            var data = state[ step.name ];
+            if ( step.jsonTemplate != null ) {
+                if ( data ) {
+                    // handle argument substitution
+                    data = '"' + data + '"';
+                } else {
+                    return index;
+                }
+            }
+            $.ajax({
+                async: false,
+                url: step.href,
+                type: step.method,
+                contentType: "application/json",
+                data: data,
+                success: function( data ) {
+                    index++;
+                    shouldProceed = index < interaction.steps.length;
+                    if ( step.method == "GET" ) {
+                        state[ step.rel ] = data;
+                        interaction.render( step.rel, state );
+                    }
+                },
+                error: function() {
+                    shouldProceed = false;
+                }
+            });
+        }
+        return index;
+    }
+
     var mainView = {
-        "name"  : "main",
-        "render" : renderMain,
-        "steps" : [ "discover" ]
+        name  : "main",
+        render : renderMain,
+        steps : [ "discover" ]
     };
 
     var accountView = {
-        "name" : "account",
-        "render" : renderAccount,
-        "useCase" : "AccountsResourceId",
-        "steps": [ "transactions", "description" ]
+        name : "account",
+        render : renderAccount,
+        useCase : "AccountsResourceId",
+        steps : [ "transactions", "description" ]
     };
 
     var transactionView = {
-        "name" : "transaction",
-        "render" : renderTransaction,
-        "useCase" : "AccountResourceId",
-        "steps" : [ "TransactionResourceDescribe" ]
+        name : "transaction",
+        render : renderTransaction,
+        useCase : "AccountResourceId",
+        steps : [ "describe" ]
     };
 
     var viewList = [ mainView, accountView, transactionView ];
 
     var changeAccountNameInteraction = {
-        "render"  : null,
-        "useCase" : "AccountsResourceId",
-        "steps"   : [ "changedescription" ]
+        name         : "changeAccountName",
+        render       : renderChangeAccountName,
+        inputHandler : inputChangeAccountName,
+        useCase      : "AccountsResourceId",
+        steps        : [ "description", "changename" ]
     };
 
     var transferMoneyInteraction = {
-        "render"   : null,
-        "useCase"  : "AccountsResourceId",
-        "steps"    : [ "transfer" ]
+        name     : "transferMoney",
+        render   : null,
+        useCase  : "AccountsResourceId",
+        steps    : [ "transfer" ]
     };
+
+    var interactionList = [ changeAccountNameInteraction, transferMoneyInteraction ];
 
     function hashChange(e) {
         if ( _ignoreHashChange ) {
@@ -265,29 +347,40 @@ discovery af id metoden:
   samme resultat som
   /accounts/11111/
 
-=> #account?useCase=http://localhost:8080/accounts/11111/
-&transactions=2
+=> #account?useCase=http://localhost:8080/accounts/11111/&transactions=2
 
 "next":"http://localhost:8080/bank/accounts/11/transactions?page=2"
 
 =>
 "links" : [
 {
-    url: "http://localhost:8080/bank/accounts/11/transactions?page=2",
+    url: "http://localhost:8080/bank/accounts/11/transactions?page=2&sortBy=name",
     rel: "next",
     method: "GET"
 }, ...
 ]
 
-
-
 -----
  TODO:
- 1. Fix rel generation on serverside
+ 1. Fix link generation on server side
  4. Implement a command (Change Description, Transfer Money)
  5. Think about caching
 
-12.34.56 7 89 10 11
+-------
+
+1. click interaction button
+2. load html template
+3. run steps saving all state in a state object
+4. if step cannot be run (missing argument) create callback function
+   for the current step and assign to continue button on html
+5. When user clicks continue button the step is again tried to
+   be executed
+6. If 400, 409 do as step 4
+7. If 401 push a login step that after completion
+   will continue step
+
+
+
 
 */
 

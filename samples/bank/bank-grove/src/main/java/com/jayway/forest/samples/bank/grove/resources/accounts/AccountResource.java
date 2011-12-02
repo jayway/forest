@@ -53,12 +53,12 @@ public class AccountResource implements Resource, DescribedResource {
         return account;
     }
 
-    private String accountDescription() {
-        return account.getDescription();
+    private String accountName() {
+        return account.getName();
     }
 
-    public void changedescription( @Template("accountDescription") String description ) {
-        account.setDescription(description);
+    public void changename( @Template("accountName") String name ) {
+        account.setName(name);
     }
 
     public List<Transaction> transactions() {
