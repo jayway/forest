@@ -8,6 +8,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
+import com.jayway.forest.api.Body;
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
@@ -15,16 +16,18 @@ import com.jayway.forest.dto.Value;
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.Resource;
 
+@Path("")
 public class RootResource implements Resource {
 
-    public RootResource sub() {
-        return new RootResource();
-    }
+//    public RootResource sub() {
+//        return new RootResource();
+//    }
 
-    public void command( String input ) {
+    public void command( @Body String input ) {
         StateHolder.set(input);
     }
 
+    /*
     public void commandwithnamedparam(@FormParam("theName") String input ) {
         StateHolder.set(input);
     }
@@ -100,5 +103,6 @@ public class RootResource implements Resource {
     public Resource exceptions() {
         return new ExceptionsResource();
     }
+    */
 }
 

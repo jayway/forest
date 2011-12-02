@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jayway.forest.service.AbstractRunner;
@@ -60,7 +61,8 @@ public class JavassistTest extends AbstractRunner {
     @Test
     public void commandWithArgument() {
         given().
-        	body("10").
+        	formParam("argument1", "10").
+        	contentType(MediaType.APPLICATION_FORM_URLENCODED).
         expect().
         	statusCode(204).
         when().
@@ -104,6 +106,7 @@ public class JavassistTest extends AbstractRunner {
     }
 
     @Test
+    @Ignore("This is not supported!")
     public void commandWithTwoArgumentBody() {
         given().
         	body("[2, 5]").

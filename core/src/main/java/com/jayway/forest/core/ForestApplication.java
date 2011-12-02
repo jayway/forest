@@ -66,7 +66,7 @@ public class ForestApplication extends Application {
 		Set<Class<?>> result = new HashSet<Class<?>>();
 		for (Class<?> clazz : classes) {
 			try {
-				result.add(modify(clazz));
+				result.add(createProxy(clazz));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -74,7 +74,7 @@ public class ForestApplication extends Application {
 		return result;
 	}
 
-	private Class<?> modify(Class<?> clazz) throws Exception {
+	private Class<?> createProxy(Class<?> clazz) throws Exception {
 		if (!Resource.class.isAssignableFrom(clazz)) {
 			return clazz;
 		}
@@ -134,13 +134,22 @@ public class ForestApplication extends Application {
 			if (m.getDeclaringClass().equals(targetClass)) {
 				if (CtClass.voidType.equals(m.getReturnType())) {
 					handleCommand(m);
-//					prepareParameterAnnotations(m, FormParam.class.getName());
+					if (m.getParameterTypes().length > 1 || (m.getParameterTypes().length == 1 && isSimpleType(m.getParameterTypes()[0]))) {
+						prepareParameterAnnotations(m, FormParam.class.getName());
+					}
 				} else {
 					handleQuery(m);
 					prepareParameterAnnotations(m, QueryParam.class.getName());
 				}
 			}
 		}
+	}
+
+	private boolean isSimpleType(CtClass clazz) {
+		if (clazz.isPrimitive() || clazz.getName().equals("java.lang.String")) {
+			return true;
+		}
+		return false;
 	}
 
 	private void handleQuery(CtMethod m) throws Exception {
