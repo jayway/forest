@@ -1,12 +1,12 @@
 package com.jayway.forest.samples.bank.jersey.resources;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.core.Setup;
@@ -41,6 +41,13 @@ public class RootResource implements Resource {
 	@Path("dto")
 	@PUT
 	public String dto(IntegerDTO i) {
+		return "hello " + i.getInteger();
+	}
+
+	@Path("dtoparam")
+	@PUT
+	@Consumes("application/x-www-form-urlencoded")
+	public String dtoparam(@FormParam("param") IntegerDTO i) {
 		return "hello " + i.getInteger();
 	}
 

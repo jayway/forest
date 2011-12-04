@@ -3,12 +3,14 @@ package com.jayway.forest.samples.bank.jersey.resources;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.parsing.Parser.JSON;
 import static org.junit.Assert.assertTrue;
+import groovyx.net.http.ContentType;
 
 import javax.ws.rs.core.MediaType;
 
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.testing.ServletTester;
@@ -54,6 +56,19 @@ public class PlainJerseyTest {
         	body(Matchers.equalTo("hello 10")).
         when().
         	put("/dto");
+    }
+
+    @Test
+    @Ignore("@FormParam has certain requirements for unmarshalling that is not fulfilled by IntegerDTO")
+    public void doTestDtoParam() {
+        given().
+       		formParam("param", "{\"integer\": 10}").
+           	contentType(MediaType.APPLICATION_FORM_URLENCODED).
+        expect().
+        	statusCode(200).
+        	body(Matchers.equalTo("hello 10")).
+        when().
+        	put("/dtoparam");
     }
 
     @Test
