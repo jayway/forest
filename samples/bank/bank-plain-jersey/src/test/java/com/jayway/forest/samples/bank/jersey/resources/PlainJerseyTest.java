@@ -6,12 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import javax.ws.rs.core.MediaType;
 
+import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.testing.ServletTester;
 
+import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 
@@ -41,6 +43,17 @@ public class PlainJerseyTest {
     {
         tester.stop();
         RestAssured.reset();
+    }
+
+    @Test
+    public void doTestDto() {
+        given().
+           	body("{\"integer\": 10}").
+//       		body(new IntegerDTO(10)).
+        expect().
+        	body(Matchers.equalTo("hello 10")).
+        when().
+        	put("/dto");
     }
 
     @Test

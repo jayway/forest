@@ -27,6 +27,10 @@ public class RootResource implements Resource {
         StateHolder.set(input);
     }
 
+    public void addcommand( Integer first, IntegerDTO second ) {
+        StateHolder.set( first + second.getInteger() );
+    }
+
     /*
     public void commandwithnamedparam(@FormParam("theName") String input ) {
         StateHolder.set(input);
@@ -55,10 +59,6 @@ public class RootResource implements Resource {
 
     public Integer add( Integer first, IntegerDTO second ) {
         return first + second.getInteger();
-    }
-
-    public void addcommand( Integer first, IntegerDTO second ) {
-        StateHolder.set( first + second.getInteger() );
     }
 
     public String echo( String input ) {

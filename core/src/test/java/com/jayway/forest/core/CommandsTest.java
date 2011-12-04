@@ -21,7 +21,7 @@ public class CommandsTest extends AbstractRunner {
     @Test
     public void testEchoMethod() throws IOException {
         given().
-                body("\"second\"").
+                body("second").
         expect().
                 statusCode(200).
                 body(containsString("Operation completed successfully")).

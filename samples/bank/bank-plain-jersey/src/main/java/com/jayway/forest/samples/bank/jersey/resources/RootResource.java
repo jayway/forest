@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.jayway.forest.core.RoleManager;
 import com.jayway.forest.core.Setup;
+import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.hypermedia.HyperMediaResponse;
 import com.jayway.forest.hypermedia.Link;
 import com.jayway.forest.roles.Resource;
@@ -35,6 +36,25 @@ public class RootResource implements Resource {
 		response.addLink(new Link("simpleEcho", "GET", "simpleEcho", "documentation"));
 		response.addLink(new Link("command", "POST", "command", "N/A"));
 		return response;
+	}
+
+	@Path("dto")
+	@PUT
+	public String dto(IntegerDTO i) {
+		return "hello " + i.getInteger();
+	}
+
+	@Path("form")
+	@GET
+	public String form() {
+		return "<html><body><form method='POST'><input type='text' name='qwe'/><input type='submit'/></form></body></html>";
+	}
+
+	@Path("form")
+	@POST
+ 	public String formpost(@FormParam("qwe") String value) {
+		System.out.println("Hello form! value=" + value);
+		return "Operation completed successfully";
 	}
 
 	@Path("simpleEcho")

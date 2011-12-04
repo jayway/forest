@@ -1,6 +1,5 @@
 package com.jayway.forest.service;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -9,6 +8,7 @@ import com.jayway.forest.roles.Resource;
 
 @Path("bytecode")
 public class ByteCodeResource implements Resource {
+	
     public String noArgQuery() {
     	return "Hello world";
     }
@@ -28,7 +28,7 @@ public class ByteCodeResource implements Resource {
     public void incCommand() {
     	count++;
     }
-
+    
     public void add(String i) {
     	count += Integer.parseInt(i);
     }

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.ByteCodeResource;
 
@@ -64,9 +65,24 @@ public class JavassistTest extends AbstractRunner {
         	formParam("argument1", "10").
         	contentType(MediaType.APPLICATION_FORM_URLENCODED).
         expect().
-        	statusCode(204).
+        	statusCode(200).
         when().
         	put("/bytecode/add");
+        given().
+        expect().
+        	body(is("10")).
+        when().
+        	get("/bytecode/getcount");
+    }
+
+    @Test
+    public void commandWithJsonBody() {
+        given().
+        	body("{\"integer\": 10}").
+        expect().
+        	statusCode(200).
+        when().
+        	put("/bytecode/adddto");
         given().
         expect().
         	body(is("10")).
@@ -79,7 +95,7 @@ public class JavassistTest extends AbstractRunner {
         given().
         	body("{\"integer\": 10}").
         expect().
-        	statusCode(204).
+        	statusCode(200).
         when().
         	put("/bytecode/adddto");
         given().
@@ -95,7 +111,7 @@ public class JavassistTest extends AbstractRunner {
         	formParam("argument1", "5").formParam("argument2", "2").
         	contentType(MediaType.APPLICATION_FORM_URLENCODED).
         expect().
-        	statusCode(204).
+        	statusCode(200).
         when().
         	put("/bytecode/addMultiple");
         given().

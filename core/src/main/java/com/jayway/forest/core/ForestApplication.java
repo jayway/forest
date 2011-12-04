@@ -28,15 +28,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 
+import com.jayway.forest.api.Body;
 import com.jayway.forest.roles.Resource;
 
 public class ForestApplication extends Application {
 	
 	private final Application delegate;
-	private Set<Class<?>> delegateClasses;
-	private Set<Object> delegateSingletons;
+	private final Set<Class<?>> delegateClasses;
+	private final Set<Object> delegateSingletons;
+	private final ClassPool pool = ClassPool.getDefault();
 	
-	public ForestApplication(Application delegate) {
+	public ForestApplication(Application delegate) throws Exception {
 		this.delegate = delegate;
 		delegateClasses = getDelegateClasses();
 		delegateSingletons = getDelegateSingletons();
@@ -78,30 +80,68 @@ public class ForestApplication extends Application {
 		if (!Resource.class.isAssignableFrom(clazz)) {
 			return clazz;
 		}
-		ClassPool pool = ClassPool.getDefault();
 		CtClass sourceClass = pool.get(clazz.getName());
 		CtClass targetClass = createSubclass(pool, sourceClass);
 		copyPublicMethods(sourceClass, targetClass);
-		prepareCommandQuery(targetClass);
 
 		return targetClass.toClass();
 	}
 
-	private void copyPublicMethods(CtClass sourceClass, CtClass targetClass) throws CannotCompileException, NotFoundException {
+	private void copyPublicMethods(CtClass sourceClass, CtClass targetClass) throws Exception {
 		for (CtMethod sourceMethod : sourceClass.getMethods()) {
 			if (shouldCopy(sourceMethod)) {
-				CtMethod targetMethod = new CtMethod(sourceMethod, targetClass, null);
-				copyAttributeInfo(sourceMethod, targetMethod, AnnotationsAttribute.visibleTag);
-				copyAttributeInfo(sourceMethod, targetMethod, ParameterAnnotationsAttribute.visibleTag);
+				CtMethod targetMethod;
+				boolean isCommand = sourceMethod.getReturnType().equals(CtClass.voidType);
+				if (isCommand) {
+					targetMethod = createCommand(targetClass, sourceMethod);
+				} else {
+					targetMethod = createQuery(targetClass, sourceMethod);
+				}
 				String returnStatement = "";
-				if (!sourceMethod.getReturnType().equals(CtClass.voidType)) {
+				String afterStatement = "";
+				if (isCommand) {
+					afterStatement = "return \"Operation completed successfully\";";
+				} else {
 					returnStatement = "return ";
 				}
-				String body = "{"+ returnStatement +"super."+ sourceMethod.getName() +"($$);}";
+				String body = "{"+ returnStatement +"super."+ sourceMethod.getName() +"($$); "+ afterStatement +"}";
 				targetMethod.setBody(body);
 				targetClass.addMethod(targetMethod);
 			}
 		}
+	}
+
+	private CtMethod createQuery(CtClass targetClass, CtMethod sourceMethod) throws CannotCompileException, Exception {
+		CtMethod targetMethod;
+		targetMethod = new CtMethod(sourceMethod, targetClass, null);
+		copyAttributeInfo(sourceMethod, targetMethod, AnnotationsAttribute.visibleTag);
+		copyAttributeInfo(sourceMethod, targetMethod, ParameterAnnotationsAttribute.visibleTag);
+		addAnnotations(sourceMethod.getName(), targetMethod, GET.class);
+		prepareParameterAnnotations(targetMethod, QueryParam.class.getName());
+		return targetMethod;
+	}
+
+	private CtMethod createCommand(CtClass targetClass, CtMethod sourceMethod) throws NotFoundException, Exception {
+		CtMethod targetMethod;
+		CtClass returnType = targetClass.getClassPool().get("java.lang.String");
+		targetMethod = new CtMethod(returnType, sourceMethod.getName() + "_proxy", sourceMethod.getParameterTypes(), targetClass);
+		copyAttributeInfo(sourceMethod, targetMethod, AnnotationsAttribute.visibleTag);
+		copyAttributeInfo(sourceMethod, targetMethod, ParameterAnnotationsAttribute.visibleTag);
+		addAnnotations(sourceMethod.getName(), targetMethod, PUT.class);
+		if (targetMethod.getParameterTypes().length > 1 || (targetMethod.getParameterTypes().length == 1 && isSimpleType(targetMethod.getParameterTypes()[0]) && !hasBodyAnnotation(targetMethod))) {
+			prepareParameterAnnotations(targetMethod, FormParam.class.getName());
+		}
+		return targetMethod;
+	}
+
+	private boolean hasBodyAnnotation(CtMethod targetMethod) throws Exception {
+		Object[] objects = targetMethod.getParameterAnnotations()[0];
+		for (Object object : objects) {
+			if (object instanceof Body) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void copyAttributeInfo(CtMethod sourceMethod, CtMethod targetMethod, String name) {
@@ -129,22 +169,6 @@ public class ForestApplication extends Application {
 				!Modifier.isNative(m.getModifiers());
 	}
 
-	private void prepareCommandQuery(CtClass targetClass) throws Exception {
-		for (CtMethod m : targetClass.getMethods()) {
-			if (m.getDeclaringClass().equals(targetClass)) {
-				if (CtClass.voidType.equals(m.getReturnType())) {
-					handleCommand(m);
-					if (m.getParameterTypes().length > 1 || (m.getParameterTypes().length == 1 && isSimpleType(m.getParameterTypes()[0]))) {
-						prepareParameterAnnotations(m, FormParam.class.getName());
-					}
-				} else {
-					handleQuery(m);
-					prepareParameterAnnotations(m, QueryParam.class.getName());
-				}
-			}
-		}
-	}
-
 	private boolean isSimpleType(CtClass clazz) {
 		if (clazz.isPrimitive() || clazz.getName().equals("java.lang.String")) {
 			return true;
@@ -152,15 +176,7 @@ public class ForestApplication extends Application {
 		return false;
 	}
 
-	private void handleQuery(CtMethod m) throws Exception {
-		addAnnotations(m, GET.class);
-	}
-
-	private void handleCommand(CtMethod m) throws Exception {
-		addAnnotations(m, PUT.class);
-	}
-
-	private void addAnnotations(CtMethod m, Class<?> httpMethodAnnotation) throws Exception {
+	private void addAnnotations(String pathValue, CtMethod m, Class<?> httpMethodAnnotation) throws Exception {
 		ConstPool constPool = m.getDeclaringClass().getClassFile().getConstPool();
 		AnnotationsAttribute info = (AnnotationsAttribute) m.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
 		if (info == null) {
@@ -172,7 +188,7 @@ public class ForestApplication extends Application {
 		}
 		if (!m.hasAnnotation(Path.class)) {
 			Annotation path = new Annotation(Path.class.getName(), constPool);
-			path.addMemberValue("value", new StringMemberValue(m.getName(), constPool));
+			path.addMemberValue("value", new StringMemberValue(pathValue, constPool));
 			info.addAnnotation(path);
 		}
 		m.getMethodInfo().addAttribute(info);
