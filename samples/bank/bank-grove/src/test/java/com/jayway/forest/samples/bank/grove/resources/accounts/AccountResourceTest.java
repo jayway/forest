@@ -19,7 +19,7 @@ public class AccountResourceTest extends AbstractTestBase {
             statusCode(200).
             body(containsString("Operation completed successfully")).
         when().
-            put("/accounts/11111/deposit");
+            post("/accounts/11111/deposit");
 
 	}
 

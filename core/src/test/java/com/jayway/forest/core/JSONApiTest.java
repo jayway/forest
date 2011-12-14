@@ -6,8 +6,7 @@ import com.jayway.restassured.RestAssured;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -16,30 +15,30 @@ import static org.hamcrest.CoreMatchers.is;
 public class JSONApiTest extends AbstractRunner {
 
     private String baseUrl() {
-        return RestAssured.baseURI + RestAssured.basePath;
+        return baseURI + basePath;
     }
 
     @Test
     public void commandGet() {
         expect().statusCode( 405 ).
-                body("method", equalTo("PUT")).
-                body("href", equalTo( baseUrl() + "/command")).
+                body("method", equalTo("POST")).
+                body("uri", equalTo( baseUrl() + "/command")).
                 body("jsonTemplate", equalTo("")).when().get("/command");
     }
 
-    @Test
-    public void commandPost() {
+    /*@Test
+    public void commandPut() {
         expect().statusCode( 405 ).
-                body("method", equalTo("PUT")).
-                body("href", equalTo( baseUrl() + "/command")).
-                body("jsonTemplate", equalTo("")).when().post("/command");
-    }
+                body("method", equalTo("POST")).
+                body("uri", equalTo( baseUrl() + "/command")).
+                body("jsonTemplate", equalTo("")).when().put("/command");
+    }*/
 
     @Test
     public void commandDelete() {
         expect().statusCode(405).
-                body("method", equalTo("PUT")).
-                body("href", equalTo( baseUrl() + "/command")).
+                body("method", equalTo("POST")).
+                body("uri", equalTo( baseUrl() + "/command")).
                 body("jsonTemplate", equalTo("")).when().delete("/command");
     }
 
@@ -48,7 +47,7 @@ public class JSONApiTest extends AbstractRunner {
         // wrong parameters
         expect().statusCode(400).
         body("method", equalTo("GET")).
-        body("href", equalTo( baseUrl() + "/echo")).
+        body("uri", equalTo( baseUrl() + "/echo")).
         body("jsonTemplate", equalTo("")).when().get("/echo");
 
     }
@@ -57,7 +56,7 @@ public class JSONApiTest extends AbstractRunner {
     public void queryPut() {
         expect().statusCode( 405 ).
                 body("method", equalTo("GET")).
-                body("href", equalTo( baseUrl() + "/echo")).
+                body("uri", equalTo( baseUrl() + "/echo")).
                 body("jsonTemplate", equalTo("")).when().put("/echo");
     }
 
@@ -65,7 +64,7 @@ public class JSONApiTest extends AbstractRunner {
     public void queryPost() {
         expect().statusCode( 405 ).
                 body("method", equalTo("GET")).
-                body("href", equalTo( baseUrl() + "/echo")).
+                body("uri", equalTo( baseUrl() + "/echo")).
                 body("jsonTemplate", equalTo("")).when().post("/echo");
     }
 
@@ -73,7 +72,7 @@ public class JSONApiTest extends AbstractRunner {
     public void queryDelete() {
         expect().statusCode( 405 ).
                 body("method", equalTo("GET")).
-                body("href", equalTo( baseUrl() + "/echo")).
+                body("uri", equalTo( baseUrl() + "/echo")).
                 body("jsonTemplate", equalTo("")).when().delete("/echo");
     }
 
@@ -82,7 +81,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandCreateGet() {
         expect().statusCode(405).
                 body("method", equalTo("POST")).
-                body("href", equalTo( baseUrl() + "/other/")).
+                body("uri", equalTo( baseUrl() + "/other/")).
                 body("jsonTemplate.string", equalTo("")).
                 body("jsonTemplate.integer", equalTo(0)).
                 when().get("/other/create");
@@ -98,7 +97,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandCreatePutDirect() {
         expect().statusCode( 405 ).
                 body("method", equalTo("POST")).
-                body("href", equalTo( baseUrl() + "/other/")).
+                body("uri", equalTo( baseUrl() + "/other/")).
                 body("jsonTemplate.string", equalTo("")).
                 body("jsonTemplate.integer", equalTo(0)).
                 when().put("/other/create");
@@ -108,7 +107,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandCreateDelete() {
         expect().statusCode( 405 ).
                 body("method", equalTo("POST")).
-                body("href", equalTo( baseUrl() + "/other/")).
+                body("uri", equalTo( baseUrl() + "/other/")).
                 body("jsonTemplate.string", equalTo("")).
                 body("jsonTemplate.integer", equalTo(0)).
                 when().delete("/other/create");
@@ -119,7 +118,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandDeleteGet() {
         expect().statusCode(405).
                 body("method", equalTo("DELETE")).
-                body("href", equalTo( baseUrl() + "/other/")).
+                body("uri", equalTo( baseUrl() + "/other/")).
                 when().get("/other/delete");
     }
 
@@ -127,7 +126,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandDeletePut() {
         expect().statusCode( 405 ).
                 body("method", equalTo("DELETE")).
-                body("href", equalTo( baseUrl() + "/other/")).
+                body("uri", equalTo( baseUrl() + "/other/")).
                 when().put("/other/delete");
     }
 
@@ -135,7 +134,7 @@ public class JSONApiTest extends AbstractRunner {
     public void commandDeletePost() {
         expect().statusCode( 405 ).
                 body("method", equalTo("DELETE")).
-                body("href", equalTo( baseUrl() + "/other/")).
+                body("uri", equalTo( baseUrl() + "/other/")).
                 when().post("/other/delete");
     }
 
@@ -149,7 +148,7 @@ public class JSONApiTest extends AbstractRunner {
     @Test
     public void encodingTest2() {
         String value = "Übercoolness æøåôõ";
-        given().body( "\""+value+"\"").expect().statusCode(200).when().put("/command");
+        given().body( "\""+value+"\"").expect().statusCode(200).when().post("/command");
         String result = (String) StateHolder.get();
         Assert.assertEquals( value, result );
     }
@@ -158,16 +157,9 @@ public class JSONApiTest extends AbstractRunner {
     @Test
     public void createCommandTest() {
         expect().statusCode(200).
-                body("method[2]", equalTo("POST")).
-                body("rel[2]", equalTo("OtherResourceCreate")).
-                body("href[2]", equalTo(baseUrl() + "/other/")).when().get("/other/");
-    }
-
-    @Test
-    public void discoverIdResource() {
-        expect().statusCode(200).
-                body("rel[4]", equalTo("OtherResourceId")).
-                when().get("/other/");
+                body("links.method[2]", equalTo("POST")).
+                body("links.rel[2]", equalTo("create")).
+                body("links.uri[2]", equalTo(baseUrl() + "/other/")).when().get("/other/");
     }
 
     @Test
@@ -181,9 +173,9 @@ public class JSONApiTest extends AbstractRunner {
     @Test
     public void deleteCommandTest() {
         expect().statusCode(200).
-                body("method[1]", equalTo("DELETE")).
-                body("rel[1]", equalTo("OtherResourceDelete")).
-                body("href[1]", equalTo( baseUrl() + "/other/")).when().get("/other/");
+                body("links.method[1]", equalTo("DELETE")).
+                body("links.rel[1]", equalTo("delete")).
+                body("links.uri[1]", equalTo( baseUrl() + "/other/")).when().get("/other/");
     }
 
 

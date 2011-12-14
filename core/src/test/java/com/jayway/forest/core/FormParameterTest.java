@@ -26,7 +26,7 @@ public class FormParameterTest extends AbstractRunner {
                 statusCode(200).
                 body(containsString("Operation completed successfully")).
         when().
-                put("/command");
+                post("/command");
 
         assertThat(StateHolder.get().toString(), equalTo("hello"));
     }
@@ -40,7 +40,7 @@ public class FormParameterTest extends AbstractRunner {
                 statusCode(200).
                 body(containsString("Operation completed successfully")).
         when().
-                put("/commandwithnamedparam");
+                post("/commandwithnamedparam");
 
         assertThat(StateHolder.get().toString(), equalTo("helloagain"));
     }

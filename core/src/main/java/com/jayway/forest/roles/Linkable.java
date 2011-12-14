@@ -6,37 +6,34 @@ import static com.jayway.forest.core.RoleManager.role;
  */
 public class Linkable {
 
-    private String href;
+    private String uri;
     private String name;
     private String rel;
-    private String description;
 
-    public Linkable( String href, String name, String rel, String description ) {
-        this( href, name, rel);
-        this.description = description;
+    public Linkable( String id ) {
+    	this(id, id);
     }
 
-    public Linkable( String href, String name, String rel ) {
-        this(href, name);
-        if ( rel.endsWith( ":") ) this.rel = rel + this.href;
-        else this.rel = rel;
-    }
-
-    public Linkable( String href, String name ) {
-        if ( !href.startsWith("http://")) {
-            this.href = role( UriInfo.class).getSelf() + href;
+    public Linkable( String id, String name ) {
+        if ( !id.startsWith("http://")) {
+            this.uri = role( UriInfo.class).getSelf() + id;
         } else {
-            this.href = href;
+            this.uri = id;
+        }
+        if ( !id.endsWith("/") ) {
+            this.uri = this.uri + "/";
         }
         this.name = name;
     }
 
-    public Linkable( String name ) {
-    	this(name + "/", name);
+    public Linkable( String id, String name, String rel ) {
+        this(id, name);
+        this.rel = rel;
     }
 
-    public String getHref() {
-        return href;
+
+    public String getUri() {
+        return uri;
     }
 
     public String getName() {
@@ -47,7 +44,7 @@ public class Linkable {
         return rel;
     }
 
-    public String getDescription() {
-        return description;
+    public void setRel( String rel ) {
+        this.rel = rel;
     }
 }

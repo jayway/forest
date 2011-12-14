@@ -38,7 +38,7 @@ public class ConstraintsTest extends AbstractRunner {
 
     @Test
     public void testIllegalDelete() {
-        given().expect().statusCode( 404 ).when().delete("/other/contraint/");
+        given().expect().statusCode( 405 ).when().delete("/other/contraint/");
     }
 
 }

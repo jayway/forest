@@ -10,7 +10,7 @@ jQuery(document).ready(function()
             async: false,
             url: url,
             success: function( data ) {
-                $.each( data, function( idx, elm) {
+                $.each( data.links, function( idx, elm) {
                     if ( elm.rel ) {
                         cache[ elm.rel ] = elm;
                     } else {

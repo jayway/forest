@@ -12,7 +12,7 @@ public class CapabilityDeleteCommand extends CapabilityCommand {
     private DeletableResource deletable;
 
     public CapabilityDeleteCommand(DeletableResource resource, String documentation ) {
-		super(DeletableResource.class.getDeclaredMethods()[0], resource, documentation, resource.getClass().getSimpleName()+"Delete");
+		super(DeletableResource.class.getDeclaredMethods()[0], resource, documentation, "delete");
         this.deletable = resource;
 	}
 
@@ -27,9 +27,9 @@ public class CapabilityDeleteCommand extends CapabilityCommand {
     }
 
     @Override
-    public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
+    public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
         if ( mediaTypeHandler.acceptHtml() ) {
-            super.put(formParams, stream, mediaTypeHandler);
+            super.post(formParams, stream, mediaTypeHandler);
         } else {
             throw new MethodNotAllowedRenderTemplateException( this );
         }

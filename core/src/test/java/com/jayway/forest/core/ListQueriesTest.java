@@ -11,8 +11,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.jayway.restassured.RestAssured.get;
-import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class ListQueriesTest extends AbstractRunner {
 
@@ -22,6 +22,15 @@ public class ListQueriesTest extends AbstractRunner {
         Assert.assertEquals("Size must be 2", 2, list.size());
         Assert.assertEquals("world", list.get(0));
         Assert.assertEquals("hello", list.get(1));
+    }
+
+    @Test
+    public void testListBasicWithRel() {
+        expect().
+                body("list.size()", equalTo(10)).
+                body("list[0].rel", equalTo("child")).
+        when().
+                get("/listresponse/discover");
     }
 
     @Test

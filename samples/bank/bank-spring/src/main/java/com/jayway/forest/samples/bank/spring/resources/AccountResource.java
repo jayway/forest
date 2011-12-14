@@ -1,5 +1,6 @@
 package com.jayway.forest.samples.bank.spring.resources;
 
+import com.jayway.forest.roles.ReadableResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jayway.forest.roles.DescribedResource;
@@ -17,7 +18,7 @@ import com.jayway.forest.samples.bank.spring.constraints.IsWithdrawable;
 
 import static com.jayway.forest.core.RoleManager.*;
 
-public class AccountResource implements Resource, DescribedResource, ResourceWithAccount {
+public class AccountResource implements Resource, ReadableResource<String>, ResourceWithAccount {
 
     private final Account account;
     
@@ -54,7 +55,7 @@ public class AccountResource implements Resource, DescribedResource, ResourceWit
 
 
     @Override
-    public Object description() {
+    public String read() {
         return String.format( Account.HTML_DESCRIPTION, account.getAccountNumber(), account.getBalance(), account.isAllowExceedBalanceLimit() );
     }
 

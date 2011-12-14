@@ -2,10 +2,7 @@ package com.jayway.forest.service;
 
 import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.dto.MyLinkable;
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.IdDiscoverableResource;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +10,7 @@ import java.util.List;
 
 /**
  */
-public class ListResponseResource implements IdDiscoverableResource, DescribedResource {
+public class ListResponseResource implements IdDiscoverableResource, ReadableResource<String> {
 
 
     public List<String> list() {
@@ -48,7 +45,7 @@ public class ListResponseResource implements IdDiscoverableResource, DescribedRe
     public Iterable<Linkable> linkables() {
         List<Linkable> list = new ArrayList<Linkable>(15);
         for (int i=0; i<15; i++) {
-            list.add( new Linkable(""+i+"/", "number"+i, "linkable", "This is element number "+i + " in the long line of elements in this list"));
+            list.add( new Linkable(""+i+"/", "number"+i));
         }
         return list;
     }
@@ -56,7 +53,7 @@ public class ListResponseResource implements IdDiscoverableResource, DescribedRe
     public List<MyLinkable> testlinkables() {
         List<MyLinkable> list = new ArrayList<MyLinkable>(15);
         for (int i=0; i<15; i++) {
-            list.add( new MyLinkable(""+i+"/", "number"+i, "linkable", "", "test"+i));
+            list.add( new MyLinkable(""+i, "number"+i, "", "test"+i));
         }
         return list;
     }
@@ -72,7 +69,7 @@ public class ListResponseResource implements IdDiscoverableResource, DescribedRe
     }
 
     @Override
-    public Object description() {
+    public String read() {
         return "Description text";
     }
 }

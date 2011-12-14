@@ -2,14 +2,11 @@ package com.jayway.forest.service;
 
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.core.RoleManager;
-import com.jayway.forest.roles.DeletableResource;
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.IdResource;
-import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.*;
 
 /**
  */
-public class ConstraintResource implements Resource, IdResource, DescribedResource, DeletableResource {
+public class ConstraintResource implements Resource, IdResource, ReadableResource<String>, DeletableResource {
 
     @Override
     @RolesInContext( String.class )
@@ -20,7 +17,7 @@ public class ConstraintResource implements Resource, IdResource, DescribedResour
 
     @Override
     @RolesInContext( String.class )
-    public String description() {
+    public String read() {
         return RoleManager.role(String.class);
     }
 

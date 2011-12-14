@@ -101,5 +101,9 @@ public class RootResource implements Resource {
     public OtherResource other() {
         return new OtherResource();
     }
+
+    public UpdateResource update() {
+        return new UpdateResource();
+    }
 }
 

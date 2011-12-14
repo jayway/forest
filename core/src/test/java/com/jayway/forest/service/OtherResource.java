@@ -6,7 +6,7 @@ import com.jayway.forest.roles.*;
 
 /**
  */
-public class OtherResource implements Resource, IdResource, DescribedResource, DeletableResource, CreatableResource<StringAndIntegerDTO> {
+public class OtherResource implements Resource, IdResource, ReadableResource<StringDTO>, DeletableResource, CreatableResource<StringAndIntegerDTO> {
 
     @Override
     public Resource id(String id) {
@@ -18,7 +18,7 @@ public class OtherResource implements Resource, IdResource, DescribedResource, D
     }
 
     @Override
-    public StringDTO description() {
+    public StringDTO read() {
         StateHolder.set( new StringDTO((String) StateHolder.get()) );
         return (StringDTO) StateHolder.get();
     }
@@ -30,7 +30,7 @@ public class OtherResource implements Resource, IdResource, DescribedResource, D
 
     @Override
     public Linkable create( StringAndIntegerDTO argument ) {
-        return new Linkable( argument.getString() + "/" + argument.getInteger().toString() + "/", argument.getString(), "appendabletest" );
+        return new Linkable( argument.getString() + "/" + argument.getInteger().toString(), argument.getString() );
     }
 
 }

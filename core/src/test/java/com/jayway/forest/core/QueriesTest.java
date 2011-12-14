@@ -20,7 +20,7 @@ public class QueriesTest  extends AbstractRunner {
     public void testInvokeIndex() throws IOException {
         StateHolder.set("Expected String");
 
-        StringDTO returned = get("/other/description").as(StringDTO.class);
+        StringDTO returned = get("/other/read").as(StringDTO.class);
         assertEquals("Expected String", returned.string());
     }
 

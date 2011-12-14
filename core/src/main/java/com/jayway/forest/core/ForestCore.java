@@ -1,22 +1,17 @@
 package com.jayway.forest.core;
 
+import com.jayway.forest.di.DependencyInjectionSPI;
+import com.jayway.forest.exceptions.MethodNotAllowedException;
+import com.jayway.forest.reflection.Capabilities;
+import com.jayway.forest.reflection.Capability;
+import com.jayway.forest.reflection.impl.*;
+import com.jayway.forest.roles.*;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.jayway.forest.di.DependencyInjectionSPI;
-import com.jayway.forest.exceptions.MethodNotAllowedException;
-import com.jayway.forest.exceptions.MethodNotAllowedRenderTemplateException;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.reflection.*;
-import com.jayway.forest.reflection.impl.*;
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.IdDiscoverableResource;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.UriInfo;
 
 public class ForestCore {
 
@@ -35,7 +30,7 @@ public class ForestCore {
         RoleManager.spi = dependencyInjectionSPI;
         // call application specific context setup
         application.setupRequestContext();
-        return new PathAndMethod(path, request.getMethod() );
+        return new PathAndMethod(path );
     }
 
     public Object get(HttpServletRequest request) {
@@ -48,20 +43,35 @@ public class ForestCore {
 
     public void put(HttpServletRequest request, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler) {
     	PathAndMethod pathAndMethod = setup(request);
-        if ( pathAndMethod.method() == null ) {
-            throw new MethodNotAllowedException();
-        }
-        resourceUtil.put(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
+        Resource resource = evaluatePath(pathAndMethod.pathSegments());
+        String methodName = methodName( resource, pathAndMethod.method(), request.getMethod()  ); 
+        resourceUtil.put(resource, methodName, formParams, stream, mediaTypeHandler);
     }
 
     public void post(HttpServletRequest request, InputStream stream, Map<String, String[]> formParams, MediaTypeHandler mediaTypeHandler) {
     	PathAndMethod pathAndMethod = setup(request);
-        resourceUtil.post(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream, mediaTypeHandler);
+        Resource resource = evaluatePath(pathAndMethod.pathSegments());
+        String methodName = methodName( resource, pathAndMethod.method(), request.getMethod()  );
+        resourceUtil.post(resource, methodName, formParams, stream, mediaTypeHandler);
     }
 
     public void delete(HttpServletRequest request) {
     	PathAndMethod pathAndMethod = setup(request);
-        resourceUtil.delete(evaluatePath(pathAndMethod.pathSegments()), pathAndMethod.method());
+        Resource resource = evaluatePath(pathAndMethod.pathSegments());
+        String methodName = methodName( resource, pathAndMethod.method(), request.getMethod()  );
+        resourceUtil.delete(resource, methodName);
+    }
+
+    private String methodName(Resource resource, String methodName, String httpMethod ) {
+        if ( methodName != null ) return methodName;
+        if ( httpMethod.equals("PUT") && resource instanceof UpdatableResource ) {
+            return "update";
+        } else if ( httpMethod.equals("DELETE") && resource instanceof DeletableResource ) {
+            return "delete";
+        } else if ( httpMethod.equals("POST") && resource instanceof CreatableResource) {
+            return "create";
+        }
+        throw new MethodNotAllowedException();
     }
 
     private Resource evaluatePath( List<String> segments ) {
@@ -106,11 +116,11 @@ public class ForestCore {
                 }
             }
         }
-        if (resource instanceof DescribedResource) {
+        if (resource instanceof ReadableResource) {
             try {
-                capabilities.setDescriptionResult(((DescribedResource) resource).description());
+                capabilities.setReadResult(((ReadableResource) resource).read());
             } catch ( Exception e) {
-                capabilities.setDescriptionResult("Exception occurred when evaluating 'description'");
+                capabilities.setReadResult("Exception occurred when evaluating 'read'");
             }
         }
         return capabilities;

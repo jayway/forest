@@ -7,7 +7,7 @@ class PathAndMethod {
     private List<String> pathSegments;
     private String method;
 
-    public PathAndMethod( String rawPath, String httpMethod ) {
+    public PathAndMethod( String rawPath ) {
         int index = rawPath.indexOf( '/' );
         if ( index > 0 ) {
             rawPath = rawPath.substring( index+1 );
@@ -21,16 +21,9 @@ class PathAndMethod {
             }
         }
         method = null;
-        if (onlyPathSegments) {
-            if (httpMethod.equals( "POST" )) {
-                method = "create";
-            } else if ( httpMethod.equals("DELETE")) {
-                method = "delete";
-            }
-        } else {
+        if (!onlyPathSegments) {
             method = split[ split.length -1 ];
         }
-
     }
 
     public List<String> pathSegments() {

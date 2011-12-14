@@ -37,9 +37,9 @@ public abstract class JsonMessageBodyWriter<T> extends AbstractMessageBodyWriter
         writer.append( "{ \"method\":\"").append(reference.httpMethod()).append("\",");
         writer.append("\"name\":").append("\"").append(reference.name() ).append("\",");
         if ( reference instanceof CapabilityCreateCommand || reference instanceof CapabilityDeleteCommand ) {
-            writer.append("\"href\":\"").append(reference.href().substring(0, reference.href().length() - 6 )).append("\"");
+            writer.append("\"uri\":\"").append(reference.uri().substring(0, reference.uri().length() - 6 )).append("\"");
         } else {
-            writer.append("\"href\":\"").append(reference.href()).append("\"");
+            writer.append("\"uri\":\"").append(reference.uri()).append("\"");
         }
         if ( reference instanceof FormCapability ) {
             FormCapability base = (FormCapability) reference;
