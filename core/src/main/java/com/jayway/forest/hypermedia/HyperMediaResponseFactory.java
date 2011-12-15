@@ -2,14 +2,12 @@ package com.jayway.forest.hypermedia;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
 import com.jayway.forest.constraint.Constraint;
-import com.jayway.forest.roles.CreatableResource;
+import com.jayway.forest.roles.IdDiscoverableResource;
 
 public class HyperMediaResponseFactory<R> {
 
@@ -30,6 +28,7 @@ public class HyperMediaResponseFactory<R> {
 			throw new RuntimeException(e);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private <B> HyperMediaResponse<B> makeInner(R resource, B body, Class<B> bodyClass) throws Exception {
 		HyperMediaResponse<B> response = new HyperMediaResponse<B>(resourceClass.getName(), body, bodyClass);
 		for (Method method : resourceClass.getMethods()) {
@@ -40,6 +39,9 @@ public class HyperMediaResponseFactory<R> {
 				String httpMethod = findHttpMethod(method);
 				response.addLink(new Link(uri, httpMethod, name, documentation));
 			}
+		}
+		if (resource instanceof IdDiscoverableResource) {
+			response.addLinks((List<Link>) ((IdDiscoverableResource)resource).discover());
 		}
 		return response;
 	}

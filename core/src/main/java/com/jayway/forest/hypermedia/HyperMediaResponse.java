@@ -20,6 +20,10 @@ public class HyperMediaResponse<T> {
 		links.add(link);
 	}
 
+	public void addLinks(List<Link> links) {
+		this.links.addAll(links);
+	}
+
 	public String getTitle() {
 		return title;
 	}

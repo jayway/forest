@@ -2,6 +2,7 @@ package com.jayway.forest.hypermedia;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.HttpMethod;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import com.jayway.forest.constraint.DoNotDiscover;
 import com.jayway.forest.roles.CreatableResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
+import com.jayway.forest.roles.IdResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 
@@ -75,6 +77,26 @@ public class HyperMediaResponseFactoryTest {
 		@Override
 		public Linkable create(String argument) {
 			return null;
+		}
+	}
+
+	@Test
+	public void testIdDiscoverable() {
+		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyIdDiscoverableResource.class).make(new MyIdDiscoverableResource(), "Hello world", String.class);
+		assertEquals("delete", response.linksWithMethod(HttpMethod.DELETE).get(0).getName());
+		assertEquals("posten", response.linksWithMethod(HttpMethod.POST).get(0).getName());
+	}
+
+	public static class MyIdDiscoverableResource implements IdDiscoverableResource {
+		@Override
+		public Resource id(String id) {
+			return null;
+		}
+
+		@Override
+		public List<Link> discover() {
+			return Arrays.asList(new Link("uri", HttpMethod.DELETE, "delete", "documentation"),
+					new Link("uri", HttpMethod.POST, "posten", "documentation"));
 		}
 	}
 }

@@ -2,9 +2,13 @@ package com.jayway.forest.roles;
 
 import static com.jayway.forest.core.RoleManager.role;
 
+import com.jayway.forest.hypermedia.Link;
+
+// TODO: remove this class
+
 /**
  */
-public class Linkable {
+public class Linkable extends Link {
 
     private String href;
     private String name;
@@ -22,6 +26,7 @@ public class Linkable {
     }
 
     public Linkable( String href, String name ) {
+    	super(href, "httpMethod", name, "documentation");
         if ( !href.startsWith("http://")) {
             this.href = role( UriInfo.class).getSelf() + href;
         } else {
