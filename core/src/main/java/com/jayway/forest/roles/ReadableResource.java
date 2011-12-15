@@ -1,5 +1,7 @@
 package com.jayway.forest.roles;
 
+import javax.ws.rs.GET;
+
 
 /**
  * Let the resource class implement this method 
@@ -7,5 +9,6 @@ package com.jayway.forest.roles;
  * capabilities of the resource
  */
 public interface ReadableResource<T> extends Resource {
+	@GET
     T read();
 }

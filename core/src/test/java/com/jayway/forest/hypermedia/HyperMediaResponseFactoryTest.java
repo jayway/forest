@@ -12,8 +12,10 @@ import org.junit.Test;
 
 import com.jayway.forest.constraint.DoNotDiscover;
 import com.jayway.forest.roles.CreatableResource;
+import com.jayway.forest.roles.DeletableResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
 import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.roles.ReadUpdatableResource;
 import com.jayway.forest.roles.Resource;
 
 public class HyperMediaResponseFactoryTest {
@@ -67,12 +69,14 @@ public class HyperMediaResponseFactoryTest {
 
 	@Test
 	public void testCreateable() {
-		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyCreatableResource.class).make(new MyCreatableResource(), "Hello world", String.class);
-		Link annotated = response.linksWithMethod(HttpMethod.PUT).get(0);
-		assertEquals("create", annotated.getName());
+		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyCrudResource.class).make(new MyCrudResource(), "Hello world", String.class);
+		assertEquals("create", response.linksWithMethod(HttpMethod.PUT).get(0).getName());
+		assertEquals("read", response.linksWithMethod(HttpMethod.GET).get(0).getName());
+		assertEquals("update", response.linksWithMethod(HttpMethod.POST).get(0).getName());
+		assertEquals("delete", response.linksWithMethod(HttpMethod.DELETE).get(0).getName());
 	}
 
-	public static class MyCreatableResource implements CreatableResource<String>{
+	public static class MyCrudResource implements CreatableResource<String>, ReadUpdatableResource<String>, DeletableResource {
 		@Override
 		public Linkable create(String argument) {
 			return null;
@@ -81,6 +85,24 @@ public class HyperMediaResponseFactoryTest {
 		@Override
 		public Resource id(String id) {
 			return null;
+		}
+
+		@Override
+		public String read() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void update(String argument) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void delete() {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 
