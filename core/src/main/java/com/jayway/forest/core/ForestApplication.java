@@ -28,7 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 
-import com.jayway.forest.api.Body;
+import com.jayway.forest.Body;
 import com.jayway.forest.roles.Resource;
 
 public class ForestApplication extends Application {

@@ -1,4 +1,4 @@
-package com.jayway.forest.api;
+package com.jayway.forest;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

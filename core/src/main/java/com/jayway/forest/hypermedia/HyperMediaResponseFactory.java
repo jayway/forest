@@ -9,6 +9,7 @@ import java.util.List;
 import javax.ws.rs.HttpMethod;
 
 import com.jayway.forest.constraint.Constraint;
+import com.jayway.forest.roles.CreatableResource;
 
 public class HyperMediaResponseFactory<R> {
 
@@ -54,17 +55,44 @@ public class HyperMediaResponseFactory<R> {
 		return false;
 	}
 
-	private String findHttpMethod(Method method) {
-		String httpMethod;
-		HttpMethod methodAnnotation = getAnnotation(method.getAnnotations(), HttpMethod.class);
-		if (methodAnnotation != null) {
-			httpMethod = methodAnnotation.value();
-		} else  if (method.getReturnType().equals(Void.TYPE)) {
-			httpMethod = HttpMethod.POST;
-		} else {
-			httpMethod = HttpMethod.GET;
+	private String findHttpMethod(Method method) throws Exception {
+		String httpMethod = findHttpMethodFromAnnotation(method);
+		if (httpMethod == null) {
+			if (method.getReturnType().equals(Void.TYPE)) {
+				httpMethod = HttpMethod.POST;
+			} else {
+				httpMethod = HttpMethod.GET;
+			}
 		}
 		return httpMethod;
+	}
+
+	private String findHttpMethodFromAnnotation(Method method) throws Exception {
+		String httpMethod = doFindHttpMethodFromAnnotation(method);
+		if (httpMethod != null) {
+			return httpMethod;
+		}
+		final Class<?> declaringClass = method.getDeclaringClass();
+		final Class<?>[] interfaces = declaringClass.getInterfaces();
+		for (final Class<?> i : interfaces) {
+			try {
+				Method interfaceMethod = i.getMethod(method.getName(), method.getParameterTypes());
+				httpMethod = findHttpMethodFromAnnotation(interfaceMethod);
+				if (httpMethod != null) {
+					return httpMethod;
+				}
+			} catch (NoSuchMethodException e) {
+			}
+		}
+		return null;
+	}
+
+	private String doFindHttpMethodFromAnnotation(Method method) {
+		HttpMethod methodAnnotation = getAnnotation(method.getAnnotations(), HttpMethod.class);
+		if (methodAnnotation != null) {
+			return methodAnnotation.value();
+		}
+		return null;
 	}
 
 	private <T extends Annotation> T getAnnotation(Annotation[] annotations, Class<T> clazz) {

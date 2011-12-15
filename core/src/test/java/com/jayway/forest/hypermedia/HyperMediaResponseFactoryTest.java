@@ -2,12 +2,17 @@ package com.jayway.forest.hypermedia;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.PUT;
 
 import org.junit.Test;
 
 import com.jayway.forest.constraint.DoNotDiscover;
+import com.jayway.forest.roles.CreatableResource;
+import com.jayway.forest.roles.IdDiscoverableResource;
+import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 
 public class HyperMediaResponseFactoryTest {
@@ -55,6 +60,20 @@ public class HyperMediaResponseFactoryTest {
 	public static class ConstrainedResource implements Resource {
 		@DoNotDiscover
 		public String getStuff(int argument) {
+			return null;
+		}
+	}
+
+	@Test
+	public void testCreateable() {
+		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyCreatableResource.class).make(new MyCreatableResource(), "Hello world", String.class);
+		Link annotated = response.linksWithMethod(HttpMethod.PUT).get(0);
+		assertEquals("create", annotated.getName());
+	}
+
+	public static class MyCreatableResource implements CreatableResource<String>{
+		@Override
+		public Linkable create(String argument) {
 			return null;
 		}
 	}

@@ -8,7 +8,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import com.jayway.forest.api.Body;
+import com.jayway.forest.Body;
 import com.jayway.forest.constraint.RolesInContext;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
@@ -49,6 +49,10 @@ public class RootResource implements Resource {
         StateHolder.set(list);
     }
 
+    public OtherResource other() {
+        return new OtherResource();
+    }
+
     /*
     public void commandwithnamedparam(@FormParam("theName") String input ) {
         StateHolder.set(input);
@@ -74,10 +78,6 @@ public class RootResource implements Resource {
         return input;
     }
     
-    public OtherResource other() {
-        return new OtherResource();
-    }
-
     @RolesInContext( String.class )
     public String constraint() {
         return role(String.class);
