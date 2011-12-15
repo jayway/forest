@@ -2,10 +2,7 @@ package com.jayway.forest.reflection.impl;
 
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.reflection.PagingSortingParameter;
-import com.jayway.forest.roles.FieldComparator;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.UriInfo;
+import com.jayway.forest.roles.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.*;
@@ -32,6 +29,21 @@ public class CapabilityQueryForList extends CapabilityQuery {
         // actual call to the resource method
         List<?> returnedList = (List<?>) super.get(request);
 
+        // handle rel
+        if ( resource instanceof IdDiscoverableResource && method.getName().equals("discover")) {
+            for ( Object elm: returnedList) {
+                Linkable link = (Linkable) elm;
+                link.setRel( "child" );
+            }
+        } else if ( returnedList != null && returnedList.size() > 0 && returnedList.get(0) instanceof Linkable ) {
+            for ( Object elm: returnedList ) {
+                Linkable link = (Linkable) elm;
+                if ( link.getRel() == null ) {
+                    link.setRel( method.getName() + ":" + link.getUri() );
+                }
+            }
+        }
+        
         PagedSortedListResponse response = new PagedSortedListResponse();
         if (pagingSortingParameter.isTouched()) {
         	if (pagingSortingParameter.getTotalElements() == null) {
@@ -73,8 +85,9 @@ public class CapabilityQueryForList extends CapabilityQuery {
                     // urlParameters have been parsed and passed to pagingSortingParameter, so sort based on these
                     Collections.sort(safeList, new FieldComparator( pagingSortingParameter.sortParameters() ));
                 } else if (Linkable.class.isAssignableFrom(inferListType())) {
+                    // Must be possible to get an unsorted list back
                     // a Linkable is default sorted by name
-                    Collections.sort(safeList, new FieldComparator(new SortParameter("name")));
+                    // Collections.sort(safeList, new FieldComparator(new SortParameter("name")));
                 }
             }
 
@@ -95,10 +108,10 @@ public class CapabilityQueryForList extends CapabilityQuery {
 
                 String self = role(UriInfo.class).getSelf();
                 if ( maxIndex < actualListSize ) {
-                    response.setNext( href() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
+                    response.setNext( uri() + urlParameter.linkTo( pagingSortingParameter.getPage()+1) );
                 }
                 if ( minIndex > 0 ) {
-                    response.setPrevious( href() + urlParameter.linkTo( pagingSortingParameter.getPage()-1) );
+                    response.setPrevious( uri() + urlParameter.linkTo( pagingSortingParameter.getPage()-1) );
                 }
             }
         }

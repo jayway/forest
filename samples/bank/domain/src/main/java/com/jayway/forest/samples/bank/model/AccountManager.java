@@ -45,7 +45,7 @@ public class AccountManager {
 
     private void doDeposit( Depositable depositable, Integer amount, String message ) {
         depositable.deposit( amount );
-        logTransaction( (Account) depositable, new Transaction( amount, message) );
+        logTransaction( (Account) depositable, new Transaction( amount, message, ((Account) depositable).getBalance()) );
     }
 
     private void doDeposit( Depositable depositable, Integer amount ) {
@@ -60,7 +60,7 @@ public class AccountManager {
 
     private void doWithdraw( Withdrawable withdrawable, Integer amount, String message ) {
         withdrawable.withdraw( amount );
-        logTransaction( (Account) withdrawable, new Transaction( amount, message ) );
+        logTransaction( (Account) withdrawable, new Transaction( amount, message, ((Account) withdrawable).getBalance() ) );
     }
 
     private void doWithdraw( Withdrawable withdrawable, Integer amount ) {

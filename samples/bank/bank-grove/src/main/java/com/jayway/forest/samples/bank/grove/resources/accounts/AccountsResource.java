@@ -46,7 +46,7 @@ public class AccountsResource implements IdDiscoverableResource, CreatableResour
         for (Account account : role(AccountRepository.class).all()) {
             if ( account.getBalance() < 0 ) {
                 String description = jsonHelper.toJSON(account).toString();
-                overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), description ,account.getBalance() ));
+                overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() ));
             }
         }
         return overdrawn;
@@ -68,6 +68,6 @@ public class AccountsResource implements IdDiscoverableResource, CreatableResour
     @Override
     public Linkable create(String name) {
         Account account = role(AccountRepository.class).createAccount(name);
-        return new Linkable( account.getAccountNumber() + "/", account.getName() );
+        return new Linkable( account.getAccountNumber(), account.getName() );
     }
 }

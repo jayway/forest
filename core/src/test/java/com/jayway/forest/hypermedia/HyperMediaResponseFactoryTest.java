@@ -13,7 +13,6 @@ import org.junit.Test;
 import com.jayway.forest.constraint.DoNotDiscover;
 import com.jayway.forest.roles.CreatableResource;
 import com.jayway.forest.roles.IdDiscoverableResource;
-import com.jayway.forest.roles.IdResource;
 import com.jayway.forest.roles.Linkable;
 import com.jayway.forest.roles.Resource;
 
@@ -76,6 +75,11 @@ public class HyperMediaResponseFactoryTest {
 	public static class MyCreatableResource implements CreatableResource<String>{
 		@Override
 		public Linkable create(String argument) {
+			return null;
+		}
+
+		@Override
+		public Resource id(String id) {
 			return null;
 		}
 	}

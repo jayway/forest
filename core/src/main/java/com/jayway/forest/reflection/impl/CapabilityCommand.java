@@ -29,17 +29,19 @@ public class CapabilityCommand extends FormCapability {
 
     @Override
     public void put(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler) {
-        Object[] arguments = stream == null ? arguments(method, formParams ) : arguments( method, stream, mediaTypeHandler );
-        invokeCommand( arguments );
+        throw new MethodNotAllowedRenderTemplateException( this );
     }
 
     @Override
 	public void post(Map<String, String[]> formParams, InputStream stream, MediaTypeHandler mediaTypeHandler ) {
-        if ( mediaTypeHandler.acceptHtml() ) {
+        Object[] arguments = stream == null ? arguments(method, formParams ) : arguments( method, stream, mediaTypeHandler );
+        invokeCommand( arguments );
+
+        /*if ( mediaTypeHandler.acceptHtml() ) {
             put(formParams, stream, mediaTypeHandler);
         } else {
             throw new MethodNotAllowedRenderTemplateException( this );
-        }
+        }*/
 	}
 
     @Override
@@ -75,6 +77,6 @@ public class CapabilityCommand extends FormCapability {
 
 	@Override
 	public String httpMethod() {
-		return "PUT";
+		return "POST";
 	}
 }

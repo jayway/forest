@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -96,7 +97,7 @@ public class JSONHelper {
     }
 
     private String convertWholeStreamToString(InputStream stream) {
-        return new Scanner(stream).useDelimiter("\\A").next();
+        return new Scanner(new InputStreamReader(stream)).useDelimiter("\\A").next();
     }
 
     @SuppressWarnings("unchecked")

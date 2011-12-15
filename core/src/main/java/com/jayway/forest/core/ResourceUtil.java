@@ -6,10 +6,7 @@ import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.di.DependencyInjectionSPI;
 import com.jayway.forest.reflection.Capability;
 import com.jayway.forest.reflection.impl.*;
-import com.jayway.forest.roles.CreatableResource;
-import com.jayway.forest.roles.DeletableResource;
-import com.jayway.forest.roles.IdResource;
-import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,8 +81,8 @@ public class ResourceUtil {
         return true;
     }
 
-    public Resource invokePathMethod( Resource resource, String path ) {
-        return findCapability(resource, path).subResource(path);
+    public Resource invokePathMethod( Resource resource, String segment ) {
+        return findCapability(resource, segment).subResource(segment);
     }
 
     private Capability findCapability(Resource resource, String name) {
@@ -97,6 +94,20 @@ public class ResourceUtil {
                         Type genericType = ((ParameterizedType) type).getActualTypeArguments()[0];
                         // no generic types supported in the Parameterized type of CreatableResource
                         Method method = clazz.getDeclaredMethod("create", (Class)genericType);
+                        return createCapability(resource, method);
+                    }
+                }
+            } catch (NoSuchMethodException e) {
+                log.error( "Error finding Create method", e);
+            }
+        }
+        if ( "update".equals( name ) && resource instanceof UpdatableResource ) {
+            try {
+                for (Type type : clazz.getGenericInterfaces()) {
+                    if ( type instanceof ParameterizedType && ((ParameterizedType) type).getRawType() == UpdatableResource.class ) {
+                        Type genericType = ((ParameterizedType) type).getActualTypeArguments()[0];
+                        // no generic types supported in the Parameterized type of CreatableResource
+                        Method method = clazz.getDeclaredMethod("update", (Class)genericType);
                         return createCapability(resource, method);
                     }
                 }
@@ -125,6 +136,8 @@ public class ResourceUtil {
                 String documentation = getDocumentation(method);
                 if ( resource instanceof DeletableResource && method.getName().equals("delete") ) {
                     return new CapabilityDeleteCommand((DeletableResource) resource, documentation );
+                } else if (resource instanceof UpdatableResource && method.getName().equals("update")) {
+                    return new CapabilityUpdateCommand(method, (UpdatableResource) resource, documentation);
                 } else if (method.getReturnType().equals(Void.TYPE)) {
                     return new CapabilityCommand(method, resource, documentation, method.getName() );
                 } else if (resource instanceof CreatableResource && method.getName().equals( "create" )) {

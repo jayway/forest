@@ -24,7 +24,7 @@ public class LinkableHtmlMessageBodyWriter extends HtmlMessageBodyWriter<Linkabl
 			MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException, WebApplicationException {
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
         writeHeader(writer);
-        writer.write("<code>Location:</code> <a href='" + linkable.getHref() + "' rel='"+linkable.getRel()+"'>"+linkable.getName() +"</a>");
+        writer.write("<code>Location:</code> <a href='" + linkable.getUri() + "' rel='"+linkable.getRel()+"'>"+linkable.getName() +"</a>");
         writeFooter(writer);
         writer.flush();
 	}

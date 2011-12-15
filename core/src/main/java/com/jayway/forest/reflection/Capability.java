@@ -37,7 +37,7 @@ public abstract class Capability implements CapabilityReference {
 		return name;
 	}
 
-    public String href() {
+    public String uri() {
         return href;
     }
 

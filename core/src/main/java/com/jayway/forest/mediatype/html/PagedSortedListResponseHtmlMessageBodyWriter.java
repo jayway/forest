@@ -30,25 +30,25 @@ public class PagedSortedListResponseHtmlMessageBodyWriter extends HtmlMessageBod
         Writer writer = new OutputStreamWriter( out, charset);
         writeHeader(writer);
         writer.append( "<h1>").append(response.getName()).append("</h1>");
-        appendPagingInfo( writer, response, false );
 
         List<?> list = response.getList();
         if ( !list.isEmpty() ) {
-            if ( list.get( 0 ) instanceof Linkable ) {
+            appendPagingInfo( writer, response, false );
+            if ( list.get(0).getClass() == Linkable.class ) {
+                // render list
                 if ( response.getOrderByAsc() != null && response.getOrderByDesc() != null ) {
                     appendAnchor( writer, (String)response.getOrderByAsc().get( "name"), "asc", false);
                     appendAnchor( writer, (String)response.getOrderByDesc().get( "name"), "desc", false);
                 }
-
-                if (list.get(0).getClass() == Linkable.class) {
-                    writer.append( "<ul>" );
-                    for (Object elm : list) {
-                        renderLinkable(writer, (Linkable) elm);
-                    }
-                    writer.append( "</ul>" );
+                writer.append( "<ul>" );
+                for (Object elm : list) {
+                    renderLinkable(writer, (Linkable) elm);
                 }
+                writer.append( "</ul>" );
+            } else {
+                // render table
+                renderTable(writer, list, response );
             }
-            renderTable(writer, list, response );
         }
         writeFooter(writer);
         writer.flush();
@@ -68,7 +68,7 @@ public class PagedSortedListResponseHtmlMessageBodyWriter extends HtmlMessageBod
             writer.append("<tr>");
             if ( elm instanceof Linkable ) {
                 writer.append("<td>");
-                appendAnchor( writer, ((Linkable) elm).getHref(), ((Linkable) elm).getName(), false);
+                appendAnchor( writer, ((Linkable) elm).getUri(), ((Linkable) elm).getName(), false);
                 writer.append("</td>");
                 renderTableRow(writer, elm.getClass(), elm );
             } else {
@@ -134,7 +134,7 @@ public class PagedSortedListResponseHtmlMessageBodyWriter extends HtmlMessageBod
 
     private void renderLinkable(Writer writer, Linkable link) throws IOException {
         writer.append("<li>");
-        appendAnchor( writer, link.getHref(), link.getName(), false );
+        appendAnchor( writer, link.getUri(), link.getName(), false );
         writer.append( "</li>" );
     }
 

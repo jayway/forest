@@ -10,14 +10,12 @@ import com.jayway.forest.hypermedia.Link;
  */
 public class Linkable extends Link {
 
-    private String href;
+    private String uri;
     private String name;
     private String rel;
-    private String description;
 
-    public Linkable( String href, String name, String rel, String description ) {
-        this( href, name, rel);
-        this.description = description;
+    public Linkable( String id ) {
+    	this(id, id);
     }
 
     public Linkable( String href, String name, String rel ) {
@@ -25,22 +23,21 @@ public class Linkable extends Link {
         this.rel = rel;
     }
 
-    public Linkable( String href, String name ) {
-    	super(href, "httpMethod", name, "documentation");
-        if ( !href.startsWith("http://")) {
-            this.href = role( UriInfo.class).getSelf() + href;
+    public Linkable( String uri, String id ) {
+    	super(uri, "httpMethod", id, "documentation");
+        if ( !uri.startsWith("http://")) {
+            this.uri = role( UriInfo.class).getSelf() + uri;
         } else {
-            this.href = href;
+            this.uri = id;
         }
-        this.name = name;
+        if ( !id.endsWith("/") ) {
+            this.uri = this.uri + "/";
+        }
+        this.name = id;
     }
 
-    public Linkable( String name ) {
-    	this(name + "/", name);
-    }
-
-    public String getHref() {
-        return href;
+    public String getUri() {
+        return uri;
     }
 
     public String getName() {
@@ -51,7 +48,7 @@ public class Linkable extends Link {
         return rel;
     }
 
-    public String getDescription() {
-        return description;
+    public void setRel( String rel ) {
+        this.rel = rel;
     }
 }

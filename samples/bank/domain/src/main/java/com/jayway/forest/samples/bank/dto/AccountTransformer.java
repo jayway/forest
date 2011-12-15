@@ -14,6 +14,6 @@ public class AccountTransformer implements ResponseHandler.Transform<Account> {
 
     public Linkable transform(Account account) {
 
-        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getName(), account.getBalance() );
+        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() );
     }
 }

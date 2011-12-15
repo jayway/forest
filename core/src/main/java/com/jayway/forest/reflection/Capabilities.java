@@ -14,12 +14,12 @@ public class Capabilities {
 	private final List<Capability> queries = new LinkedList<Capability>();
 	private final List<Capability> commands = new LinkedList<Capability>();
 	private final List<Capability> resources = new LinkedList<Capability>();
-	private Object description;
+	private Object read;
     private PagedSortedListResponse discovered;
     private Capability idResource;
 
-    public void setDescriptionResult(Object description) {
-		this.description = description;
+    public void setReadResult(Object read) {
+		this.read = read;
 	}
 	public Capabilities(String name) {
 		this.name = name;
@@ -45,8 +45,8 @@ public class Capabilities {
 	public List<Capability> getResources() {
 		return resources;
 	}
-	public Object getDescriptionResult() {
-		return description;
+	public Object getReadResult() {
+		return read;
 	}
     public void setDiscovered( PagedSortedListResponse discovered ) {
         this.discovered = discovered;

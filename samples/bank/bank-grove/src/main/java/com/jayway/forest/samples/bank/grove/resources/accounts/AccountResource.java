@@ -1,6 +1,7 @@
 package com.jayway.forest.samples.bank.grove.resources.accounts;
 
 import com.jayway.forest.roles.DescribedResource;
+import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 import com.jayway.forest.samples.bank.dto.TransferToDTO;
@@ -15,7 +16,7 @@ import java.util.List;
 import static com.jayway.forest.core.RoleManager.addRole;
 import static com.jayway.forest.core.RoleManager.role;
 
-public class AccountResource implements Resource, DescribedResource {
+public class AccountResource implements Resource, ReadableResource<Account> {
 
     private Account account;
 
@@ -49,16 +50,16 @@ public class AccountResource implements Resource, DescribedResource {
     }
 
     @Override
-    public Object description() {
+    public Account read() {
         return account;
     }
 
-    private String accountDescription() {
-        return account.getDescription();
+    private String accountName() {
+        return account.getName();
     }
 
-    public void changedescription( @Template("accountDescription") String description ) {
-        account.setDescription(description);
+    public void changename( @Template("accountName") String name ) {
+        account.setName(name);
     }
 
     public List<Transaction> transactions() {

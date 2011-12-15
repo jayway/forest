@@ -70,7 +70,7 @@ public class ResponseHandler {
                     mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Response.class, (Response)responseObject);
                 } else if ( responseObject instanceof CreatedException ) {
                     response.setStatus( ((CreatedException) responseObject).getCode() );
-                    response.addHeader( "Location", ((CreatedException) responseObject).getLinkable().getHref() );
+                    response.addHeader( "Location", ((CreatedException) responseObject).getLinkable().getUri() );
                     mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Linkable.class, ((CreatedException) responseObject).getLinkable());
                 } else {
                     mediaTypeHandlerContainer.write(out, mediaTypeHandler.accept(), Object.class, responseObject);

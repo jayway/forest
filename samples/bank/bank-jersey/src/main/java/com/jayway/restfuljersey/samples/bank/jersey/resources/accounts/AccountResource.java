@@ -4,6 +4,7 @@ import static com.jayway.forest.core.RoleManager.role;
 
 import com.jayway.forest.exceptions.NotFoundException;
 import com.jayway.forest.roles.DescribedResource;
+import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.samples.bank.dto.AccountLinkable;
 import com.jayway.forest.samples.bank.dto.TransferToDTO;
@@ -16,7 +17,7 @@ import com.jayway.restfuljersey.samples.bank.jersey.constraints.DepositAllowed;
 import com.jayway.restfuljersey.samples.bank.jersey.constraints.HasCredit;
 import com.jayway.restfuljersey.samples.bank.jersey.constraints.IsWithdrawable;
 
-public class AccountResource implements Resource, DescribedResource {
+public class AccountResource implements Resource, ReadableResource<String> {
 
     private Account account;
 
@@ -26,7 +27,7 @@ public class AccountResource implements Resource, DescribedResource {
     }
 
     private AccountLinkable convertAccount() {
-        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getDescription(), account.getBalance() );
+        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getBalance() );
     }
 
     //public void update( @Template("convertAccount") AccountLinkable account ) {
@@ -59,7 +60,7 @@ public class AccountResource implements Resource, DescribedResource {
 
 
     @Override
-    public Object description() {
+    public String read() {
         return String.format( Account.HTML_DESCRIPTION, account.getAccountNumber(), account.getBalance(), account.isAllowExceedBalanceLimit() );
     }
 }

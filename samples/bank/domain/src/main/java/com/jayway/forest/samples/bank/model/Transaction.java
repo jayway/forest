@@ -11,12 +11,14 @@ public class Transaction {
     private Date date;
     private Integer amount;
     private String description;
+    private Integer balance;
 
-    public Transaction( Integer amount, String description ) {
+    public Transaction( Integer amount, String description, Integer balance ) {
         this.id = UUID.randomUUID().toString();
         this.amount = amount;
         this.description = description;
         this.date = new Date();
+        this.balance = balance;
     }
 
     public String getId() {

@@ -7,9 +7,11 @@ import com.jayway.forest.roles.Linkable;
 public class MyLinkable extends Linkable {
 
     private String test;
+    private String description;
 
-    public MyLinkable(String href, String name, String rel, String description, String test) {
-        super(href, name, rel, description);
+    public MyLinkable(String uri, String name, String description, String test) {
+        super(uri, name);
+        this.description = description;
         this.test = test;
     }
 }

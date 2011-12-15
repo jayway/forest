@@ -42,8 +42,8 @@ public class PathsTest extends AbstractRunner {
     @Test
     public void onPath() {
         expect().statusCode( 405 ).when().put("/other/id/");
-        expect().statusCode( 404 ).when().post("/other/id/");
-        expect().statusCode( 404 ).when().delete("/other/id/");
+        expect().statusCode( 405 ).when().post("/other/id/");
+        expect().statusCode( 405 ).when().delete("/other/id/");
     }
 
     @Test

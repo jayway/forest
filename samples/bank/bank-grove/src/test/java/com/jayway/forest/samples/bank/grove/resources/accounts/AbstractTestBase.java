@@ -1,14 +1,12 @@
 package com.jayway.forest.samples.bank.grove.resources.accounts;
 
-import static com.jayway.restassured.parsing.Parser.JSON;
-
+import com.jayway.forest.samples.bank.grove.RestService;
+import com.jayway.restassured.RestAssured;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mortbay.jetty.testing.ServletTester;
 
-import com.jayway.forest.samples.bank.grove.RestService;
-import com.jayway.restassured.RestAssured;
+import static com.jayway.restassured.parsing.Parser.JSON;
 
 public class AbstractTestBase {
 

@@ -27,9 +27,9 @@ public class CapabilitiesTest extends AbstractRunner {
     public void discover() {
         String s = expect().get("/").asString();
         Object parse = JSONValue.parse(s);
-        Assert.assertTrue( parse instanceof JSONArray);
+        Assert.assertTrue( parse instanceof JSONObject);
 
-        JSONArray array = (JSONArray) parse;
+        JSONArray array = (JSONArray) ((JSONObject) parse).get("links");
         Assert.assertTrue("Must have more than 10 elements", array.size() > 10 );
         for (Object elm : array) {
             assertElement((JSONObject) elm);
@@ -52,7 +52,7 @@ public class CapabilitiesTest extends AbstractRunner {
 
     private void assertElement( JSONObject obj ) {
         Assert.assertTrue("Must have element 'name'", obj.get("name") != null);
-        Assert.assertTrue("Must have element 'href'", obj.get("href") != null);
+        Assert.assertTrue("Must have element 'uri'", obj.get("uri") != null);
         Assert.assertTrue("Must have element 'method'", obj.get("method") != null);
     }
 

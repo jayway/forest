@@ -23,10 +23,10 @@ public class CreatableTest extends AbstractRunner {
                 .when().post("/other/").andReturn().asString();
 
         JSONObject o = (JSONObject) JSONValue.parse(result);
-        Assert.assertEquals( String.format("%s%s/other/Hello/25/", baseURI, basePath), o.get("href") );
+        Assert.assertEquals( String.format("%s%s/other/Hello/25/", baseURI, basePath), o.get("uri") );
         Assert.assertEquals( "GET", o.get("method") );
         Assert.assertEquals( "Hello", o.get("name") );
-        Assert.assertEquals( "appendabletest", o.get("rel") );
+        Assert.assertEquals( "child", o.get("rel") );
     }
 
     @Test
@@ -42,7 +42,7 @@ public class CreatableTest extends AbstractRunner {
                 .header("Location", baseURI + basePath + "/other/hello/" + 25 + "/")
                 .post("/other/?argument1.StringAndIntegerDTO.string=hello&argument1.StringAndIntegerDTO.integer=25").andReturn().asString();
 
-        String expect = String.format("<code>Location:</code> <a href='%s/bank/other/hello/25/' rel='appendabletest'>hello</a>", baseURI);
+        String expect = String.format("<code>Location:</code> <a href='%s/bank/other/hello/25/' rel='child'>hello</a>", baseURI);
         Assert.assertTrue( result.contains(expect) );
     }
 }

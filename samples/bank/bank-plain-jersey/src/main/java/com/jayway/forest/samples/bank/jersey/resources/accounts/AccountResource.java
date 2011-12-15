@@ -31,7 +31,8 @@ public class AccountResource {
     }
 
     private AccountLinkable convertAccount() {
-        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getDescription(), account.getBalance() );
+//        return new AccountLinkable( account.getAccountNumber(), account.getName(), account.getDescription(), account.getBalance() );
+    	return null;
     }
 
     //public void update( @Template("convertAccount") AccountLinkable account ) {

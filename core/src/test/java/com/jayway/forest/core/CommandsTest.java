@@ -1,22 +1,21 @@
 package com.jayway.forest.core;
 
-import com.jayway.forest.dto.IntegerDTO;
-import com.jayway.forest.service.AbstractRunner;
-import com.jayway.forest.service.StateHolder;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.jayway.forest.dto.IntegerDTO;
+import com.jayway.forest.service.AbstractRunner;
+import com.jayway.forest.service.StateHolder;
 
 /**
  */
@@ -30,7 +29,7 @@ public class CommandsTest extends AbstractRunner {
                 statusCode(200).
                 body(containsString("Operation completed successfully")).
         when().
-                put("/command");
+                post("/command");
 
         assertThat(StateHolder.get().toString(), equalTo("second"));
     }
@@ -69,7 +68,7 @@ public class CommandsTest extends AbstractRunner {
 
     @Test
     public void testCommandList() throws IOException {
-        given().body("[\"Hello\"]").when().put("/commandlist");
+        given().body("[\"Hello\"]").when().post("/commandlist");
 
         assertEquals("SuccessHello", StateHolder.get());
     }
@@ -82,7 +81,7 @@ public class CommandsTest extends AbstractRunner {
             expect().
                     statusCode(400).
             when().
-                    put( "/commandlist");
+                    post( "/commandlist");
     }
 
     @Test @SuppressWarnings("unchecked")
@@ -101,7 +100,7 @@ public class CommandsTest extends AbstractRunner {
 
     @Test @SuppressWarnings("unchecked")
     public void testComplex() {
-        given().body("[[[\"Hello\", \"World\"]]]").expect().statusCode(200).when().put("/complex");
+        given().body("[[[\"Hello\", \"World\"]]]").expect().statusCode(200).when().post("/complex");
 
 		List<List<List<String>>> list = (List<List<List<String>>>) StateHolder.get();
         String result = "";
@@ -111,5 +110,11 @@ public class CommandsTest extends AbstractRunner {
         assertEquals("HelloWorldNEW", result);
     }
 
+    @Test
+    public void testDeleteHTML() {
+        given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(200).when().post("/other/delete");
+        String message = (String) StateHolder.get();
+        System.out.printf(message );
+    }
 
 }

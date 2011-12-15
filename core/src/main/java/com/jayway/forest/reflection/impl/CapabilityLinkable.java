@@ -22,8 +22,8 @@ public class CapabilityLinkable implements CapabilityReference {
 	}
 
     @Override
-    public String href() {
-        return linkable.getHref();
+    public String uri() {
+        return linkable.getUri();
     }
 
     @Override

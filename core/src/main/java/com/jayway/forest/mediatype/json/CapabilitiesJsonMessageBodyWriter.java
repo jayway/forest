@@ -29,21 +29,34 @@ public class CapabilitiesJsonMessageBodyWriter extends JsonMessageBodyWriter<Cap
 	public void writeTo(Capabilities capabilities, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException, WebApplicationException {
         OutputStreamWriter writer = new OutputStreamWriter( out, charset);
-        writer.append("[");
-        List<CapabilityReference> all = new LinkedList<CapabilityReference>();
-        all.addAll( capabilities.getQueries() );
-        all.addAll( capabilities.getCommands() );
-        all.addAll( capabilities.getResources() );
-        for (Linkable link : capabilities.getDiscoveredLinks()) {
-            all.add(new CapabilityLinkable(link));
-        }
-        if ( capabilities.getIdResource() != null ) {
-            all.add( capabilities.getIdResource());
-        }
-        if ( !all.isEmpty() ) {
-            toMapEntries(all, writer);
+        writer.append("{ \"links\": [");
+        List<CapabilityReference> links = new LinkedList<CapabilityReference>();
+        links.addAll( capabilities.getQueries() );
+        links.addAll( capabilities.getCommands() );
+        links.addAll(capabilities.getResources());
+        if ( !links.isEmpty() ) {
+            toMapEntries(links, writer);
         }
         writer.append("]");
+
+        links.clear();
+        for (Linkable link : capabilities.getDiscoveredLinks()) {
+            links.add(new CapabilityLinkable(link));
+        }
+        if ( !links.isEmpty() ) {
+            writer.append(", \"discovered\": [");
+            toMapEntries( links, writer );
+            writer.append("]");
+        }
+
+        // do we need this???
+        /*
+        if ( capabilities.getIdResource() != null ) {
+            links.add( capabilities.getIdResource());
+        }
+        */
+
+        writer.append("}");
         writer.flush();
 	}
 

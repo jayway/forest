@@ -55,7 +55,7 @@ public class CapabilitiesHtmlMessageBodyWriter extends HtmlMessageBodyWriter<Cap
             }
             for (Linkable resource: capabilities.getDiscoveredLinks()) {
                 if ( resource == null ) continue;
-                writer.append("<li><a href='").append(resource.getHref()).append("'>").append(resource.getName()).append("</a></li>");
+                writer.append("<li><a href='").append(resource.getUri()).append("'>").append(resource.getName()).append("</a></li>");
             }
             writer.append("</ul>");
         }
@@ -70,16 +70,16 @@ public class CapabilitiesHtmlMessageBodyWriter extends HtmlMessageBodyWriter<Cap
             }
         }
 
-        if (capabilities.getDescriptionResult() != null ) {
+        if (capabilities.getReadResult() != null ) {
             writer.append("<h2>Description</h2>");
-            writer.append( new JSONHelper().toJSON( capabilities.getDescriptionResult() ).toString());
+            writer.append( new JSONHelper().toJSON( capabilities.getReadResult() ).toString());
         }
         writeFooter(writer);
         writer.flush();
 	}
 
     private void appendMethod(Writer writer, Capability method ) throws IOException {
-    	writer.append("<li><a href='").append(method.href());
+    	writer.append("<li><a href='").append(method.uri());
     	writer.append("'>").append( method.name() ).append("</a>");
         if ( method.isDocumented() ) {
         	writer.append(" <i>(").append( method.documentation() ).append("</i>)");

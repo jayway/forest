@@ -57,7 +57,7 @@ public class CapabilitySubResource extends Capability {
 	}
 
     @Override
-    public String href() {
-        return super.href() + "/";
+    public String uri() {
+        return super.uri() + "/";
     }
 }

@@ -47,7 +47,7 @@ public class AccountsResource {
     public List<AccountLinkable> overdrawn() {
         List<AccountLinkable> overdrawn = new ArrayList<AccountLinkable>();
         for (Account account : role(AccountRepository.class).all()) {
-            if ( account.getBalance() < 0 ) overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), account.getDescription(), account.getBalance() ));
+//            if ( account.getBalance() < 0 ) overdrawn.add( new AccountLinkable( account.getAccountNumber(), account.getName(), account.getDescription(), account.getBalance() ));
         }
         return overdrawn;
     }

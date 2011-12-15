@@ -8,8 +8,8 @@ public class AccountLinkable extends Linkable {
 
     private int balance;
 
-    public AccountLinkable(String id, String name, String description, int balance) {
-        super(id + "/", name, null, description);
+    public AccountLinkable(String id, String name, int balance) {
+        super(id, name);
         this.balance = balance;
     }
 
@@ -23,6 +23,6 @@ public class AccountLinkable extends Linkable {
 
     @Override
     public String toString() {
-        return super.toString();    //To change body of overridden methods use File | Settings | File Templates.
+        return super.toString();
     }
 }

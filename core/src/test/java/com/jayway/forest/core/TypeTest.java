@@ -20,7 +20,7 @@ public class TypeTest extends AbstractRunner {
 
     @Test
     public void acceptFloat() {
-        given().body("3.5").expect().statusCode(200).put("/types/postfloat");
+        given().body("3.5").expect().statusCode(200).post("/types/postfloat");
 
         Float result = (Float) StateHolder.get();
         Assert.assertEquals( result, new Float(3.5f));
