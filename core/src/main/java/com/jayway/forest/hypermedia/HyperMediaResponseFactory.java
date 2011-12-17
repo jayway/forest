@@ -1,12 +1,16 @@
 package com.jayway.forest.hypermedia;
 
+import static com.jayway.forest.constraint.ConstraintHandler.constrained;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 
 import javax.ws.rs.HttpMethod;
 
 import com.jayway.forest.constraint.Constraint;
+import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.roles.IdDiscoverableResource;
 
 public class HyperMediaResponseFactory<R> {
@@ -44,17 +48,6 @@ public class HyperMediaResponseFactory<R> {
 			response.addLinks((List<Link>) ((IdDiscoverableResource)resource).discover());
 		}
 		return response;
-	}
-
-	@SuppressWarnings("unchecked")
-	private boolean constrained(R resource, Method method) throws Exception {
-		for (Annotation annotation : method.getAnnotations()) {
-			Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
-			if (constraint != null && !constraint.value().newInstance().isValid(annotation, resource)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private String findHttpMethod(Method method) throws Exception {

@@ -1,26 +1,18 @@
 package com.jayway.forest.core;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-
-import com.jayway.forest.Body;
-import com.jayway.forest.roles.Resource;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtField.Initializer;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
@@ -30,6 +22,19 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import com.jayway.forest.Body;
+import com.jayway.forest.constraint.Constraint;
+import com.jayway.forest.constraint.ConstraintHandler;
+import com.jayway.forest.constraint.ConstraintViolationException;
+import com.jayway.forest.roles.Resource;
 
 public class ForestProxyFactory {
 	private final ClassPool pool = ClassPool.getDefault();
@@ -42,8 +47,8 @@ public class ForestProxyFactory {
 
 	public Class<?> getProxyClass(Class<?> clazz) throws Exception {
 		try {
-			return this.pool.get(getProxyName(clazz.getName())).toClass();
-		} catch (NotFoundException e) {
+			return Class.forName(getProxyName(clazz.getName()));
+		} catch (ClassNotFoundException e) {
 			return createProxy(clazz);
 		}
 	}
@@ -69,18 +74,35 @@ public class ForestProxyFactory {
 				} else {
 					targetMethod = createQuery(targetClass, sourceMethod);
 				}
-				String returnStatement = "";
-				String afterStatement = "";
-				if (isCommand) {
-					afterStatement = "return \"Operation completed successfully\";";
-				} else {
-					returnStatement = "return ";
+				StringBuffer body = new StringBuffer("{");
+				AnnotationsAttribute info = (AnnotationsAttribute) sourceMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
+				if (info != null && hasAnnotation(info.getAnnotations(), Constraint.class)) {
+					String methodFieldName = addFieldForMethodReflection(sourceClass, targetClass, sourceMethod, targetMethod);
+					body.append(String.format("if (%s.constrained(delegate, %s)) throw new %s();", ConstraintHandler.class.getName(), methodFieldName, ConstraintViolationException.class.getName()));
 				}
-				String body = "{"+ returnStatement +"delegate."+ sourceMethod.getName() +"($$); "+ afterStatement +"}";
-				targetMethod.setBody(body);
+				if (!isCommand) {
+					body.append("return ");
+				}
+				body.append("delegate."+ sourceMethod.getName() +"($$); ");
+				if (isCommand) {
+					body.append("return \"Operation completed successfully\";");
+				}
+				body.append("}");
+				targetMethod.setBody(body.toString());
 				targetClass.addMethod(targetMethod);
 			}
 		}
+	}
+
+	private String addFieldForMethodReflection(CtClass sourceClass, CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod) throws NotFoundException,
+			CannotCompileException {
+		CtClass ctMethod = this.pool.get(Method.class.getName());
+		CtClass ctProxyHelper = this.pool.get(ProxyHelper.class.getName());
+		String methodFieldName = targetMethod.getName() + "Method";
+		CtField field = new CtField(ctMethod, methodFieldName, targetClass);
+		field.setModifiers(Modifier.STATIC);
+		targetClass.addField(field, Initializer.byCallWithParams(ctProxyHelper, "getMethodObject", new String[] {sourceClass.getName(), sourceMethod.getName()}));
+		return methodFieldName;
 	}
 
 	private CtMethod createQuery(CtClass targetClass, CtMethod sourceMethod) throws CannotCompileException, Exception {
@@ -228,7 +250,6 @@ public class ForestProxyFactory {
 		}
 		info.setAnnotations(annotations);
 		m.getMethodInfo().addAttribute(info);
-		
 	}
 
 	private boolean contains(List<Annotation> paramAnnotations, String annotationClassName) {

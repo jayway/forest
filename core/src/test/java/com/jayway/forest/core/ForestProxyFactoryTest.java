@@ -8,6 +8,9 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
+import com.jayway.forest.Sneak;
+import com.jayway.forest.constraint.ConstraintViolationException;
+import com.jayway.forest.constraint.DoNotDiscover;
 import com.jayway.forest.roles.Resource;
 
 public class ForestProxyFactoryTest {
@@ -49,11 +52,29 @@ public class ForestProxyFactoryTest {
 		public int inc() {
 			return ++count;
 		}
+
+		@DoNotDiscover
+		public String constrained() {
+			return "ERROR";
+		}
 	}
 
-	private Object query(Object proxy, String methodName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	private Object query(Object proxy, String methodName) throws NoSuchMethodException, IllegalAccessException {
 		Method method = proxy.getClass().getMethod(methodName, null);
-		return method.invoke(proxy, null);
+		try {
+			return method.invoke(proxy, null);
+		} catch (InvocationTargetException e) {
+			return Sneak.sneakyThrow(e.getCause());
+		}
 	}
 	
+	@Test(expected=ConstraintViolationException.class)
+	public void resourceConstraint() throws Exception {
+		ForestProxyFactory proxyFactory = new ForestProxyFactory();
+		NoArgResource original = new NoArgResource();
+		Object proxy = proxyFactory.proxy(original);
+		assertFalse(original.equals(proxy));
+		query(proxy, "constrained");
+	}
+
 }
