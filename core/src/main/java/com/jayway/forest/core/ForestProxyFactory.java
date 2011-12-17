@@ -2,6 +2,8 @@ package com.jayway.forest.core;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,9 +36,14 @@ import com.jayway.forest.Body;
 import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.constraint.ConstraintViolationException;
+import com.jayway.forest.hypermedia.HyperMediaResponse;
+import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
 
 public class ForestProxyFactory {
+	public static final String FOREST_GET_HYPERMEDIA = "forest_getHypermedia";
+
 	private final ClassPool pool = ClassPool.getDefault();
 
 	public Object proxy(Object object) throws Exception {
@@ -60,8 +67,39 @@ public class ForestProxyFactory {
 		CtClass sourceClass = pool.get(clazz.getName());
 		CtClass targetClass = createProxyClass(pool, sourceClass);
 		copyPublicMethods(sourceClass, targetClass);
+		addMethodForHypermedia(targetClass, clazz);
 
 		return targetClass.toClass();
+	}
+
+	private void addMethodForHypermedia(CtClass targetClass, Class<?> sourceClass) throws Exception {
+		if (!ReadableResource.class.isAssignableFrom(sourceClass)) {
+			return;
+		}
+		CtClass ctHypermediaResponse = pool.get(HyperMediaResponse.class.getName());
+		CtMethod method = new CtMethod(ctHypermediaResponse, FOREST_GET_HYPERMEDIA, null, targetClass);
+		// TODO: could we cache the factory?
+		String body = "null";
+		String bodyClassName = "todo";
+		if (ReadableResource.class.isAssignableFrom(sourceClass)) {
+			body = "delegate.read()";
+			bodyClassName = ((Class<?>)findActualTypeArguments(sourceClass, ReadableResource.class)[0]).getName();
+		}
+		method.setBody(String.format("return %s.create(delegate.getClass()).make(delegate, %s, %s.class);", HyperMediaResponseFactory.class.getName(), body, bodyClassName));
+		targetClass.addMethod(method);
+	}
+
+	private Type[] findActualTypeArguments(Class<?> sourceClass, Class<?> interfaceClass) {
+		Type[] genericInterfaces = sourceClass.getGenericInterfaces();
+		for (Type type : genericInterfaces) {
+			if (type instanceof ParameterizedType) {
+				ParameterizedType parameterizedType = (ParameterizedType)type;
+				if (parameterizedType.getRawType().equals(interfaceClass)) {
+					return parameterizedType.getActualTypeArguments();
+				}
+			}
+		}
+		throw new IllegalArgumentException(String.format("For %s, could not find actual types of %s", sourceClass.getName(), interfaceClass.getName()));
 	}
 
 	private void copyPublicMethods(CtClass sourceClass, CtClass targetClass) throws Exception {
