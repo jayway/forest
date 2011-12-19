@@ -3,7 +3,7 @@ package com.jayway.forest.core;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public final class ProxyHelper {
+public abstract class ProxyHelper {
 	private ProxyHelper() {}
 	
 	public static Method getMethodObject(String[] args) {

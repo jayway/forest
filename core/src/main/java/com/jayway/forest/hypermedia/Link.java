@@ -1,8 +1,5 @@
 package com.jayway.forest.hypermedia;
 
-import javax.ws.rs.core.MediaType;
-
-
 public class Link {
 
 	private final String uri;

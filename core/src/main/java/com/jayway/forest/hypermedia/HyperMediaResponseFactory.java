@@ -5,12 +5,9 @@ import static com.jayway.forest.constraint.ConstraintHandler.constrained;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.logging.ConsoleHandler;
 
 import javax.ws.rs.HttpMethod;
 
-import com.jayway.forest.constraint.Constraint;
-import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.roles.IdDiscoverableResource;
 
 public class HyperMediaResponseFactory<R> {
@@ -32,22 +29,29 @@ public class HyperMediaResponseFactory<R> {
 			throw new RuntimeException(e);
 		}
 	}
+	
 	@SuppressWarnings("unchecked")
 	private <B> HyperMediaResponse<B> makeInner(R resource, B body, Class<B> bodyClass) throws Exception {
 		HyperMediaResponse<B> response = new HyperMediaResponse<B>(resourceClass.getName(), body, bodyClass);
 		for (Method method : resourceClass.getMethods()) {
 			if (!method.getDeclaringClass().equals(Object.class) && !constrained(resource, method)) {
-				String uri = method.getName();
-				String name = method.getName();
-				String documentation = "";
-				String httpMethod = findHttpMethod(method);
-				response.addLink(new Link(uri, httpMethod, name, documentation));
+				Link link = makeLink(method);
+				response.addLink(link);
 			}
 		}
 		if (resource instanceof IdDiscoverableResource) {
 			response.addLinks((List<Link>) ((IdDiscoverableResource)resource).discover());
 		}
 		return response;
+	}
+
+	private Link makeLink(Method method) throws Exception {
+		String uri = method.getName();
+		String name = method.getName();
+		String documentation = "";
+		String httpMethod = findHttpMethod(method);
+		Link link = new Link(uri, httpMethod, name, documentation);
+		return link;
 	}
 
 	private String findHttpMethod(Method method) throws Exception {

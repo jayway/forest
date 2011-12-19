@@ -36,10 +36,14 @@ import com.jayway.forest.Body;
 import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.constraint.ConstraintViolationException;
+import com.jayway.forest.core.javassist.AnnotationUtil;
 import com.jayway.forest.hypermedia.HyperMediaResponse;
 import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.hypermedia.ParameterDescription;
+import com.jayway.forest.hypermedia.RequestDescription;
 import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.Template;
 
 public class ForestProxyFactory {
 	public static final String FOREST_GET_HYPERMEDIA = "forest_getHypermedia";
@@ -105,31 +109,73 @@ public class ForestProxyFactory {
 	private void copyPublicMethods(CtClass sourceClass, CtClass targetClass) throws Exception {
 		for (CtMethod sourceMethod : sourceClass.getMethods()) {
 			if (shouldCopy(sourceMethod)) {
-				CtMethod targetMethod;
 				boolean isCommand = sourceMethod.getReturnType().equals(CtClass.voidType);
-				if (isCommand) {
-					targetMethod = createCommand(targetClass, sourceMethod);
-				} else {
-					targetMethod = createQuery(targetClass, sourceMethod);
+				CtMethod targetMethod = copyMethod(sourceClass, targetClass, sourceMethod, isCommand);
+				
+				if (isCommand || targetMethod.getParameterTypes().length > 0) {
+					addDescriptionMethod(targetClass, sourceMethod, targetMethod, isCommand ? FormParam.class : QueryParam.class);
 				}
-				StringBuffer body = new StringBuffer("{");
-				AnnotationsAttribute info = (AnnotationsAttribute) sourceMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
-				if (info != null && hasAnnotation(info.getAnnotations(), Constraint.class)) {
-					String methodFieldName = addFieldForMethodReflection(sourceClass, targetClass, sourceMethod, targetMethod);
-					body.append(String.format("if (%s.constrained(delegate, %s)) throw new %s();", ConstraintHandler.class.getName(), methodFieldName, ConstraintViolationException.class.getName()));
-				}
-				if (!isCommand) {
-					body.append("return ");
-				}
-				body.append("delegate."+ sourceMethod.getName() +"($$); ");
-				if (isCommand) {
-					body.append("return \"Operation completed successfully\";");
-				}
-				body.append("}");
-				targetMethod.setBody(body.toString());
-				targetClass.addMethod(targetMethod);
 			}
 		}
+	}
+
+	private void addDescriptionMethod(CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod, Class<?> annotationClass) throws Exception {
+		CtClass ctRequestDescription = pool.get(RequestDescription.class.getName());
+		CtMethod descriptionMethod = new CtMethod(ctRequestDescription, sourceMethod.getName() + "_description", null, targetClass);
+		ConstPool constPool = targetClass.getClassFile().getConstPool();
+		AnnotationsAttribute attribute = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
+		attribute.addAnnotation(new Annotation(constPool, pool.get(GET.class.getName())));
+		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) targetMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
+		attribute.addAnnotation(targetAttribute.getAnnotation(Path.class.getName()));
+		
+		Object[][] parameterAnnotations = targetMethod.getAvailableParameterAnnotations();
+
+		StringBuilder body = new StringBuilder("{");
+		body.append(String.format("%s[] parameters = new %s[%d];", ParameterDescription.class.getName(), ParameterDescription.class.getName(), targetMethod.getParameterTypes().length));
+		for (int i = 0; i<targetMethod.getParameterTypes().length; i++) {
+			String parameterName = AnnotationUtil.findAnnotationValue(parameterAnnotations[i], annotationClass);
+			if (parameterName == null) {
+				// TODO: handle body 
+			}
+			String parameterDefault = AnnotationUtil.findAnnotationValue(parameterAnnotations[i], Template.class);
+			if (parameterDefault != null) {
+				parameterDefault = String.format("delegate.%s()", parameterDefault);
+			} else {
+				parameterDefault = "null";
+			}
+			body.append(String.format("parameters[%d] = new %s(\"%s\", %s);", i, ParameterDescription.class.getName(), parameterName, parameterDefault));
+		}
+		// TODO: add link
+		body.append(String.format("return new %s(parameters, null); }", RequestDescription.class.getName()));
+		descriptionMethod.setBody(body.toString());
+
+		targetClass.addMethod(descriptionMethod);
+	}
+
+	private CtMethod copyMethod(CtClass sourceClass, CtClass targetClass, CtMethod sourceMethod, boolean isCommand) throws Exception {
+		CtMethod targetMethod;
+		if (isCommand) {
+			targetMethod = createCommand(targetClass, sourceMethod);
+		} else {
+			targetMethod = createQuery(targetClass, sourceMethod);
+		}
+		StringBuilder body = new StringBuilder("{");
+		AnnotationsAttribute info = (AnnotationsAttribute) sourceMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
+		if (info != null && AnnotationUtil.hasAnnotation(info.getAnnotations(), Constraint.class)) {
+			String methodFieldName = addFieldForMethodReflection(sourceClass, targetClass, sourceMethod, targetMethod);
+			body.append(String.format("if (%s.constrained(delegate, %s)) throw new %s();", ConstraintHandler.class.getName(), methodFieldName, ConstraintViolationException.class.getName()));
+		}
+		if (!isCommand) {
+			body.append("return ");
+		}
+		body.append("delegate."+ sourceMethod.getName() +"($$); ");
+		if (isCommand) {
+			body.append("return \"Operation completed successfully\";");
+		}
+		body.append("}");
+		targetMethod.setBody(body.toString());
+		targetClass.addMethod(targetMethod);
+		return targetMethod;
 	}
 
 	private String addFieldForMethodReflection(CtClass sourceClass, CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod) throws NotFoundException,
@@ -246,7 +292,7 @@ public class ForestProxyFactory {
 		if (info == null) {
 			info = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 		}
-		if (!hasAnnotation(info.getAnnotations(), HttpMethod.class)) {
+		if (!AnnotationUtil.hasAnnotation(info.getAnnotations(), HttpMethod.class)) {
 			Annotation get = new Annotation(httpMethodAnnotation.getName(), constPool);
 			info.addAnnotation(get);
 		}
@@ -279,7 +325,7 @@ public class ForestProxyFactory {
 			} else {
 				paramAnnotations = new ArrayList<Annotation>(Arrays.asList(annotations[indx]));
 			}
-			if (!contains(paramAnnotations, annotationClassName)) { 
+			if (!AnnotationUtil.contains(paramAnnotations, annotationClassName)) { 
 				Annotation param = new Annotation(annotationClassName, constPool);
 				param.addMemberValue("value", new StringMemberValue("argument" + (indx+1), constPool));
 				paramAnnotations.add(param);
@@ -288,24 +334,5 @@ public class ForestProxyFactory {
 		}
 		info.setAnnotations(annotations);
 		m.getMethodInfo().addAttribute(info);
-	}
-
-	private boolean contains(List<Annotation> paramAnnotations, String annotationClassName) {
-		for (Annotation annotation : paramAnnotations) {
-			if (annotation.getTypeName().equals(annotationClassName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private boolean hasAnnotation(Annotation[] annotations, Class annotationClass) throws Exception {
-		for (Annotation annotation : annotations) {
-			if (Class.forName(annotation.getTypeName()).getAnnotation(annotationClass) != null) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

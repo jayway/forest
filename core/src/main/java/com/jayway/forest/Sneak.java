@@ -1,7 +1,7 @@
 package com.jayway.forest;
 
 public class Sneak {
-    public static RuntimeException sneakyThrow(Throwable t) {
+    public static <T> T sneakyThrow(Throwable t) {
         if ( t == null ) throw new NullPointerException("t");
         Sneak.<RuntimeException>sneakyThrow0(t);
         return null;

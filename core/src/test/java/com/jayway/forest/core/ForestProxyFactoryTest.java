@@ -6,15 +6,22 @@ import static org.junit.Assert.assertFalse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.QueryParam;
+
 import org.junit.Test;
 
 import com.jayway.forest.Sneak;
 import com.jayway.forest.constraint.ConstraintViolationException;
 import com.jayway.forest.constraint.DoNotDiscover;
+import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.hypermedia.HyperMediaResponse;
 import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.hypermedia.RequestDescription;
 import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
+import com.jayway.forest.roles.Template;
 
 public class ForestProxyFactoryTest {
 
@@ -86,7 +93,59 @@ public class ForestProxyFactoryTest {
 		assertEquals(expected, result);
 	}
 
-	private Object query(Object proxy, String methodName) throws NoSuchMethodException, IllegalAccessException {
+	public static class ResourceMethodsWithArguments implements Resource {
+		public String noDefault(String arg) {
+			return "hello";
+		}
+
+		public String withDefault(@DefaultValue("qwe") String arg) {
+			return "hello";
+		}
+
+		public String withTemplate(@Template("qwe") String arg) {
+			return "hello";
+		}
+		
+		String qwe() {
+			return "qwe-template";
+		}
+
+		public String namedParam(@QueryParam("param") String arg) {
+			return "hello";
+		}
+
+		public void update(@FormParam("arg") String arg) {
+		}
+
+		public void multiple(@FormParam("arg") String arg, @FormParam("other") String other) {
+		}
+
+		// TODO: test this
+		public void body(StringDTO dto) {
+		}
+	}
+
+	@Test
+	public void requestDescriptionNames() throws Exception {
+		ForestProxyFactory proxyFactory = new ForestProxyFactory();
+		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
+		Object proxy = proxyFactory.proxy(original);
+		assertEquals("argument1", ((RequestDescription) query(proxy, "noDefault_description")).getParameter(0).getName());
+		assertEquals("param", ((RequestDescription) query(proxy, "namedParam_description")).getParameter(0).getName());
+		assertEquals("arg", ((RequestDescription) query(proxy, "update_description")).getParameter(0).getName());
+		assertEquals("other", ((RequestDescription) query(proxy, "multiple_description")).getParameter(1).getName());
+	}
+
+	@Test
+	public void requestDescriptionDefaultValues() throws Exception {
+		ForestProxyFactory proxyFactory = new ForestProxyFactory();
+		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
+		Object proxy = proxyFactory.proxy(original);
+//		assertEquals("qwe", ((RequestDescription) query(proxy, "withDefault_description")).getParameter(0).getDefaultValue());
+		assertEquals("qwe-template", ((RequestDescription) query(proxy, "withTemplate_description")).getParameter(0).getDefaultValue());
+	}
+
+	private Object query(Object proxy, String methodName) throws Exception {
 		Method method = proxy.getClass().getMethod(methodName, null);
 		try {
 			return method.invoke(proxy, null);
