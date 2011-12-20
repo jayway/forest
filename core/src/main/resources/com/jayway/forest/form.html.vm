@@ -1,19 +1,11 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head>
 <body>
-<h1>$response.title</h1>
-<h2>Queries</h2>
-<ul>
-#foreach( $link in $response.linksWithMethod("GET") )
-    <li><a href="$link.uri">$link.name</a></li>
+<h1>$description.link.name</h1>
+<form name='$description.link.name' action='$description.link.uri' method='$description.link.httpMethod'>
+#foreach( $parameter in $description.parameters )
+    $parameter.name : <input name="$parameter.name" type="text" value="$parameter.defaultValue" /><br/>
 #end
-</ul>
-<h2>Commands</h2>
-<ul>
-#foreach( $link in $response.linksWithMethod("PUT","POST","DELETE") )
-    <li><a href="$link.uri">$link.name</a></li>
-#end
-</ul>
-<h2>Body</h2>
-$body
+<input type='submit' />
+</form>
 </body>
 </html>

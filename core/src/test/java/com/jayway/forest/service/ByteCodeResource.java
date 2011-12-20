@@ -1,12 +1,18 @@
 package com.jayway.forest.service;
 
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import com.jayway.forest.dto.IntegerDTO;
+import com.jayway.forest.hypermedia.HyperMediaResponse;
+import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
 import com.jayway.forest.roles.Resource;
+import com.sun.jersey.spi.resource.Singleton;
 
 @Path("bytecode")
+@Singleton
 public class ByteCodeResource implements Resource {
 	
     public String noArgQuery() {
@@ -49,6 +55,12 @@ public class ByteCodeResource implements Resource {
     	return text;
     }
 
+//    @GET
+//    @Path("")
+//    public HyperMediaResponse<String> qweqwe() {
+//    	return HyperMediaResponseFactory.create(ByteCodeResource.class).make(this, "", String.class);
+//    }
+    
 	public static void reset() {
 		count = 0;
 	}

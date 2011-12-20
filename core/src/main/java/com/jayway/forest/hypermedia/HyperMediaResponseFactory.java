@@ -45,7 +45,7 @@ public class HyperMediaResponseFactory<R> {
 		return response;
 	}
 
-	private Link makeLink(Method method) throws Exception {
+	public static Link makeLink(Method method) throws Exception {
 		String uri = method.getName();
 		String name = method.getName();
 		String documentation = "";
@@ -54,7 +54,7 @@ public class HyperMediaResponseFactory<R> {
 		return link;
 	}
 
-	private String findHttpMethod(Method method) throws Exception {
+	private static String findHttpMethod(Method method) throws Exception {
 		String httpMethod = findHttpMethodFromAnnotation(method);
 		if (httpMethod == null) {
 			if (method.getReturnType().equals(Void.TYPE)) {
@@ -66,7 +66,7 @@ public class HyperMediaResponseFactory<R> {
 		return httpMethod;
 	}
 
-	private String findHttpMethodFromAnnotation(Method method) throws Exception {
+	private static String findHttpMethodFromAnnotation(Method method) throws Exception {
 		String httpMethod = doFindHttpMethodFromAnnotation(method);
 		if (httpMethod != null) {
 			return httpMethod;
@@ -86,7 +86,7 @@ public class HyperMediaResponseFactory<R> {
 		return null;
 	}
 
-	private String doFindHttpMethodFromAnnotation(Method method) {
+	private static String doFindHttpMethodFromAnnotation(Method method) {
 		HttpMethod methodAnnotation = getAnnotation(method.getAnnotations(), HttpMethod.class);
 		if (methodAnnotation != null) {
 			return methodAnnotation.value();
@@ -94,7 +94,7 @@ public class HyperMediaResponseFactory<R> {
 		return null;
 	}
 
-	private <T extends Annotation> T getAnnotation(Annotation[] annotations, Class<T> clazz) {
+	private static <T extends Annotation> T getAnnotation(Annotation[] annotations, Class<T> clazz) {
 		for (Annotation annotation : annotations) {
 			T a = annotation.annotationType().getAnnotation(clazz);
 			if (a != null) {
@@ -103,4 +103,5 @@ public class HyperMediaResponseFactory<R> {
 		}
 		return null;
 	}
+
 }

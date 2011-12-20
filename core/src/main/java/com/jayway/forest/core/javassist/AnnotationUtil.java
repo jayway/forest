@@ -20,7 +20,7 @@ public abstract class AnnotationUtil {
 		}
 		return null;
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static boolean hasAnnotation(Annotation[] annotations, Class annotationClass) throws Exception {
 		for (Annotation annotation : annotations) {

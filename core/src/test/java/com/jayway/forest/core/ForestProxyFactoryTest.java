@@ -126,14 +126,23 @@ public class ForestProxyFactoryTest {
 	}
 
 	@Test
-	public void requestDescriptionNames() throws Exception {
+	public void requestDescriptionArgumentNames() throws Exception {
 		ForestProxyFactory proxyFactory = new ForestProxyFactory();
 		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
 		Object proxy = proxyFactory.proxy(original);
-		assertEquals("argument1", ((RequestDescription) query(proxy, "noDefault_description")).getParameter(0).getName());
-		assertEquals("param", ((RequestDescription) query(proxy, "namedParam_description")).getParameter(0).getName());
-		assertEquals("arg", ((RequestDescription) query(proxy, "update_description")).getParameter(0).getName());
-		assertEquals("other", ((RequestDescription) query(proxy, "multiple_description")).getParameter(1).getName());
+		assertEquals("argument1", ((RequestDescription) query(proxy, "noDefault_description")).getParameters()[0].getName());
+		assertEquals("param", ((RequestDescription) query(proxy, "namedParam_description")).getParameters()[0].getName());
+		assertEquals("arg", ((RequestDescription) query(proxy, "update_description")).getParameters()[0].getName());
+		assertEquals("other", ((RequestDescription) query(proxy, "multiple_description")).getParameters()[1].getName());
+	}
+
+	@Test
+	public void requestDescriptionLink() throws Exception {
+		ForestProxyFactory proxyFactory = new ForestProxyFactory();
+		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
+		Object proxy = proxyFactory.proxy(original);
+		RequestDescription description = (RequestDescription) query(proxy, "noDefault_description");
+		assertEquals("noDefault", description.getLink().getName());
 	}
 
 	@Test
@@ -141,8 +150,8 @@ public class ForestProxyFactoryTest {
 		ForestProxyFactory proxyFactory = new ForestProxyFactory();
 		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
 		Object proxy = proxyFactory.proxy(original);
-//		assertEquals("qwe", ((RequestDescription) query(proxy, "withDefault_description")).getParameter(0).getDefaultValue());
-		assertEquals("qwe-template", ((RequestDescription) query(proxy, "withTemplate_description")).getParameter(0).getDefaultValue());
+//		assertEquals("qwe", ((RequestDescription) query(proxy, "withDefault_description")).getParameters()[0].getDefaultValue());
+		assertEquals("qwe-template", ((RequestDescription) query(proxy, "withTemplate_description")).getParameters()[0].getDefaultValue());
 	}
 
 	private Object query(Object proxy, String methodName) throws Exception {

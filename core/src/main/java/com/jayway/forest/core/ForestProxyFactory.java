@@ -16,6 +16,7 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtField.Initializer;
 import javassist.CtMethod;
+import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
@@ -23,12 +24,13 @@ import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
@@ -37,8 +39,10 @@ import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.constraint.ConstraintViolationException;
 import com.jayway.forest.core.javassist.AnnotationUtil;
+import com.jayway.forest.core.javassist.JavassistHelper;
 import com.jayway.forest.hypermedia.HyperMediaResponse;
 import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.hypermedia.Link;
 import com.jayway.forest.hypermedia.ParameterDescription;
 import com.jayway.forest.hypermedia.RequestDescription;
 import com.jayway.forest.roles.ReadableResource;
@@ -46,9 +50,16 @@ import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 
 public class ForestProxyFactory {
+	private static final Class<?> DEFAULT_HTTP_METHOD_FOR_QUERY = GET.class;
+	private static final Class<?> DEFAULT_HTTP_METHOD_FOR_COMMAND = POST.class;
+
 	public static final String FOREST_GET_HYPERMEDIA = "forest_getHypermedia";
 
-	private final ClassPool pool = ClassPool.getDefault();
+	private final ClassPool pool = new ClassPool(true);
+	
+	public ForestProxyFactory() {
+		pool.appendClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
+	}
 
 	public Object proxy(Object object) throws Exception {
 		Class<?> clazz = getProxyClass(object.getClass());
@@ -77,19 +88,25 @@ public class ForestProxyFactory {
 	}
 
 	private void addMethodForHypermedia(CtClass targetClass, Class<?> sourceClass) throws Exception {
-		if (!ReadableResource.class.isAssignableFrom(sourceClass)) {
-			return;
-		}
 		CtClass ctHypermediaResponse = pool.get(HyperMediaResponse.class.getName());
 		CtMethod method = new CtMethod(ctHypermediaResponse, FOREST_GET_HYPERMEDIA, null, targetClass);
 		// TODO: could we cache the factory?
 		String body = "null";
-		String bodyClassName = "todo";
+		String bodyClassName = "java.lang.String";
 		if (ReadableResource.class.isAssignableFrom(sourceClass)) {
 			body = "delegate.read()";
 			bodyClassName = ((Class<?>)findActualTypeArguments(sourceClass, ReadableResource.class)[0]).getName();
 		}
 		method.setBody(String.format("return %s.create(delegate.getClass()).make(delegate, %s, %s.class);", HyperMediaResponseFactory.class.getName(), body, bodyClassName));
+
+		ConstPool constPool = targetClass.getClassFile().getConstPool();
+		AnnotationsAttribute attribute = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
+		attribute.addAnnotation(new Annotation(constPool, pool.get(GET.class.getName())));
+		Annotation pathAnnotation = new Annotation(constPool, pool.get(Path.class.getName()));
+		pathAnnotation.addMemberValue("value", new StringMemberValue("", constPool));
+		attribute.addAnnotation(pathAnnotation);
+		method.getMethodInfo().addAttribute(attribute);
+
 		targetClass.addMethod(method);
 	}
 
@@ -113,20 +130,25 @@ public class ForestProxyFactory {
 				CtMethod targetMethod = copyMethod(sourceClass, targetClass, sourceMethod, isCommand);
 				
 				if (isCommand || targetMethod.getParameterTypes().length > 0) {
-					addDescriptionMethod(targetClass, sourceMethod, targetMethod, isCommand ? FormParam.class : QueryParam.class);
+					addDescriptionMethod(targetClass, sourceMethod, targetMethod, isCommand);
 				}
 			}
 		}
 	}
 
-	private void addDescriptionMethod(CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod, Class<?> annotationClass) throws Exception {
+	private void addDescriptionMethod(CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod, boolean isCommand) throws Exception {
+		Class<?> annotationClass = isCommand ? FormParam.class : QueryParam.class;
 		CtClass ctRequestDescription = pool.get(RequestDescription.class.getName());
 		CtMethod descriptionMethod = new CtMethod(ctRequestDescription, sourceMethod.getName() + "_description", null, targetClass);
 		ConstPool constPool = targetClass.getClassFile().getConstPool();
 		AnnotationsAttribute attribute = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-		attribute.addAnnotation(new Annotation(constPool, pool.get(GET.class.getName())));
+		attribute.addAnnotation(new Annotation(constPool, pool.get(DEFAULT_HTTP_METHOD_FOR_QUERY.getName())));
 		AnnotationsAttribute targetAttribute = (AnnotationsAttribute) targetMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
 		attribute.addAnnotation(targetAttribute.getAnnotation(Path.class.getName()));
+		// TODO: how to handle description method for queries?!
+		if (isCommand) {
+			descriptionMethod.getMethodInfo().addAttribute(attribute);
+		}
 		
 		Object[][] parameterAnnotations = targetMethod.getAvailableParameterAnnotations();
 
@@ -146,10 +168,21 @@ public class ForestProxyFactory {
 			body.append(String.format("parameters[%d] = new %s(\"%s\", %s);", i, ParameterDescription.class.getName(), parameterName, parameterDefault));
 		}
 		// TODO: add link
-		body.append(String.format("return new %s(parameters, null); }", RequestDescription.class.getName()));
+		Link link = HyperMediaResponseFactory.makeLink(JavassistHelper.toReflection(sourceMethod));
+//		new Link(uri, httpMethod, name, documentation)
+		body.append(String.format("%s link = new %s(%s, %s, %s, %s);", Link.class.getName(), Link.class.getName(), 
+				asStringInCode(link.getUri()), asStringInCode(link.getHttpMethod()), asStringInCode(link.getName()), asStringInCode(link.getDocumentation())));
+		body.append(String.format("return new %s(parameters, link); }", RequestDescription.class.getName()));
 		descriptionMethod.setBody(body.toString());
 
 		targetClass.addMethod(descriptionMethod);
+	}
+
+	private String asStringInCode(String string) {
+		if (string == null) {
+			return "null";
+		}
+		return '\"' + string + '\"';
 	}
 
 	private CtMethod copyMethod(CtClass sourceClass, CtClass targetClass, CtMethod sourceMethod, boolean isCommand) throws Exception {
@@ -194,7 +227,7 @@ public class ForestProxyFactory {
 		targetMethod = new CtMethod(sourceMethod, targetClass, null);
 		copyAttributeInfo(sourceMethod, targetMethod, AnnotationsAttribute.visibleTag);
 		copyAttributeInfo(sourceMethod, targetMethod, ParameterAnnotationsAttribute.visibleTag);
-		addAnnotations(sourceMethod.getName(), targetMethod, GET.class);
+		addAnnotations(sourceMethod.getName(), targetMethod, DEFAULT_HTTP_METHOD_FOR_QUERY);
 		prepareParameterAnnotations(targetMethod, QueryParam.class.getName());
 		return targetMethod;
 	}
@@ -205,7 +238,7 @@ public class ForestProxyFactory {
 		targetMethod = new CtMethod(returnType, sourceMethod.getName() + "_proxy", sourceMethod.getParameterTypes(), targetClass);
 		copyAttributeInfo(sourceMethod, targetMethod, AnnotationsAttribute.visibleTag);
 		copyAttributeInfo(sourceMethod, targetMethod, ParameterAnnotationsAttribute.visibleTag);
-		addAnnotations(sourceMethod.getName(), targetMethod, PUT.class);
+		addAnnotations(sourceMethod.getName(), targetMethod, DEFAULT_HTTP_METHOD_FOR_COMMAND);
 		if (targetMethod.getParameterTypes().length > 1 || (targetMethod.getParameterTypes().length == 1 && isSimpleType(targetMethod.getParameterTypes()[0]) && !hasBodyAnnotation(targetMethod))) {
 			prepareParameterAnnotations(targetMethod, FormParam.class.getName());
 		}

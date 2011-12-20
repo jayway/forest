@@ -2,6 +2,9 @@ package com.jayway.forest.core;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+
+import java.lang.reflect.Method;
 
 import javax.ws.rs.core.MediaType;
 
@@ -12,6 +15,8 @@ import org.junit.Test;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.ByteCodeResource;
+import com.jayway.restassured.response.Response;
+import com.jayway.restassured.response.ResponseBody;
 
 public class JavassistTest extends AbstractRunner {
 	
@@ -51,7 +56,7 @@ public class JavassistTest extends AbstractRunner {
     public void command() {
         given().
         when().
-        	put("/bytecode/incCommand");
+        	post("/bytecode/incCommand");
         given().
         expect().
         	body(is("1")).
@@ -67,7 +72,7 @@ public class JavassistTest extends AbstractRunner {
         expect().
         	statusCode(200).
         when().
-        	put("/bytecode/add");
+        	post("/bytecode/add");
         given().
         expect().
         	body(is("10")).
@@ -82,7 +87,7 @@ public class JavassistTest extends AbstractRunner {
         expect().
         	statusCode(200).
         when().
-        	put("/bytecode/adddto");
+        	post("/bytecode/adddto");
         given().
         expect().
         	body(is("10")).
@@ -97,7 +102,7 @@ public class JavassistTest extends AbstractRunner {
         expect().
         	statusCode(200).
         when().
-        	put("/bytecode/adddto");
+        	post("/bytecode/adddto");
         given().
         expect().
         	body(is("10")).
@@ -113,7 +118,7 @@ public class JavassistTest extends AbstractRunner {
         expect().
         	statusCode(200).
         when().
-        	put("/bytecode/addMultiple");
+        	post("/bytecode/addMultiple");
         given().
         expect().
         	body(is("10")).
@@ -129,7 +134,7 @@ public class JavassistTest extends AbstractRunner {
         expect().
         	statusCode(204).
         when().
-        	put("/bytecode/addMultiple");
+        	post("/bytecode/addMultiple");
         given().
         expect().
         	body(is("10")).
@@ -145,5 +150,26 @@ public class JavassistTest extends AbstractRunner {
     	body(is("qwe")).
         when().
         	get("/bytecode/echo");
+    }
+
+    @Test
+    public void hypermediaResponse() throws Exception {
+        Response response = given().
+        expect().
+        	contentType(MediaType.TEXT_HTML).
+        when().
+        	get("/bytecode/");
+        assertEquals(200, response.getStatusCode());
+    }
+
+    @Test
+    public void descriptionResponse() throws Exception {
+        Response response = given().
+        expect().
+        	contentType(MediaType.TEXT_HTML).
+        when().
+        	get("/bytecode/addMultiple");
+        System.out.println(response.getBody().asString());
+        assertEquals(200, response.getStatusCode());
     }
 }
