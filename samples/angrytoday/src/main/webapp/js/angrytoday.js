@@ -131,7 +131,12 @@ jQuery(document).ready(function() {
         render : renderAngry,
         steps : [ "description", "comments" ]
     };
+/*
+steps : [ { name: 'description', render:renderDescription},
+          { comments: renderComments}]
 
+steps[0].name
+*/
     var angryPost = {
         inputHandler : inputAngryPost,
         steps        : [ "create" ]

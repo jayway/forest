@@ -12,5 +12,6 @@
     </parent>
     <modules>
         <module>bank</module>
+        <module>angrytoday</module>
     </modules>
 </project>

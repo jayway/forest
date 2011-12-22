@@ -50,15 +50,20 @@
     }
 
     $.fn.appendViewLink = function( view, link ) {
-        this.append( "<a href='#" + view.name + "?useCase=" + $.URLEncode( link.uri )+ "'>"+link.name+"</a>" );
+        this.append( "<a href='#" + view.name + "?useCase=" + relativeUrl( link.uri )+ "'>"+link.name+"</a>" );
         return this;
     }
 
     $.fn.clickLink = function( view, link ) {
         this.unbind().click( function() {
-            window.location = '#' + view.name + "?useCase=" + $.URLEncode( link.uri );
+            window.location = '#' + view.name + "?useCase=" + relativeUrl( link.uri );
         });
         return this;
+    }
+
+    function relativeUrl( uri ) {
+        var idx = uri.indexOf( root );
+        return uri.substring( idx + root.length );
     }
 
     $.fn.interactionClick = function( interaction, state ) {
@@ -90,8 +95,13 @@
     }
 
     function refreshCache( useCase ) {
-        var url = useCase ? useCase : root;
-        initializeStepCache( url );
+        if ( !useCase ) {
+            initializeStepCache( root );
+        } else if ( useCase.indexOf('http') == 0 ) {
+            initializeStepCache( useCase );
+        } else {
+            initializeStepCache( root + useCase );
+        }
     }
 
     function findStep( step ) {
