@@ -1,0 +1,74 @@
+body {
+    background: url(/images/background.gif);
+}
+
+h1 {color:#BADA55;}
+
+tr.even {background-color:#A0A0A0;}
+tr.odd { background-color:#D0D0D0;}
+
+a.disabled {background-color:#D0D0D0; }
+
+div.rounded {
+    border-style: solid;
+    border-radius: 6px;
+    align: center;
+    width: 80%;
+    background-color: white;
+    margin:0 auto;
+}
+
+div.angrypost {
+    width: 90%;
+    align: left;
+    border-style: none;
+    border-radius: 6px;
+    background-color:#F0F0F0;
+    padding: 5px;
+    margin: 10px;
+}
+
+div.comment {
+    width: 60%;
+    border-width:1px;
+    border-style: solid;
+    border-radius: 6px;
+    background-color: #FFFFBB;
+    padding: 5px;
+    margin-left: 10px;
+    margin-right:10px;
+}
+
+
+li.tag {
+    list-style: none;
+    display: inline-block;
+    margin: 0 5px 10px 0;
+    position: relative;
+    background: transparent;
+    outline: 0;
+    font: 13px/1.6em "Lucida Grande", Tahoma, Helvetica, Arial, Sans-Serif;
+    letter-spacing: 0.03em;
+    color: #555;
+    background-color: #DDDEDF;
+    padding: 2px 5px;
+    font-size: 0.9em;
+    line-height: normal;
+    border: solid 1px #DDDEDF;
+    border-radius: 8px;
+}
+
+a.disabled {
+    color:#909090;
+    text-decoration:none;
+    cursor:default;
+}
+
+div.popup {
+    width : 200;
+    height: 100;
+    background-color: white;
+    border-style: solid;
+    border-width : 1px;
+    border-radius: 6px;
+}
