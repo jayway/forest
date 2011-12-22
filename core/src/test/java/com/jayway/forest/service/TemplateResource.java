@@ -1,6 +1,7 @@
 package com.jayway.forest.service;
 
 import com.jayway.forest.dto.IntegerDTO;
+import com.jayway.forest.dto.Value;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
 
@@ -62,5 +63,13 @@ public class TemplateResource implements Resource {
     private IntegerDTO evil() {
         throw new IllegalArgumentException();
     }
+    
+    public void withenum( @Template("enumTemplate") Value value) {
+        
+    }
 
+    
+    private Value enumTemplate() {
+        return Value.One;
+    }
 }

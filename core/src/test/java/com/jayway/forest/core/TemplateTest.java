@@ -1,5 +1,6 @@
 package com.jayway.forest.core;
 
+import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -98,6 +99,12 @@ public class TemplateTest extends AbstractRunner {
     @Test
     public void testCallingTemplateThrowingException() throws IOException {
         given().body("[{ \"integer\": 32}]").expect().statusCode(500).when().put("/templates/witheviltemplates");
+    }
+    
+    @Test
+    public void testWithEnum() {
+        expect().statusCode(405).body("jsonTemplate", equalTo("One")).
+                when().get("/templates/withenum");
     }
 
 }

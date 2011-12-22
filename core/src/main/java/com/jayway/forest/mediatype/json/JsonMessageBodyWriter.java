@@ -90,6 +90,8 @@ public abstract class JsonMessageBodyWriter<T> extends AbstractMessageBodyWriter
     private void jsonTemplateForParameter(StringBuilder sb, Class<?> clazz, Type genericType, Object templateValue ) {
         if ( ReflectionUtil.basicTypes.contains( clazz ) ) {
             defaultInstanceBasic(sb, clazz, templateValue );
+        } else if ( templateValue instanceof Enum) {
+            defaultInstanceBasic( sb, String.class, templateValue.toString() );
         } else {
             sb.append("{");
             defaultInstanceComposed(sb, clazz, genericType, templateValue);

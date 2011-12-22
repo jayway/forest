@@ -27,7 +27,7 @@ public class AccountsResource implements Resource, IdDiscoverableResource {
     }
 
     @Doc("returning a list of something not Linkable")
-    public List<CheckingAccount> overdrawscheckingaccounts() {
+    public List<CheckingAccount> overdrawncheckingaccounts() {
         List<CheckingAccount> overdrawn = new ArrayList<CheckingAccount>();
         for (Account account : role(AccountRepository.class).all()) {
             if ( account instanceof CheckingAccount && account.getBalance() < 0 ) overdrawn.add((CheckingAccount) account);
