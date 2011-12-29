@@ -1,6 +1,6 @@
 (function( $ ){
     var root;
-    var views = {};
+    var views;
     var cache = {};
     var _ignoreHashChange = false;
     var defaultView;
@@ -10,11 +10,9 @@
         return $;
     }
 
-    $.setViews = function( viewList ) {
-        $.each( viewList, function(i,elm) {
-            views[ elm.name ] = elm;
-        });
-        defaultView = viewList[0].name;
+    $.setViews = function( viewArray ) {
+        views = viewArray;
+        defaultView = viewArray[0];
 
         // install view template cache
         var newDiv = $("<div id='viewcache'></div>");
@@ -61,6 +59,17 @@
         return this;
     }
 
+    function findView( viewName ) {
+        var view;
+        $.each( views, function( i, current ) {
+            if ( current.name == viewName ) {
+                view = current;
+                return false;
+            }
+        });
+        return view;
+    }
+
     function relativeUrl( uri ) {
         var idx = uri.indexOf( root );
         return uri.substring( idx + root.length );
@@ -75,7 +84,26 @@
         return false;
     }
 
-    function initializeStepCache( url ) {
+    function findNamespaces( url ) {
+        var namespaces = [ url ];
+        $.ajax({
+            async: false,
+            url: url,
+            success: function( data ) {
+                $.each( data.links, function(idx, elm) {
+                    if ( !elm.rel ) {
+                        namespaces.push( elm.uri );
+                    }
+                });
+            },
+            error: function() {
+                namespaces = [];
+            }
+        });
+        return namespaces;
+    }
+
+    function initializeStepCache( url) {
         $.ajax({
             async: false,
             url: url,
@@ -88,9 +116,13 @@
                     }
                 });
             },
-            error: function( ) {
-                alert( "Error: "+url );
-            }
+            error: function( jqXHR, textStatus, errorThrown ) {
+                if ( jqXHR.status == 404 ) {
+                    regenerateUseCase();
+                } else {
+                    alert( "Error: "+url+''+ jqXHR.status );
+                }
+           }
         });
     }
 
@@ -112,17 +144,17 @@
             if ( cache[ step ]) {
                 return cache[ step ];
             } else {
-                alert( "Could not find "+ step );
+                throw "step not found";
             }
         }
     }
 
-    function invoke( render, step, url ) {
+    function invoke( render, url ) {
         $.ajax({
             async: false,
             url: url,
             success: function( data ) {
-                render( step, data );
+                render( data );
             }
         });
     }
@@ -130,13 +162,13 @@
     function parseHash( state ) {
         var hashString = location.hash.substring(1);
         if ( !state ) {
-            var hash = { "arguments": {}, hash: defaultView };
+            var hash = { "arguments": {}, view: defaultView };
         } else {
-            var hash = { "arguments": state, hash: defaultView };
+            var hash = { "arguments": state, view: defaultView };
         }
         if ( hashString.indexOf( "?" ) != -1 ) {
             var nameSplit = hashString.split( "?" );
-            hash.hash = nameSplit[0];
+            hash.view = findView( nameSplit[0] );
             // k1=v1&k2=v2&...
             var arguments = nameSplit[1].split( "&" );
 
@@ -151,8 +183,11 @@
             }
         } else {
             if ( hashString != "" ) {
-                hash.hash = hashString;
+                hash.view = findView( hashString );
             }
+        }
+        if ( !hash.view ) {
+            throw "view not found";
         }
         return hash;
     }
@@ -163,9 +198,15 @@
         $.each( hash.arguments, function( key, value ) {
             if ( !first ) { argumentString += "&"; }
             else first = false;
-            argumentString += key + '=' + $.URLEncode( value );
+            if ( key != 'useCase' ) {
+                argumentString += key + '=' + $.URLEncode( value );
+            }
         });
-        return '#' + hash.hash + argumentString;
+        if ( hash.useCase ) {
+            return '#' + hash.view.name + argumentString + 'useCase=' + hash.useCase;
+        } else {
+            return '#' + hash.view.name + argumentString;
+        }
     }
 
     function history( hash, blockEvent ) {
@@ -177,19 +218,89 @@
         $.ajax({ url: url, success: callback });
     }
 
-    function executeScenario( view, methodArguments ) {
-        refreshCache( methodArguments.useCase );
-        $.each( view.steps, function(i, step) {
-            var rel = findStep( step );
+    function executeScenario( hash ) {
+        cache = {};
+        refreshCache( hash.arguments.useCase );
+        $.each( hash.view.steps, function(i, step) {
+            var rel = findStep( step.rel );
             var url = rel.uri;
-            if ( methodArguments[ step ] ) {
-                url += '?' + $.URLDecode( methodArguments[ step ] );
+            if ( hash.arguments[ step.rel ] ) {
+                url += '?' + $.URLDecode( hash.arguments[ step.rel ] );
             }
-            invoke( view.render, step, url );
+            invoke( step.render, url );
         });
     }
 
+    function regenerateUseCase() {
+        var hash = parseHash();
+
+        var obsolete = hash.arguments.useCase
+        if ( obsolete.substr(-1) === '/' ) {
+            obsolete = obsolete.substring( 0, obsolete.length-1);
+        }
+        var current = { segments:obsolete.split('/'), url:root };
+        var namespaces = findNamespaces( current.url );
+        $.each( current.segments, function(i, segment) {
+            var nextNamespaces = tryForward( segment, namespaces, current );
+            if ( nextNamespaces.length > 0 ) {
+                namespaces = nextNamespaces;
+            }
+        });
+        // smoke test: with the regenerated useCase can
+        // we find all needed rel for the view?
+        // so sometimes broken urls will dissolve
+        var useCase = relativeUrl( current.url );
+        if ( smokeTest( useCase, hash.view ) ) {
+            // change url
+            hash.useCase = useCase;
+            history( toUrl( hash ), false );
+        } else {
+            alert('Not found');
+            throw 'unable to regenerate use case';
+        }
+    }
+
+    function tryForward( segment, namespaces, current ) {
+        var nextNamespaces = [];
+        var canUse = true;
+        // make sure the segment is not a namespace segment
+        $.each( namespaces, function(i, namespace) {
+            var segments = namespace.split( '/' );
+            if ( segments[ segments.length-1 ] === segment ) {
+                canUse = false;
+                return false;
+            }
+        });
+        if ( canUse ) {
+            $.each( namespaces, function(i, namespace) {
+                var testUrl = namespace + segment + '/';
+                nextNamespaces = findNamespaces( testUrl );
+                if ( nextNamespaces.length > 0 ) {
+                    current.url = testUrl;
+                    return false;
+                };
+            });
+        }
+        return nextNamespaces;
+    }
+
+    function smokeTest( url, view ) {
+        cache = {};
+        refreshCache( url );
+        var ok = true;
+        $.each( view.steps, function(i, step) {
+            try {
+                findStep( step.rel );
+            } catch( e) {
+                ok = false;
+                return false;
+            }
+        });
+        return ok;
+    }
+
     function executeInteraction( interaction, state ) {
+        cache = {};
         var hash = parseHash( state );
         refreshCache( hash.arguments.useCase );
         loadTemplate( interaction.name, function() { runInteraction( 0, interaction, hash.arguments); });
@@ -278,8 +389,7 @@
             _ignoreHashChange = false;
         } else {
             var hash = parseHash();
-            if ( !views[ hash.hash ] ) return;
-            loadTemplate( hash.hash, function() { executeScenario( views[ hash.hash ], hash.arguments ) });
+            loadTemplate( hash.view.name, function() { executeScenario( hash )});
         }
     }
 

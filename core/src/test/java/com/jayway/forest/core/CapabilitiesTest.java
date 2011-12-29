@@ -25,7 +25,7 @@ public class CapabilitiesTest extends AbstractRunner {
 
     @Test
     public void discover() {
-        String s = expect().get("/").asString();
+        String s = expect().log().get("/").asString();
         Object parse = JSONValue.parse(s);
         Assert.assertTrue( parse instanceof JSONObject);
 

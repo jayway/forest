@@ -5,13 +5,9 @@ jQuery(document).ready(function() {
     }
 
 // Views
-    function renderMain( step, data ) {
-        if ( step == "description" ) {
-            $$('description').empty().append( data );
-            $$('create').interactionClick( angryPost );
-        } else if ( step == "discover" ) {
-            renderDiscover( data );
-        }
+    function renderDescription( data ) {
+        $$('description').empty().append( data );
+        $$('create').interactionClick( angryPost );
     }
 
     function renderDiscover( data ) {
@@ -41,21 +37,16 @@ jQuery(document).ready(function() {
         navigation.find('#next').addPaginationClick( data.next, callback, "discover" );
     }
 
-    function renderAngry( step, data ) {
-        if ( step == "description" ) {
-            var tags = $$('tags').empty();
-            $.each( data.tags, function(i, tag) {
-                var tagElm = $("<li class='tag'>"+tag+" <img id='closing' src='/images/CloseIcon-small.png'></li>");
-                tags.append( tagElm );
-                tagElm.find('#closing').interactionClick( unAngryTag, {untag: tag} );
-            });
-            $('<button>Add</button>').interactionClick( addAngryTag ).appendTo( tags );
-            $$('addComment').interactionClick( angryComment );
-            $$('angrypost').empty().append( data.message );
-        } else if ( step == "comments" ) {
-            renderComments( data );
-        }
-        // fix buttons: addComment
+    function renderAngry( data ) {
+        var tags = $$('tags').empty();
+        $.each( data.tags, function(i, tag) {
+            var tagElm = $("<li class='tag'>"+tag+" <img id='closing' src='/images/CloseIcon-small.png'></li>");
+            tags.append( tagElm );
+            tagElm.find('#closing').interactionClick( unAngryTag, {untag: tag} );
+        });
+        $('<button>Add</button>').interactionClick( addAngryTag ).appendTo( tags );
+        $$('addComment').interactionClick( angryComment );
+        $$('angrypost').empty().append( data.message );
     }
 
     function renderComments(data) {
@@ -94,7 +85,7 @@ jQuery(document).ready(function() {
     }
 
     function tagInputHandler( step, state, continuation ) {
-        centerPopup( "input" ).find('#title').empty().append("Add tag");
+        centerPopup( 'input' ).find('#title').empty().append( 'Add tag' );
         var input = $$('input').fadeIn("slow");
         $$('cancel').unbind().click( function() { input.fadeOut("slow") });
         enterTextField( $$('textinput'), function( value ) {
@@ -121,22 +112,15 @@ jQuery(document).ready(function() {
     }
 
     var mainView = {
-        name  : "main",
-        render : renderMain,
-        steps : [ "description", "discover" ]
-    };
+        name: 'main',
+        steps: [{ rel: 'description', render: renderDescription },
+                { rel: 'discover',    render: renderDiscover }]};
 
     var angryView = {
-        name : "angry",
-        render : renderAngry,
-        steps : [ "description", "comments" ]
-    };
-/*
-steps : [ { name: 'description', render:renderDescription},
-          { comments: renderComments}]
+        name: 'angry',
+        steps: [{ rel: 'description', render: renderAngry},
+                { rel: 'comments',    render: renderComments}]};
 
-steps[0].name
-*/
     var angryPost = {
         inputHandler : inputAngryPost,
         steps        : [ "create" ]
@@ -156,6 +140,6 @@ steps[0].name
         steps : [ "untag" ]
     };
 
-    $.setRoot(  "/angrytoday/" ).setViews( [ mainView, angryView ] );
+    $.setRoot(  "/angrytoday/" ).setViews( [mainView, angryView] );
 })
 
