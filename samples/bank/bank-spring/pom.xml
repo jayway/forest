@@ -12,7 +12,6 @@
     <name>forest-samples-bank-spring</name>
     <packaging>war</packaging>
 
-
     <dependencies>
         <dependency>
             <groupId>com.jayway.forest</groupId>

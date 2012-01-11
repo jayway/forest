@@ -17,7 +17,10 @@
         <module>samples</module>
         <module>frontend</module>
     </modules>
-
+    <properties>
+        <spring.version>3.0.6.RELEASE</spring.version>
+        <slf4j.version>1.6.2</slf4j.version>
+    </properties>
     <scm>
         <connection>scm:git:git://github.com/jayway/forest.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jayway/forest.git</developerConnection>
@@ -149,13 +152,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>3.0.6.RELEASE</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>3.0.6.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>cglib</groupId>
@@ -170,17 +167,17 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.6.2</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>1.6.2</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.6.2</version>
+                <version>${slf4j.version}</version>
             </dependency>
 
 
@@ -220,7 +217,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>3.0.6.RELEASE</version>
+                <version>${spring.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
