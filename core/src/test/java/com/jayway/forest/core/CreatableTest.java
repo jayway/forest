@@ -1,19 +1,19 @@
 package com.jayway.forest.core;
 
-import com.jayway.forest.service.AbstractRunner;
-import com.jayway.forest.service.StateHolder;
-import com.jayway.restassured.RestAssured;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.junit.Assert;
-import org.junit.Test;
-
 import static com.jayway.restassured.RestAssured.basePath;
 import static com.jayway.restassured.RestAssured.baseURI;
 import static com.jayway.restassured.RestAssured.given;
 
-/**
- */
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.jayway.forest.service.AbstractRunner;
+import com.jayway.forest.service.StateHolder;
+
+@Ignore
 public class CreatableTest extends AbstractRunner {
 
     @Test

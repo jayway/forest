@@ -1,17 +1,16 @@
 package com.jayway.forest.core;
 
+import static com.jayway.restassured.RestAssured.given;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.jayway.forest.dto.Value;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
-import org.junit.Assert;
-import org.junit.Test;
 
-import java.io.IOException;
-
-import static com.jayway.restassured.RestAssured.given;
-import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.CoreMatchers.is;
-
+@Ignore
 public class JSONParsingTest extends AbstractRunner {
 
     @Test

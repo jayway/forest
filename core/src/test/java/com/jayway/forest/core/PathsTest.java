@@ -1,12 +1,13 @@
 package com.jayway.forest.core;
 
-import com.jayway.forest.service.AbstractRunner;
-import org.junit.Test;
-
 import static com.jayway.restassured.RestAssured.expect;
 
-/**
- */
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.jayway.forest.service.AbstractRunner;
+
+@Ignore
 public class PathsTest extends AbstractRunner {
 
    @Test

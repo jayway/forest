@@ -4,12 +4,12 @@ import com.jayway.forest.dto.StringAndIntegerDTO;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 
-/**
- */
+@Ignore
 public class UpdatableTest extends AbstractRunner {
 
     @Test

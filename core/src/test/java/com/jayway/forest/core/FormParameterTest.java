@@ -8,13 +8,13 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
 
-/**
- */
+@Ignore
 public class FormParameterTest extends AbstractRunner {
 
     @Test

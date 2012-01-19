@@ -3,12 +3,14 @@ package com.jayway.forest.core;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@Ignore
 public class TypeTest extends AbstractRunner {
 
     @Test

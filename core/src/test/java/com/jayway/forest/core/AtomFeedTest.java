@@ -8,12 +8,13 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.restassured.parsing.Parser;
 
-
+@Ignore
 public class AtomFeedTest extends AbstractRunner {
 
     @Test

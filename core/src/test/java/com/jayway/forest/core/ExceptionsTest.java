@@ -1,12 +1,15 @@
 package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 
 import static com.jayway.restassured.RestAssured.given;
 
+@Ignore
 public class ExceptionsTest extends AbstractRunner {
 
     @Test

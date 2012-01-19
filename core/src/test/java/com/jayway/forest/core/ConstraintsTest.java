@@ -2,6 +2,8 @@ package com.jayway.forest.core;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.RestfulServletService;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,8 +12,7 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
-/**
- */
+@Ignore
 public class ConstraintsTest extends AbstractRunner {
 
 

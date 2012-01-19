@@ -17,8 +17,7 @@ import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
 
-/**
- */
+@Ignore
 public class CommandsTest extends AbstractRunner {
 
     @Test
