@@ -2,9 +2,7 @@ package com.jayway.forest.samples.bank.simple.resources;
 
 import javax.ws.rs.Path;
 
-import com.jayway.forest.constraint.Doc;
 import com.jayway.forest.roles.Resource;
-import com.jayway.forest.samples.bank.simple.resources.accounts.AccountsResource;
 import com.sun.jersey.spi.resource.Singleton;
 
 @Path("")
@@ -22,7 +20,12 @@ public class RootResource implements Resource {
 		value++;
 		System.out.println(this + ": " + value);
 	}
-	
+
+	public void add(int adder, String message) {
+		value += adder;
+		System.out.println(this + ": " + value + " message=" + message);
+	}
+
 	public int getValue() {
 		System.out.println(this + ": " + value);
 		return value;

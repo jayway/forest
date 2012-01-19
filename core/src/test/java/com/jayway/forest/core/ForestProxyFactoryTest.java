@@ -114,6 +114,10 @@ public class ForestProxyFactoryTest {
 			return "hello";
 		}
 
+		public String primitiveParam(int arg) {
+			return "hello";
+		}
+
 		public void update(@FormParam("arg") String arg) {
 		}
 
