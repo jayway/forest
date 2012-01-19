@@ -154,7 +154,7 @@ public class ForestProxyFactoryTest {
 		ForestProxyFactory proxyFactory = new ForestProxyFactory();
 		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
 		Object proxy = proxyFactory.proxy(original);
-//		assertEquals("qwe", ((RequestDescription) query(proxy, "withDefault_description")).getParameters()[0].getDefaultValue());
+		assertEquals("qwe", ((RequestDescription) query(proxy, "withDefault_description")).getParameters()[0].getDefaultValue());
 		assertEquals("qwe-template", ((RequestDescription) query(proxy, "withTemplate_description")).getParameters()[0].getDefaultValue());
 	}
 

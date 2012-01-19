@@ -27,6 +27,7 @@ import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
@@ -163,7 +164,9 @@ public class ForestProxyFactory {
 			if (parameterDefault != null) {
 				parameterDefault = String.format("delegate.%s()", parameterDefault);
 			} else {
-				parameterDefault = "null";
+				// @DefaultValue is always a String, but @Template is an Object. Do we need to handle this?
+				String defaultValue = AnnotationUtil.findAnnotationValue(parameterAnnotations[i], DefaultValue.class);
+				parameterDefault = defaultValue != null ? '"' + defaultValue + '"' : "null";
 			}
 			body.append(String.format("parameters[%d] = new %s(\"%s\", %s);", i, ParameterDescription.class.getName(), parameterName, parameterDefault));
 		}
@@ -213,9 +216,15 @@ public class ForestProxyFactory {
 
 	private String addFieldForMethodReflection(CtClass sourceClass, CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod) throws NotFoundException,
 			CannotCompileException {
+		String methodFieldName = targetMethod.getName() + "Method";
+		try {
+			targetClass.getField(methodFieldName);
+			return methodFieldName;
+		} catch (NotFoundException e) {
+			// ignore
+		}
 		CtClass ctMethod = this.pool.get(Method.class.getName());
 		CtClass ctProxyHelper = this.pool.get(ProxyHelper.class.getName());
-		String methodFieldName = targetMethod.getName() + "Method";
 		CtField field = new CtField(ctMethod, methodFieldName, targetClass);
 		field.setModifiers(Modifier.STATIC);
 		targetClass.addField(field, Initializer.byCallWithParams(ctProxyHelper, "getMethodObject", new String[] {sourceClass.getName(), sourceMethod.getName()}));
