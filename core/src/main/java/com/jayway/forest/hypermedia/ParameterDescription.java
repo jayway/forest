@@ -13,7 +13,10 @@ public class ParameterDescription {
 		return name;
 	}
 
-	public Object getDefaultValue() {
-		return defaultValue;
+	public String getDefaultValue() {
+		if (defaultValue == null) {
+			return "";
+		}
+		return defaultValue.toString();
 	}
 }
