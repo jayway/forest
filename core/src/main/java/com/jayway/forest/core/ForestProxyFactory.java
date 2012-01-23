@@ -46,6 +46,7 @@ import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
 import com.jayway.forest.hypermedia.Link;
 import com.jayway.forest.hypermedia.ParameterDescription;
 import com.jayway.forest.hypermedia.RequestDescription;
+import com.jayway.forest.hypermedia.RequestDescriptionFactory;
 import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
 import com.jayway.forest.roles.Template;
@@ -151,31 +152,9 @@ public class ForestProxyFactory {
 			descriptionMethod.getMethodInfo().addAttribute(attribute);
 		}
 		
-		Object[][] parameterAnnotations = targetMethod.getAvailableParameterAnnotations();
-
 		StringBuilder body = new StringBuilder("{");
-		body.append(String.format("%s[] parameters = new %s[%d];", ParameterDescription.class.getName(), ParameterDescription.class.getName(), targetMethod.getParameterTypes().length));
-		for (int i = 0; i<targetMethod.getParameterTypes().length; i++) {
-			String parameterName = AnnotationUtil.findAnnotationValue(parameterAnnotations[i], annotationClass);
-			if (parameterName == null) {
-				// TODO: handle body 
-			}
-			String parameterDefault = AnnotationUtil.findAnnotationValue(parameterAnnotations[i], Template.class);
-			if (parameterDefault != null) {
-				parameterDefault = String.format("delegate.%s()", parameterDefault);
-			} else {
-				// @DefaultValue is always a String, but @Template is an Object. Do we need to handle this?
-				String defaultValue = AnnotationUtil.findAnnotationValue(parameterAnnotations[i], DefaultValue.class);
-				parameterDefault = defaultValue != null ? '"' + defaultValue + '"' : "null";
-			}
-			body.append(String.format("parameters[%d] = new %s(\"%s\", %s);", i, ParameterDescription.class.getName(), parameterName, parameterDefault));
-		}
-		// TODO: add link
-		Link link = HyperMediaResponseFactory.makeLink(JavassistHelper.toReflection(sourceMethod));
-//		new Link(uri, httpMethod, name, documentation)
-		body.append(String.format("%s link = new %s(%s, %s, %s, %s);", Link.class.getName(), Link.class.getName(), 
-				asStringInCode(link.getUri()), asStringInCode(link.getHttpMethod()), asStringInCode(link.getName()), asStringInCode(link.getDocumentation())));
-		body.append(String.format("return new %s(parameters, link); }", RequestDescription.class.getName()));
+		body.append(String.format("return %s.create(%s.class).make(delegate, \"%s\");", RequestDescriptionFactory.class.getName(), sourceMethod.getDeclaringClass().getName(), sourceMethod.getName()));
+		body.append("}");
 		descriptionMethod.setBody(body.toString());
 
 		targetClass.addMethod(descriptionMethod);
