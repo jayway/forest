@@ -1,6 +1,6 @@
 package com.jayway.forest.samples.bank.repository;
 
-import com.jayway.forest.exceptions.NotFoundException;
+import com.jayway.forest.legacy.exceptions.NotFoundException;
 import com.jayway.forest.samples.bank.model.Account;
 import com.jayway.forest.samples.bank.model.AccountManager;
 import com.jayway.forest.samples.bank.model.CheckingAccount;

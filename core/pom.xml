@@ -13,11 +13,19 @@
     </parent>
 
     <dependencies>
-    	<!-- TODO: should we have a dependency to Jersey? Or just any JAX-RS implementation? -->
-    	<!-- this is nececessary to correctly handle MediaType.toString etc -->
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.15.0-GA</version>
+		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
+			<version>1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-json</artifactId>
 			<version>1.8</version>
 		</dependency>
 		<!-- 

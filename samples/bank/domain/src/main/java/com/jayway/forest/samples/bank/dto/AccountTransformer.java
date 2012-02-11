@@ -1,7 +1,7 @@
 package com.jayway.forest.samples.bank.dto;
 
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.servlet.ResponseHandler;
+import com.jayway.forest.legacy.roles.Linkable;
+import com.jayway.forest.legacy.servlet.ResponseHandler;
 import com.jayway.forest.samples.bank.model.Account;
 
 /**

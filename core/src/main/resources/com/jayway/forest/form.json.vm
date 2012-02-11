@@ -1,0 +1,5 @@
+{"name":"$description.link.name", "uri":"$description.link.uri", "method":"$description.link.httpMethod","parameters":[
+#foreach( $parameter in $description.parameters )
+{"name":"$parameter.name", "defaultValue":"$parameter.defaultValue"}
+#end
+]}

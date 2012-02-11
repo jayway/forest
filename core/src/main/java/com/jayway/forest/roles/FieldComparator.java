@@ -1,10 +1,11 @@
 package com.jayway.forest.roles;
 
-import com.jayway.forest.reflection.ReflectionUtil;
-import com.jayway.forest.reflection.impl.SortParameter;
-
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  */

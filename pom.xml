@@ -14,8 +14,8 @@
     <url>http://github.com/jayway/forest</url>
     <modules>
         <module>core</module>
+        <module>legacy</module>
         <module>samples</module>
-        <module>frontend</module>
     </modules>
     <properties>
         <spring.version>3.0.6.RELEASE</spring.version>

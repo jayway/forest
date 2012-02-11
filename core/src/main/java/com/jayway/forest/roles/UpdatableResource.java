@@ -1,5 +1,7 @@
 package com.jayway.forest.roles;
 
+import javax.ws.rs.POST;
+
 /**
  * Implement this on a resource when
  * it is updatable.
@@ -10,6 +12,7 @@ package com.jayway.forest.roles;
  */
 public interface UpdatableResource<T> extends Resource {
 
+	@POST
     void update(T argument);
 
 }

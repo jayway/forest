@@ -4,8 +4,8 @@ import com.jayway.angrytoday.domain.AngryPost;
 import com.jayway.angrytoday.domain.Comment;
 import com.jayway.angrytoday.dto.AngryPostDTO;
 import com.jayway.angrytoday.repository.AngryTodayRepository;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.roles.*;
+import com.jayway.forest.legacy.exceptions.NotFoundException;
+import com.jayway.forest.legacy.roles.*;
 
 import java.util.ArrayList;
 import java.util.List;

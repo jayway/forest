@@ -1,0 +1,9 @@
+{"title":"$response.title", "queries":[
+#foreach( $link in $response.linksWithMethod("GET") )
+{"href":"$link.uri", "name":"$link.name"}
+#end
+], "commands":[
+#foreach( $link in $response.linksWithMethod("PUT","POST","DELETE") )
+{"href":"$link.uri", "name":"$link.name"}
+#end
+], "body":$body}

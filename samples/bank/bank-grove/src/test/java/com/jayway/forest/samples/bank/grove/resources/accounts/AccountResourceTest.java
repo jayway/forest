@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 
 import org.junit.Test;
 
-import com.jayway.forest.core.MediaTypeHandler;
+import com.jayway.forest.legacy.core.MediaTypeHandler;
 
 
 public class AccountResourceTest extends AbstractTestBase {

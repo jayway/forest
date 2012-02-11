@@ -1,9 +1,9 @@
 package com.jayway.forest.samples.bank.grove.resources.accounts;
 
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.ReadableResource;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.Template;
+import com.jayway.forest.legacy.roles.DescribedResource;
+import com.jayway.forest.legacy.roles.ReadableResource;
+import com.jayway.forest.legacy.roles.Resource;
+import com.jayway.forest.legacy.roles.Template;
 import com.jayway.forest.samples.bank.dto.TransferToDTO;
 import com.jayway.forest.samples.bank.grove.constraints.DepositAllowed;
 import com.jayway.forest.samples.bank.grove.constraints.HasCredit;
@@ -13,8 +13,8 @@ import com.jayway.forest.samples.bank.repository.AccountRepository;
 
 import java.util.List;
 
-import static com.jayway.forest.core.RoleManager.addRole;
-import static com.jayway.forest.core.RoleManager.role;
+import static com.jayway.forest.legacy.core.RoleManager.addRole;
+import static com.jayway.forest.legacy.core.RoleManager.role;
 
 public class AccountResource implements Resource, ReadableResource<Account> {
 

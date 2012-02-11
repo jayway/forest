@@ -1,5 +1,7 @@
 package com.jayway.forest.roles;
 
+import javax.ws.rs.PUT;
+
 /**
  * Implement this on a resource when
  * it can create a sub resource.
@@ -10,6 +12,7 @@ package com.jayway.forest.roles;
  */
 public interface CreatableResource<T> extends IdResource {
 
+	@PUT
     Linkable create( T argument);
 
 }

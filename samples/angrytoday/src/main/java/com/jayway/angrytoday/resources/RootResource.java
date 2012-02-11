@@ -2,7 +2,7 @@ package com.jayway.angrytoday.resources;
 
 import com.jayway.angrytoday.domain.AngryPost;
 import com.jayway.angrytoday.repository.AngryTodayRepository;
-import com.jayway.forest.roles.*;
+import com.jayway.forest.legacy.roles.*;
 
 import java.util.Collection;
 import java.util.LinkedList;

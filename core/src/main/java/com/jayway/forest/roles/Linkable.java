@@ -1,10 +1,12 @@
 package com.jayway.forest.roles;
 
-import static com.jayway.forest.core.RoleManager.role;
+import com.jayway.forest.hypermedia.Link;
+
+// TODO: remove this class
 
 /**
  */
-public class Linkable {
+public class Linkable extends Link {
 
     private String uri;
     private String name;
@@ -14,23 +16,24 @@ public class Linkable {
     	this(id, id);
     }
 
-    public Linkable( String id, String name ) {
-        if ( !id.startsWith("http://")) {
-            this.uri = role( UriInfo.class).getSelf() + id;
-        } else {
-            this.uri = id;
-        }
-        if ( !id.endsWith("/") ) {
-            this.uri = this.uri + "/";
-        }
-        this.name = name;
-    }
-
-    public Linkable( String id, String name, String rel ) {
-        this(id, name);
+    public Linkable( String href, String name, String rel ) {
+        this(href, name);
         this.rel = rel;
     }
 
+    public Linkable( String uri, String id ) {
+    	super(uri, "httpMethod", id, "documentation");
+    	// XXX: how to handle this
+//        if ( !uri.startsWith("http://")) {
+//            this.uri = role( UriInfo.class).getSelf() + uri;
+//        } else {
+//            this.uri = id;
+//        }
+        if ( !id.endsWith("/") ) {
+            this.uri = this.uri + "/";
+        }
+        this.name = id;
+    }
 
     public String getUri() {
         return uri;

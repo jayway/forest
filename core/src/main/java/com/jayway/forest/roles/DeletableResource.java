@@ -1,5 +1,7 @@
 package com.jayway.forest.roles;
 
+import javax.ws.rs.DELETE;
+
 /**
  * Implement this on a resource to let it
  * be deletable i.e. Http Delete to that
@@ -10,6 +12,7 @@ package com.jayway.forest.roles;
  */
 public interface DeletableResource extends Resource {
 
+	@DELETE
     void delete();
 
 }

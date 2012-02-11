@@ -14,6 +14,5 @@
         <module>domain</module>
         <module>bank-grove</module>
         <module>bank-spring</module>
-        <module>bank-jersey</module>
     </modules>
 </project>

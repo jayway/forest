@@ -2,8 +2,8 @@ package com.jayway.forest.samples.bank.spring.constraints;
 
 import java.lang.annotation.*;
 
-import com.jayway.forest.constraint.Constraint;
-import com.jayway.forest.constraint.ConstraintEvaluator;
+import com.jayway.forest.legacy.constraint.Constraint;
+import com.jayway.forest.legacy.constraint.ConstraintEvaluator;
 import com.jayway.forest.samples.bank.model.Account;
 import com.jayway.forest.samples.bank.spring.ResourceWithAccount;
 

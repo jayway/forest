@@ -1,11 +1,11 @@
 package com.jayway.angrytoday.resources;
 
 import com.jayway.angrytoday.domain.Comment;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.roles.CreatableResource;
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.Resource;
+import com.jayway.forest.legacy.exceptions.NotFoundException;
+import com.jayway.forest.legacy.roles.CreatableResource;
+import com.jayway.forest.legacy.roles.DescribedResource;
+import com.jayway.forest.legacy.roles.Linkable;
+import com.jayway.forest.legacy.roles.Resource;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package com.jayway.angrytoday;
 
 import com.jayway.angrytoday.resources.RootResource;
-import com.jayway.forest.core.Application;
-import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.servlet.RestfulServlet;
+import com.jayway.forest.legacy.core.Application;
+import com.jayway.forest.legacy.di.grove.GroveDependencyInjectionImpl;
+import com.jayway.forest.legacy.roles.Resource;
+import com.jayway.forest.legacy.servlet.RestfulServlet;
 
 public class AngryTodayRestService extends RestfulServlet {
 

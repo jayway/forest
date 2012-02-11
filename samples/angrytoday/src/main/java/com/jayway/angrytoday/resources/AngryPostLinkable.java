@@ -1,6 +1,6 @@
 package com.jayway.angrytoday.resources;
 
-import com.jayway.forest.roles.Linkable;
+import com.jayway.forest.legacy.roles.Linkable;
 
 import java.util.Set;
 

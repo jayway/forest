@@ -1,10 +1,11 @@
 package com.jayway.forest.samples.bank.spring.resources;
 
-import com.jayway.forest.roles.ReadableResource;
+import com.jayway.forest.legacy.roles.DescribedResource;
+import com.jayway.forest.legacy.roles.ReadableResource;
+import com.jayway.forest.legacy.roles.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.jayway.forest.roles.DescribedResource;
-import com.jayway.forest.roles.Resource;
 import com.jayway.forest.samples.bank.dto.TransferToDTO;
 import com.jayway.forest.samples.bank.model.Account;
 import com.jayway.forest.samples.bank.model.AccountManager;
@@ -16,7 +17,7 @@ import com.jayway.forest.samples.bank.spring.constraints.DepositAllowed;
 import com.jayway.forest.samples.bank.spring.constraints.HasCredit;
 import com.jayway.forest.samples.bank.spring.constraints.IsWithdrawable;
 
-import static com.jayway.forest.core.RoleManager.*;
+import static com.jayway.forest.legacy.core.RoleManager.*;
 
 public class AccountResource implements Resource, ReadableResource<String>, ResourceWithAccount {
 

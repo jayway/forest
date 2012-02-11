@@ -6,6 +6,7 @@ import com.jayway.restassured.specification.RequestSpecification;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.testing.ServletTester;
 
 import static com.jayway.restassured.parsing.Parser.JSON;
@@ -19,7 +20,6 @@ public class AbstractRunner {
     @Before
     public void setup() {
         StateHolder.set(null);
-        RestfulServletService.reset();
     }
 
 
@@ -28,7 +28,9 @@ public class AbstractRunner {
     {
         tester = new ServletTester();
         tester.setContextPath("/");
-        tester.addServlet(RestfulServletService.class, "/bank/*");
+        ServletHolder servlet = tester.addServlet(com.sun.jersey.spi.container.servlet.ServletContainer.class, "/bank/*");
+        servlet.setInitParameter("javax.ws.rs.Application", "com.jayway.forest.core.TestApplication");
+        servlet.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
         RestAssured.baseURI = tester.createSocketConnector(true);
         RestAssured.defaultParser = JSON;
         RestAssured.basePath = "/bank";

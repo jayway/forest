@@ -5,8 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.jayway.forest.constraint.Constraint;
-import com.jayway.forest.constraint.ConstraintEvaluator;
+import com.jayway.forest.legacy.constraint.Constraint;
+import com.jayway.forest.legacy.constraint.ConstraintEvaluator;
 import com.jayway.forest.samples.bank.model.Account;
 import com.jayway.forest.samples.bank.spring.ResourceWithAccount;
 

@@ -2,13 +2,13 @@ package com.jayway.forest.samples.bank.grove;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.jayway.forest.core.Application;
-import com.jayway.forest.core.RoleManager;
-import com.jayway.forest.di.grove.GroveDependencyInjectionImpl;
-import com.jayway.forest.roles.Resource;
-import com.jayway.forest.servlet.ExceptionMapper;
-import com.jayway.forest.servlet.Response;
-import com.jayway.forest.servlet.RestfulServlet;
+import com.jayway.forest.legacy.core.Application;
+import com.jayway.forest.legacy.core.RoleManager;
+import com.jayway.forest.legacy.di.grove.GroveDependencyInjectionImpl;
+import com.jayway.forest.legacy.roles.Resource;
+import com.jayway.forest.legacy.servlet.ExceptionMapper;
+import com.jayway.forest.legacy.servlet.Response;
+import com.jayway.forest.legacy.servlet.RestfulServlet;
 import com.jayway.forest.samples.bank.exceptions.CannotDepositException;
 import com.jayway.forest.samples.bank.exceptions.OverdrawException;
 import com.jayway.forest.samples.bank.grove.resources.RootResource;

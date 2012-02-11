@@ -1,14 +1,14 @@
 package com.jayway.forest.samples.bank.grove.resources.accounts;
 
-import com.jayway.forest.constraint.Doc;
-import com.jayway.forest.core.JSONHelper;
-import com.jayway.forest.exceptions.NotFoundException;
-import com.jayway.forest.roles.CreatableResource;
-import com.jayway.forest.roles.IdDiscoverableResource;
-import com.jayway.forest.roles.Linkable;
-import com.jayway.forest.roles.Resource;
+import com.jayway.forest.legacy.constraint.Doc;
+import com.jayway.forest.legacy.core.JSONHelper;
+import com.jayway.forest.legacy.exceptions.NotFoundException;
+import com.jayway.forest.legacy.roles.CreatableResource;
+import com.jayway.forest.legacy.roles.IdDiscoverableResource;
+import com.jayway.forest.legacy.roles.Linkable;
+import com.jayway.forest.legacy.roles.Resource;
+import com.jayway.forest.legacy.servlet.ResponseHandler;
 import com.jayway.forest.samples.bank.model.AccountManager;
-import com.jayway.forest.servlet.ResponseHandler;
 import com.jayway.forest.samples.bank.dto.AccountLinkable;
 import com.jayway.forest.samples.bank.dto.AccountTransformer;
 import com.jayway.forest.samples.bank.model.Account;
@@ -18,7 +18,7 @@ import com.jayway.forest.samples.bank.repository.AccountRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jayway.forest.core.RoleManager.*;
+import static com.jayway.forest.legacy.core.RoleManager.*;
 
 public class AccountsResource implements IdDiscoverableResource, CreatableResource<String> {
 
