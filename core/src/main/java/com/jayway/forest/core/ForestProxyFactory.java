@@ -24,32 +24,26 @@ import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
-import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import com.jayway.forest.Body;
 import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.constraint.ConstraintViolationException;
 import com.jayway.forest.core.javassist.AnnotationUtil;
-import com.jayway.forest.core.javassist.JavassistHelper;
 import com.jayway.forest.hypermedia.HyperMediaResponse;
 import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
-import com.jayway.forest.hypermedia.Link;
-import com.jayway.forest.hypermedia.ParameterDescription;
-import com.jayway.forest.hypermedia.RequestDescription;
 import com.jayway.forest.hypermedia.RequestDescriptionFactory;
 import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
-import com.jayway.forest.roles.Template;
 
 public class ForestProxyFactory {
 	private static final Class<?> DEFAULT_HTTP_METHOD_FOR_QUERY = GET.class;
@@ -139,9 +133,8 @@ public class ForestProxyFactory {
 	}
 
 	private void addDescriptionMethod(CtClass targetClass, CtMethod sourceMethod, CtMethod targetMethod, boolean isCommand) throws Exception {
-		Class<?> annotationClass = isCommand ? FormParam.class : QueryParam.class;
-		CtClass ctRequestDescription = pool.get(RequestDescription.class.getName());
-		CtMethod descriptionMethod = new CtMethod(ctRequestDescription, sourceMethod.getName() + "_description", null, targetClass);
+		CtClass ctReturnType = pool.get(Response.class.getName());
+		CtMethod descriptionMethod = new CtMethod(ctReturnType, sourceMethod.getName() + "_description", null, targetClass);
 		ConstPool constPool = targetClass.getClassFile().getConstPool();
 		AnnotationsAttribute attribute = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 		attribute.addAnnotation(new Annotation(constPool, pool.get(DEFAULT_HTTP_METHOD_FOR_QUERY.getName())));
@@ -153,18 +146,11 @@ public class ForestProxyFactory {
 		}
 		
 		StringBuilder body = new StringBuilder("{");
-		body.append(String.format("return %s.create(%s.class).make(delegate, \"%s\");", RequestDescriptionFactory.class.getName(), sourceMethod.getDeclaringClass().getName(), sourceMethod.getName()));
+		body.append(String.format("return %s.status(405).entity(%s.create(%s.class).make(delegate, \"%s\")).build();", Response.class.getName(), RequestDescriptionFactory.class.getName(), sourceMethod.getDeclaringClass().getName(), sourceMethod.getName()));
 		body.append("}");
 		descriptionMethod.setBody(body.toString());
 
 		targetClass.addMethod(descriptionMethod);
-	}
-
-	private String asStringInCode(String string) {
-		if (string == null) {
-			return "null";
-		}
-		return '\"' + string + '\"';
 	}
 
 	private CtMethod copyMethod(CtClass sourceClass, CtClass targetClass, CtMethod sourceMethod, boolean isCommand) throws Exception {

@@ -170,6 +170,6 @@ public class JavassistTest extends AbstractRunner {
         when().
         	get("/bytecode/addMultiple");
         System.out.println(response.getBody().asString());
-        assertEquals(200, response.getStatusCode());
+        assertEquals(405, response.getStatusCode());
     }
 }

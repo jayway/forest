@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.junit.Test;
 
@@ -134,10 +135,10 @@ public class ForestProxyFactoryTest {
 		ForestProxyFactory proxyFactory = new ForestProxyFactory();
 		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
 		Object proxy = proxyFactory.proxy(original);
-		assertEquals("argument1", ((RequestDescription) query(proxy, "noDefault_description")).getParameters()[0].getName());
-		assertEquals("param", ((RequestDescription) query(proxy, "namedParam_description")).getParameters()[0].getName());
-		assertEquals("arg", ((RequestDescription) query(proxy, "update_description")).getParameters()[0].getName());
-		assertEquals("other", ((RequestDescription) query(proxy, "multiple_description")).getParameters()[1].getName());
+		assertEquals("argument1", (queryForRequestDescription(proxy, "noDefault_description")).getParameters()[0].getName());
+		assertEquals("param", (queryForRequestDescription(proxy, "namedParam_description")).getParameters()[0].getName());
+		assertEquals("arg", (queryForRequestDescription(proxy, "update_description")).getParameters()[0].getName());
+		assertEquals("other", (queryForRequestDescription(proxy, "multiple_description")).getParameters()[1].getName());
 	}
 
 	@Test
@@ -145,7 +146,7 @@ public class ForestProxyFactoryTest {
 		ForestProxyFactory proxyFactory = new ForestProxyFactory();
 		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
 		Object proxy = proxyFactory.proxy(original);
-		RequestDescription description = (RequestDescription) query(proxy, "noDefault_description");
+		RequestDescription description = queryForRequestDescription(proxy, "noDefault_description");
 		assertEquals("noDefault", description.getLink().getName());
 	}
 
@@ -154,8 +155,8 @@ public class ForestProxyFactoryTest {
 		ForestProxyFactory proxyFactory = new ForestProxyFactory();
 		ResourceMethodsWithArguments original = new ResourceMethodsWithArguments();
 		Object proxy = proxyFactory.proxy(original);
-		assertEquals("qwe", ((RequestDescription) query(proxy, "withDefault_description")).getParameters()[0].getDefaultValue());
-		assertEquals("qwe-template", ((RequestDescription) query(proxy, "withTemplate_description")).getParameters()[0].getDefaultValue());
+		assertEquals("qwe", ( queryForRequestDescription(proxy, "withDefault_description")).getParameters()[0].getDefaultValue());
+		assertEquals("qwe-template", (queryForRequestDescription(proxy, "withTemplate_description")).getParameters()[0].getDefaultValue());
 	}
 
 	private Object query(Object proxy, String methodName) throws Exception {
@@ -167,4 +168,13 @@ public class ForestProxyFactoryTest {
 		}
 	}
 
+	private RequestDescription queryForRequestDescription(Object proxy, String methodName) throws Exception {
+		Method method = proxy.getClass().getMethod(methodName, null);
+		try {
+			Response response = (Response) method.invoke(proxy, null);
+			return (RequestDescription) response.getEntity();
+		} catch (InvocationTargetException e) {
+			return Sneak.sneakyThrow(e.getCause());
+		}
+	}
 }

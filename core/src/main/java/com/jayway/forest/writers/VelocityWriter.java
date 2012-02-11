@@ -1,4 +1,4 @@
-package com.jayway.forest.writers.html;
+package com.jayway.forest.writers;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;

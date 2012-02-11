@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import com.jayway.forest.service.AbstractRunner;
 import com.jayway.forest.service.StateHolder;
+import com.jayway.restassured.RestAssured;
 
-@Ignore
 public class JSONApiTest extends AbstractRunner {
 
     private String baseUrl() {
@@ -23,10 +23,13 @@ public class JSONApiTest extends AbstractRunner {
 
     @Test
     public void commandGet() {
-        expect().statusCode( 405 ).
+        expect().
+        		contentType("application/json").
+        		statusCode( 405 ).
                 body("method", equalTo("POST")).
                 body("uri", equalTo( baseUrl() + "/command")).
-                body("jsonTemplate", equalTo("")).when().get("/command");
+//                body("jsonTemplate", equalTo("")).
+                when().get("/command");
     }
 
     /*@Test
