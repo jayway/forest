@@ -29,9 +29,9 @@ public class JSONHelper {
         }
 
         // JSONArray
-        if ( dto instanceof List ) {
+        if ( dto instanceof Iterable ) {
             JSONArray arrayResult = new JSONArray();
-            for ( Object o : (List<?>)dto ) {
+            for ( Object o : (Iterable<?>)dto ) {
                 arrayResult.add( toJSON(o) );
             }
             return arrayResult;
@@ -63,6 +63,7 @@ public class JSONHelper {
                 }
             } catch (IllegalAccessException e) { }
         }
+        // TODO What if clazz is Object? Then superclass will be null!
         if ( clazz.getSuperclass() != Object.class ) return allFields( clazz.getSuperclass(), instance, result );
         return result;
     }
