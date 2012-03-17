@@ -80,9 +80,7 @@ public class QueriesTest  extends AbstractRunner {
         StateHolder.set( new StringDTO("Man shouts :\"My GOD http://localhost?!!\""));
         String result = given().expect().statusCode(200).get("/getstring").andReturn().asString();
 
-        System.out.println( result );
         Assert.assertEquals("{\"string\":\"Man shouts :\\\"My GOD http:\\/\\/localhost?!!\\\"\"}", result );
     }
-
 }
 

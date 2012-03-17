@@ -12,6 +12,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -84,6 +85,11 @@ public class CommandsTest extends AbstractRunner {
         given().spec( contentTypeFormUrlEncoded() ).expect().statusCode(200).when().post("/other/delete");
         String message = (String) StateHolder.get();
         System.out.printf(message );
+    }
+
+    @Test
+    public void illegalDTO() {
+        given().body("{\"hello\": 5}").expect().body(is("No default constructor: com.jayway.forest.dto.IllegalDTO")).statusCode(500).post("/illegaldto");
     }
 
 }

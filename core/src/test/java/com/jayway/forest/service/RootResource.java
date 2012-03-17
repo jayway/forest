@@ -1,6 +1,7 @@
 package com.jayway.forest.service;
 
 import com.jayway.forest.constraint.RolesInContext;
+import com.jayway.forest.dto.IllegalDTO;
 import com.jayway.forest.dto.IntegerDTO;
 import com.jayway.forest.dto.StringDTO;
 import com.jayway.forest.dto.Value;
@@ -76,6 +77,10 @@ public class RootResource implements Resource {
     public StringDTO getstring() {
         Object string = StateHolder.get();
         return (StringDTO) string;
+    }
+
+    public void illegaldto(IllegalDTO illegalDTO ) {
+        // we can never get here because DTO has no default constructor
     }
 
     public RootResource sub() {

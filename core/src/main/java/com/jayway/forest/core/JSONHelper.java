@@ -189,7 +189,7 @@ public class JSONHelper {
                 }
                 return composite;
             } catch (InstantiationException e) {
-                throw new InternalServerErrorException(e.getMessage());
+                throw new InternalServerErrorException("No default constructor: " + e.getMessage());
             } catch (IllegalAccessException e) {
                 throw new InternalServerErrorException(e.getMessage());
             }
