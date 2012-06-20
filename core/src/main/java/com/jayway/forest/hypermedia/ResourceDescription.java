@@ -3,14 +3,14 @@ package com.jayway.forest.hypermedia;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HyperMediaResponse<T> {
+public class ResourceDescription<T> {
 	
 	public final String title;
 	private List<Link> links = new LinkedList<Link>();
 	private final T body;
 	private final Class<T> bodyClass;
 
-	public HyperMediaResponse(String title, T body, Class<T> bodyClass) {
+	public ResourceDescription(String title, T body, Class<T> bodyClass) {
 		this.title = title;
 		this.body = body;
 		this.bodyClass = bodyClass;
@@ -68,7 +68,7 @@ public class HyperMediaResponse<T> {
 		if (getClass() != obj.getClass())
 			return false;
 		@SuppressWarnings("unchecked")
-		HyperMediaResponse<T> other = (HyperMediaResponse<T>) obj;
+		ResourceDescription<T> other = (ResourceDescription<T>) obj;
 		if (body == null) {
 			if (other.body != null)
 				return false;

@@ -22,7 +22,7 @@ public class HyperMediaResponseFactoryTest {
 
 	@Test
 	public void testCommandQueryMethods() {
-		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyResource.class).make(new MyResource(), "Hello world", String.class);
+		ResourceDescription<String> response = ResourceDescriptionFactory.create(MyResource.class).make(new MyResource(), "Hello world", String.class);
 		
 		Link query = response.linksWithMethod(HttpMethod.GET).get(0);
 		assertEquals("getStuff", query.getName());
@@ -41,7 +41,7 @@ public class HyperMediaResponseFactoryTest {
 
 	@Test
 	public void testAnnotatedHttpMethods() {
-		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(AnnotatedResource.class).make(new AnnotatedResource(), "Hello world", String.class);
+		ResourceDescription<String> response = ResourceDescriptionFactory.create(AnnotatedResource.class).make(new AnnotatedResource(), "Hello world", String.class);
 		
 		Link annotated = response.linksWithMethod(HttpMethod.PUT).get(0);
 		assertEquals("getStuff", annotated.getName());
@@ -56,7 +56,7 @@ public class HyperMediaResponseFactoryTest {
 
 	@Test
 	public void testConstrainedMethod() {
-		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(ConstrainedResource.class).make(new ConstrainedResource(), "Hello world", String.class);
+		ResourceDescription<String> response = ResourceDescriptionFactory.create(ConstrainedResource.class).make(new ConstrainedResource(), "Hello world", String.class);
 		assertEquals(0, response.linksWithMethod(HttpMethod.GET, HttpMethod.POST).size());
 	}
 
@@ -69,7 +69,7 @@ public class HyperMediaResponseFactoryTest {
 
 	@Test
 	public void testCreateable() {
-		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyCrudResource.class).make(new MyCrudResource(), "Hello world", String.class);
+		ResourceDescription<String> response = ResourceDescriptionFactory.create(MyCrudResource.class).make(new MyCrudResource(), "Hello world", String.class);
 		assertEquals("create", response.linksWithMethod(HttpMethod.PUT).get(0).getName());
 		assertEquals("read", response.linksWithMethod(HttpMethod.GET).get(0).getName());
 		assertEquals("update", response.linksWithMethod(HttpMethod.POST).get(0).getName());
@@ -108,7 +108,7 @@ public class HyperMediaResponseFactoryTest {
 
 	@Test
 	public void testIdDiscoverable() {
-		HyperMediaResponse<String> response = HyperMediaResponseFactory.create(MyIdDiscoverableResource.class).make(new MyIdDiscoverableResource(), "Hello world", String.class);
+		ResourceDescription<String> response = ResourceDescriptionFactory.create(MyIdDiscoverableResource.class).make(new MyIdDiscoverableResource(), "Hello world", String.class);
 		assertEquals("delete", response.linksWithMethod(HttpMethod.DELETE).get(0).getName());
 		assertEquals("posten", response.linksWithMethod(HttpMethod.POST).get(0).getName());
 	}

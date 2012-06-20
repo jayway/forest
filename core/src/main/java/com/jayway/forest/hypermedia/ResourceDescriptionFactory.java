@@ -10,19 +10,19 @@ import javax.ws.rs.HttpMethod;
 
 import com.jayway.forest.roles.IdDiscoverableResource;
 
-public class HyperMediaResponseFactory<R> {
+public class ResourceDescriptionFactory<R> {
 
 	private final Class<?> resourceClass;
 
-	public static <R> HyperMediaResponseFactory<R> create(Class<R> resourceClass) {
-		return new HyperMediaResponseFactory<R>(resourceClass);
+	public static <R> ResourceDescriptionFactory<R> create(Class<R> resourceClass) {
+		return new ResourceDescriptionFactory<R>(resourceClass);
 	}
 
-	private HyperMediaResponseFactory(Class<R> resourceClass) {
+	private ResourceDescriptionFactory(Class<R> resourceClass) {
 		this.resourceClass = resourceClass;
 	}
 
-	public <B> HyperMediaResponse<B> make(R resource, B body, Class<B> bodyClass) {
+	public <B> ResourceDescription<B> make(R resource, B body, Class<B> bodyClass) {
 		try {
 			return makeInner(resource, body, bodyClass);
 		} catch (Exception e) {
@@ -31,8 +31,8 @@ public class HyperMediaResponseFactory<R> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <B> HyperMediaResponse<B> makeInner(R resource, B body, Class<B> bodyClass) throws Exception {
-		HyperMediaResponse<B> response = new HyperMediaResponse<B>(resourceClass.getName(), body, bodyClass);
+	private <B> ResourceDescription<B> makeInner(R resource, B body, Class<B> bodyClass) throws Exception {
+		ResourceDescription<B> response = new ResourceDescription<B>(resourceClass.getName(), body, bodyClass);
 		for (Method method : resourceClass.getMethods()) {
 			if (!method.getDeclaringClass().equals(Object.class) && !constrained(resource, method)) {
 				Link link = makeLink(method);

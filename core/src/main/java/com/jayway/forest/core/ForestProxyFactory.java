@@ -39,8 +39,8 @@ import com.jayway.forest.constraint.Constraint;
 import com.jayway.forest.constraint.ConstraintHandler;
 import com.jayway.forest.constraint.ConstraintViolationException;
 import com.jayway.forest.core.javassist.AnnotationUtil;
-import com.jayway.forest.hypermedia.HyperMediaResponse;
-import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.hypermedia.ResourceDescription;
+import com.jayway.forest.hypermedia.ResourceDescriptionFactory;
 import com.jayway.forest.hypermedia.RequestDescriptionFactory;
 import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
@@ -84,7 +84,7 @@ public class ForestProxyFactory {
 	}
 
 	private void addMethodForHypermedia(CtClass targetClass, Class<?> sourceClass) throws Exception {
-		CtClass ctHypermediaResponse = pool.get(HyperMediaResponse.class.getName());
+		CtClass ctHypermediaResponse = pool.get(ResourceDescription.class.getName());
 		CtMethod method = new CtMethod(ctHypermediaResponse, FOREST_GET_HYPERMEDIA, null, targetClass);
 		// TODO: could we cache the factory?
 		String body = "null";
@@ -93,7 +93,7 @@ public class ForestProxyFactory {
 			body = "delegate.read()";
 			bodyClassName = ((Class<?>)findActualTypeArguments(sourceClass, ReadableResource.class)[0]).getName();
 		}
-		method.setBody(String.format("return %s.create(delegate.getClass()).make(delegate, %s, %s.class);", HyperMediaResponseFactory.class.getName(), body, bodyClassName));
+		method.setBody(String.format("return %s.create(delegate.getClass()).make(delegate, %s, %s.class);", ResourceDescriptionFactory.class.getName(), body, bodyClassName));
 
 		ConstPool constPool = targetClass.getClassFile().getConstPool();
 		AnnotationsAttribute attribute = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);

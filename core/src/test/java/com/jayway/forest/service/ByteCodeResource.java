@@ -6,8 +6,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import com.jayway.forest.dto.IntegerDTO;
-import com.jayway.forest.hypermedia.HyperMediaResponse;
-import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.hypermedia.ResourceDescription;
+import com.jayway.forest.hypermedia.ResourceDescriptionFactory;
 import com.jayway.forest.roles.Resource;
 import com.sun.jersey.spi.resource.Singleton;
 

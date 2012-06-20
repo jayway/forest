@@ -15,18 +15,18 @@ import javax.ws.rs.ext.Providers;
 
 import org.apache.velocity.VelocityContext;
 
-import com.jayway.forest.hypermedia.HyperMediaResponse;
+import com.jayway.forest.hypermedia.ResourceDescription;
 
-public abstract class AbstractHyperMediaResponseWriter<T> extends VelocityWriter<HyperMediaResponse<T>> {
+public abstract class AbstractHyperMediaResponseWriter<T> extends VelocityWriter<ResourceDescription<T>> {
 	@Context
 	private Providers providers;
     
     public AbstractHyperMediaResponseWriter(MediaType mediaType, String template) {
-    	super(HyperMediaResponse.class, mediaType, template);
+    	super(ResourceDescription.class, mediaType, template);
 	}
 
 	@Override
-	public void writeTo(HyperMediaResponse<T> response, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+	public void writeTo(ResourceDescription<T> response, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException, WebApplicationException {
 		String body = null;
 		if (response.getBody() != null) {

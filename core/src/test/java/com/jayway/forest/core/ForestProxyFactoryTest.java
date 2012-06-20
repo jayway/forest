@@ -17,8 +17,8 @@ import com.jayway.forest.Sneak;
 import com.jayway.forest.constraint.ConstraintViolationException;
 import com.jayway.forest.constraint.DoNotDiscover;
 import com.jayway.forest.dto.StringDTO;
-import com.jayway.forest.hypermedia.HyperMediaResponse;
-import com.jayway.forest.hypermedia.HyperMediaResponseFactory;
+import com.jayway.forest.hypermedia.ResourceDescription;
+import com.jayway.forest.hypermedia.ResourceDescriptionFactory;
 import com.jayway.forest.hypermedia.RequestDescription;
 import com.jayway.forest.roles.ReadableResource;
 import com.jayway.forest.roles.Resource;
@@ -90,7 +90,7 @@ public class ForestProxyFactoryTest {
 		MyReadableResource original = new MyReadableResource();
 		Object proxy = proxyFactory.proxy(original);
 		Object result = query(proxy, ForestProxyFactory.FOREST_GET_HYPERMEDIA);
-		HyperMediaResponse<String> expected = HyperMediaResponseFactory.create(MyReadableResource.class).make(original, original.read(), String.class);
+		ResourceDescription<String> expected = ResourceDescriptionFactory.create(MyReadableResource.class).make(original, original.read(), String.class);
 		assertEquals(expected, result);
 	}
 

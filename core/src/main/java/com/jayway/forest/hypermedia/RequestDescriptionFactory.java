@@ -34,7 +34,7 @@ public class RequestDescriptionFactory<T> {
 			Object defaultValue = getDefaultValue(resource, method, indx);
 			parameters[indx] = new ParameterDescription(name, defaultValue);
 		}
-		Link link = HyperMediaResponseFactory.makeLink(method);
+		Link link = ResourceDescriptionFactory.makeLink(method);
 		return new RequestDescription(parameters, link);
 	}
 	
