@@ -13,5 +13,6 @@
     <modules>
         <module>bank</module>
         <module>angrytoday</module>
+        <module>jquerymodule</module>
     </modules>
 </project>
